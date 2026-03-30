@@ -641,15 +641,17 @@ window._deleteNote = deleteNote
 
 // ================== Init ==================
 window.onload = function () {
+
   // صفحة الأدمن
   if (document.getElementById("users")) {
     openTab("addUserTab")
     loadUsers()
     loadStats()
+    loadTeachers() // 🔥 مهم جدًا
   }
 
   // صفحة الطالب
-  if (document.getElementById("noteList") || document.getElementById("pdfList")) {
+  if (document.getElementById("noteList")) {
     openTab("profile")
     loadStudentData()
   }
@@ -687,5 +689,29 @@ async function uploadPDF2() {
 
   status.innerText = "✅ تم"
 }
+async function loadTeachers() {
+  let select = document.getElementById("teacherSelect")
+  if (!select) return
 
+  let { data, error } = await supabase
+    .from("users")
+    .select("id, name")
+    .eq("role", "teacher")
+
+  if (error) {
+    console.log("❌ error:", error)
+    return
+  }
+
+  select.innerHTML = `<option value="">-- اختر المدرس --</option>`
+
+  if (!data || data.length === 0) {
+    select.innerHTML = `<option>❌ مفيش مدرسين</option>`
+    return
+  }
+
+  data.forEach(t => {
+    select.innerHTML += `<option value="${t.id}">${t.name}</option>`
+  })
+}
 console.log("🔥 Supabase Connected:", supabase)
