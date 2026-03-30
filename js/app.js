@@ -564,7 +564,7 @@ async function loadTeacherProfile() {
         ${s.youtube ? `<a href="${s.youtube}" target="_blank" style="color:#ff0000; font-size:16px;">▶️ يوتيوب</a>` : ""}
       </div>`
   }
-}
+
 
 // ================== رفع حل الطالب ==================
 async function uploadSolution() {
