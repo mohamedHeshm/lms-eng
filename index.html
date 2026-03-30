@@ -13,7 +13,7 @@
 
   <div class="login-box-pro">
 
-    <h2>🎓 Al-Ma'moun </h2>
+    <h2>🎓 Al-Ma'moun</h2>
     <p>تسجيل الدخول</p>
 
     <!-- Email -->
@@ -28,7 +28,11 @@
       <label>🔒 الباسورد</label>
     </div>
 
-    <button onclick="login()"> دخول</button>
+    <!-- زر الدخول -->
+    <button onclick="login()" id="loginBtn">دخول</button>
+
+    <!-- حالة تسجيل الدخول -->
+    <p id="loginStatus" style="text-align:center; margin-top:10px;"></p>
 
     <div class="footer-text">
       ✨ Developer by Mohamed Hesham ✨
@@ -43,5 +47,32 @@
 <button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
 
 <script type="module" src="js/app.js"></script>
+
+<script>
+  // 🔥 تحسين تجربة تسجيل الدخول
+  async function login() {
+    let btn = document.getElementById("loginBtn")
+    let status = document.getElementById("loginStatus")
+
+    btn.disabled = true
+    status.innerText = "⏳ جاري تسجيل الدخول..."
+
+    try {
+      await window.login()
+    } catch (e) {
+      status.innerText = "❌ حصل خطأ"
+    }
+
+    btn.disabled = false
+  }
+
+  // 🔥 Enter للدخول
+  document.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      login()
+    }
+  })
+</script>
+
 </body>
 </html>

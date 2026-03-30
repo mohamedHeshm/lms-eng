@@ -11,7 +11,7 @@
 
   <h2>👨‍🏫 لوحة المدرس</h2>
 
-  <!-- زرار الحلول فوق بارز -->
+  <!-- زرار الحلول -->
   <div style="margin-bottom:15px;">
     <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px;">
       📥 حلول الطلاب
@@ -87,7 +87,8 @@
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الملفات المرفوعة</h3>
-      <div id="pdf2ListTeacher"></div>
+      <!-- 🔥 تم تصحيح الـ id هنا -->
+      <div id="pdfListTeacher2"></div>
     </div>
   </div>
 
@@ -116,7 +117,9 @@
 </div>
 
 <script type="module" src="js/app.js"></script>
+
 <button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
 <button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+
 </body>
 </html>
