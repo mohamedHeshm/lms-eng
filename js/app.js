@@ -7,7 +7,7 @@ const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ================== تسجيل دخول ==================
-async function login() {
+window.login = async function () {
   let email = document.getElementById("email").value.trim();
   let pass = document.getElementById("password").value.trim();
 
