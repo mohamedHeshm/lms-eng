@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* ====== عام ====== */
+body {
+  font-family: 'Cairo', sans-serif;
+  background: #f5f7fb;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ====== Tabs ====== */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  background: #e9eefc;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  background: #4facfe;
+  color: white;
+}
+
+/* ====== Cards ====== */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* ====== Inputs ====== */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* ====== Password ====== */
+.password-box {
+  position: relative;
+}
+
+.password-box span {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  cursor: pointer;
+}
+
+/* ====== Buttons ====== */
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #4facfe;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #3a8be0;
+}
+
+.logout {
+  background: #ff4d4d;
+}
+
+.logout:hover {
+  background: #cc0000;
+}
+
+/* ====== Users ====== */
+.user-card {
+  background: #f1f5ff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 12px;
+}
+
+.danger {
+  background: #ff4d4d;
+}
+
+.danger:hover {
+  background: #cc0000;
+}
+
+/* ====== Stats ====== */
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.stat-box h3 {
+  color: #4facfe;
+}
+
+.tab-content {
+  display: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>👑 لوحة الأدمن</h2>
+
+  <!-- 📊 الإحصائيات -->
+  <div class="stats">
+    <div class="stat-box">
+      <h3 id="totalUsers">0</h3>
+      <p>👥 المستخدمين</p>
+    </div>
+
+    <div class="stat-box">
+      <h3 id="teachersCount">0</h3>
+      <p>👨‍🏫 المدرسين</p>
+    </div>
+
+    <div class="stat-box">
+      <h3 id="studentsCount">0</h3>
+      <p>👨‍🎓 الطلاب</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button onclick="openTab('addUserTab')">➕ إضافة</button>
+    <button onclick="openTab('usersTab')">👥 المستخدمين</button>
+  </div>
+
+  <!-- ➕ إضافة مستخدم -->
+  <div id="addUserTab" class="tab-content">
+    <div class="card">
+      <h3>إضافة مستخدم</h3>
+
+      <input type="text" id="name" placeholder="الاسم">
+      <input type="email" id="userEmail" placeholder="الايميل">
+
+      <div class="password-box">
+        <input type="password" id="userPass" placeholder="الباسورد">
+        <span onclick="togglePass()">👁️</span>
+      </div>
+
+      <select id="role">
+        <option value="teacher">مدرس</option>
+        <option value="student">طالب</option>
+      </select>
+
+      <button onclick="addUser()">إضافة</button>
+    </div>
+  </div>
+
+  <!-- 👥 المستخدمين -->
+  <div id="usersTab" class="tab-content">
+    <div class="card">
+
+      <input type="text" id="search" placeholder="🔍 ابحث..." oninput="searchUsers()">
+
+      <div id="users"></div>
+
+    </div>
+  </div>
+
+  <button class="logout" onclick="logout()">تسجيل خروج</button>
+
+</div>
+
+<script type="module" src="js/app.js"></script>
+
+<script>
+// فتح أول تاب
+window.onload = function () {
+  openTab("addUserTab");
+  if (typeof loadUsers === "function") loadUsers();
+  if (typeof loadStats === "function") loadStats();
+};
+</script>
+<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+</body>
+</html>

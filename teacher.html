@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard">
+
+<div class="container">
+
+  <h2>👨‍🏫 لوحة المدرس</h2>
+
+  <!-- الأزرار -->
+  <div class="tabs">
+    <button onclick="openTab('profile')">👤 البروفايل</button>
+    <button onclick="openTab('social')">🔗 التواصل</button>
+    <button onclick="openTab('video')">🎥 فيديو</button>
+    <button onclick="openTab('pdf')">📁 PDF</button>
+    <button onclick="openTab('note')">📝 ملاحظات</button>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profile" class="tab-content">
+    <div class="card">
+      <h3>👤 صفحتي</h3>
+      <input type="text" id="bio" placeholder="عرف نفسك">
+<input type="file" id="imgFile" accept="image/*">
+      <button onclick="saveProfile()">حفظ</button>
+    </div>
+  </div>
+
+  <!-- SOCIAL -->
+  <div id="social" class="tab-content">
+    <div class="card">
+      <h3>🔗 روابط التواصل</h3>
+      <input type="text" id="facebook" placeholder="رابط فيسبوك">
+      <input type="text" id="whatsapp" placeholder="رابط واتساب">
+      <input type="text" id="youtube" placeholder="رابط يوتيوب">
+      <button onclick="saveSocial()">حفظ</button>
+    </div>
+  </div>
+
+  <!-- VIDEO -->
+  <div id="video" class="tab-content">
+    <div class="card">
+      <h3>🎥 فيديو</h3>
+      <input type="text" id="videoInput" placeholder="رابط الفيديو">
+      <button onclick="addVideo()">نشر</button>
+    </div>
+  </div>
+
+  <!-- PDF -->
+  <div id="pdf" class="tab-content">
+    <div class="card">
+      <h3>📁 رفع PDF</h3>
+      <input type="file" id="pdfFile" accept="application/pdf">
+      <button onclick="uploadPDF()">رفع</button>
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <!-- NOTE -->
+  <div id="note" class="tab-content">
+    <div class="card">
+      <h3>📝 ملاحظات</h3>
+      <input type="text" id="noteInput" placeholder="اكتب ملاحظة">
+      <button onclick="addNote()">نشر</button>
+    </div>
+  </div>
+  
+<h3>📥 حلول الطلاب</h3>
+
+<div id="solutionsList"></div>
+
+  <button class="logout" onclick="logout()">تسجيل خروج</button>
+
+</div>
+
+<script type="module" src="js/app.js"></script>
+<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+</body>
+</html>

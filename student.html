@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard">
+
+<div class="container">
+
+  <h2>👨‍🎓 لوحة الطالب</h2>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button onclick="openTab('profile')">👤 المدرس</button>
+    <button onclick="openTab('social')">🔗 التواصل</button>
+    <button onclick="openTab('videos')">🎥 الفيديوهات</button>
+    <button onclick="openTab('pdfs')">📁 PDF</button>
+    <button onclick="openTab('notes')">📝 الملاحظات</button>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profile" class="tab-content">
+    <div class="card" id="teacherProfile"></div>
+  </div>
+
+  <!-- SOCIAL -->
+  <div id="social" class="tab-content">
+    <div class="card" id="teacherSocial"></div>
+  </div>
+
+  <!-- VIDEOS -->
+  <div id="videos" class="tab-content">
+    <div class="card">
+      <h3>🎥 الفيديوهات</h3>
+      <div id="videos"></div>
+    </div>
+  </div>
+
+  <!-- PDF -->
+  <div id="pdfs" class="tab-content">
+    <div class="card">
+      <h3>📁 الملفات</h3>
+      <ul id="pdfList"></ul>
+    </div>
+    <h3>📤 تسليم الواجب</h3>
+
+<input type="file" id="solutionFile" accept="application/pdf">
+<button onclick="uploadSolution()">رفع الحل</button>
+
+<p id="uploadStatus"></p>
+  </div>
+
+  <!-- NOTES -->
+  <div id="notes" class="tab-content">
+    <div class="card">
+      <h3>📝 الملاحظات</h3>
+      <ul id="noteList"></ul>
+    </div>
+  </div>
+
+  <button class="logout" onclick="logout()">تسجيل خروج</button>
+
+</div>
+
+<script type="module" src="js/app.js"></script>
+<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+</body>
+</html>

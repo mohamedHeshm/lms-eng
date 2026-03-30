@@ -1,0 +1,380 @@
+/* ================== Reset ================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
+
+body {
+  background: #f5f7fb;
+}
+
+/* ================== Container ================== */
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ================== Cards ================== */
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ================== Inputs ================== */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+/* ================== Password ================== */
+.password-box {
+  position: relative;
+}
+
+.password-box span {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  cursor: pointer;
+}
+
+/* ================== Buttons ================== */
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #4facfe;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #3a8be0;
+}
+
+/* Logout */
+.logout {
+  background: #ff4d4d;
+}
+
+.logout:hover {
+  background: #cc0000;
+}
+
+/* Danger */
+.danger {
+  background: #ff4d4d;
+}
+
+.danger:hover {
+  background: #cc0000;
+}
+
+/* ================== Tabs ================== */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1;
+  background: #e9eefc;
+  color: #333;
+}
+
+.tabs button:hover {
+  background: #4facfe;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+  animation: fade 0.3s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================== Stats ================== */
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.stat-box h3 {
+  color: #4facfe;
+  font-size: 22px;
+}
+
+/* ================== Users ================== */
+.user-card {
+  background: #f1f5ff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 12px;
+}
+
+/* ================== Lists ================== */
+ul li {
+  background: #f1f5ff;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* ================== Links ================== */
+a {
+  color: #4facfe;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ================== Images ================== */
+#teacherProfile img {
+  display: block;
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+/* ================== Videos ================== */
+iframe {
+  margin: 10px;
+  border-radius: 10px;
+}
+
+/* ================== Login (OLD fallback) ================== */
+.login-box {
+  width: 320px;
+  margin: 100px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* ================== Scroll Buttons ================== */
+
+/* ↑ يمين */
+#scrollTopBtn {
+  position: fixed;
+  right: 15px;
+  bottom: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #4facfe;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+/* ↓ شمال */
+#scrollBottomBtn {
+  position: fixed;
+  left: 15px;
+  bottom: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #00c851;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+#scrollTopBtn.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#scrollTopBtn:hover {
+  background: #4facfe;
+  color: white;
+  transform: scale(1.1);
+}
+
+#scrollBottomBtn:hover {
+  background: #00c851;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ================== LOGIN PRO 3D ================== */
+
+.login-body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  overflow: hidden;
+  position: relative;
+}
+
+/* خلفية متحركة */
+.login-body::before {
+  content: "";
+  position: absolute;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
+  animation: moveBg 10s linear infinite;
+}
+
+@keyframes moveBg {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(-80px, -80px); }
+  100% { transform: translate(0,0); }
+}
+
+/* الحاوية */
+.login-container {
+  perspective: 1200px;
+}
+
+/* البوكس */
+.login-box-pro {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  padding: 40px;
+  border-radius: 20px;
+  width: 320px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  transition: 0.4s;
+}
+
+/* 3D */
+.login-box-pro:hover {
+  transform: rotateY(12deg) rotateX(6deg) scale(1.05);
+}
+
+/* inputs */
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-bottom: 2px solid rgba(255,255,255,0.7);
+  background: transparent;
+  color: white;
+  outline: none;
+}
+
+.input-group label {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  transition: 0.3s;
+  opacity: 0.7;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label {
+  top: -10px;
+  font-size: 12px;
+  color: #00f2fe;
+}
+
+/* زر */
+.login-box-pro button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #00f2fe, #4facfe);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-box-pro button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.login-box-pro button:active {
+  transform: scale(0.95);
+}
+
+/* التوقيع */
+.footer-text {
+  margin-top: 15px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Glow */
+.login-box-pro::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: inherit;
+  filter: blur(30px);
+  opacity: 0.3;
+  z-index: -1;
+}
