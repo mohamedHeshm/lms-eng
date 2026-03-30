@@ -25,8 +25,10 @@
   <div id="profile" class="tab-content">
     <div class="card">
       <h3>👤 صفحتي</h3>
+      <div id="profilePreview"></div>
       <input type="text" id="bio" placeholder="عرف نفسك">
       <input type="file" id="imgFile" accept="image/*">
+      <p id="profileStatus"></p>
       <button onclick="saveProfile()">حفظ</button>
     </div>
   </div>
@@ -45,9 +47,13 @@
   <!-- VIDEO -->
   <div id="video" class="tab-content">
     <div class="card">
-      <h3>🎥 فيديو</h3>
+      <h3>🎥 نشر فيديو</h3>
       <input type="text" id="videoInput" placeholder="رابط الفيديو">
       <button onclick="addVideo()">نشر</button>
+    </div>
+    <div class="card" style="margin-top:15px;">
+      <h3>📋 الفيديوهات المنشورة</h3>
+      <div id="videoListTeacher"></div>
     </div>
   </div>
 
@@ -59,19 +65,26 @@
       <button onclick="uploadPDF()">رفع</button>
       <p id="status"></p>
     </div>
+    <div class="card" style="margin-top:15px;">
+      <h3>📋 الملفات المرفوعة</h3>
+      <div id="pdfListTeacher"></div>
+    </div>
   </div>
 
   <!-- NOTE -->
   <div id="note" class="tab-content">
     <div class="card">
-      <h3>📝 ملاحظات</h3>
+      <h3>📝 نشر ملاحظة</h3>
       <input type="text" id="noteInput" placeholder="اكتب ملاحظة">
       <button onclick="addNote()">نشر</button>
+    </div>
+    <div class="card" style="margin-top:15px;">
+      <h3>📋 الملاحظات المنشورة</h3>
+      <div id="noteListTeacher"></div>
     </div>
   </div>
 
   <h3>📥 حلول الطلاب</h3>
-
   <div id="solutionsList"></div>
 
   <button class="logout" onclick="logout()">تسجيل خروج</button>

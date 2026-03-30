@@ -153,6 +153,7 @@ async function addNote() {
 
   noteInput.value = ""
   alert("✅ تم النشر")
+  loadTeacherContent()
 }
 
 // ================== Video ==================
@@ -181,6 +182,7 @@ async function addVideo() {
 
   input.value = ""
   alert("✅ تم نشر الفيديو")
+  loadTeacherContent()
 }
 
 // ================== PDF ==================
@@ -194,26 +196,117 @@ async function uploadPDF() {
 
   status.innerText = "⏳ جاري الرفع..."
 
-  // اسم فريد للملف بدون مسافات
   let safeName = file.name.replace(/\s+/g, "_")
-  let path = "pdfs/" + Date.now() + "_" + safeName
+  let path = "pdfs/" + currentUser.id + "_" + Date.now() + "_" + safeName
 
-  let { error: uploadError } = await supabase.storage
+  let { data: uploadData, error: uploadError } = await supabase.storage
     .from("files")
-    .upload(path, file)
+    .upload(path, file, { upsert: true })
 
   if (uploadError) return (status.innerText = "❌ خطأ في الرفع: " + uploadError.message)
 
   let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
+  let publicUrl = urlData.publicUrl
 
   let { error: dbError } = await supabase.from("pdfs").insert([
-    { teacher_id: currentUser.id, file_url: urlData.publicUrl }
+    { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name }
   ])
 
   if (dbError) return (status.innerText = "❌ خطأ في الحفظ: " + dbError.message)
 
   status.innerText = "✅ تم النشر بنجاح"
   document.getElementById("pdfFile").value = ""
+  loadTeacherContent()
+}
+
+// ================== تحميل محتوى المدرس (PDFs + Videos + Notes) ==================
+async function loadTeacherContent() {
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+  if (!currentUser) return
+
+  // PDFs
+  let pdfListTeacher = document.getElementById("pdfListTeacher")
+  if (pdfListTeacher) {
+    let { data: pdfs } = await supabase.from("pdfs")
+      .select("*")
+      .eq("teacher_id", currentUser.id)
+      .order("id", { ascending: false })
+
+    pdfListTeacher.innerHTML = ""
+    if (pdfs && pdfs.length > 0) {
+      pdfs.forEach(p => {
+        pdfListTeacher.innerHTML += `
+          <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
+            <a href="${p.file_url}" target="_blank" style="flex:1; color:#4facfe;">📄 ${p.file_name || "ملف PDF"}</a>
+            <button onclick="window._deletePDF('${p.id}')" style="width:auto; padding:5px 12px; background:#ff4d4d;">🗑 حذف</button>
+          </div>`
+      })
+    } else {
+      pdfListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش ملفات لحد دلوقتي</p>"
+    }
+  }
+
+  // Videos
+  let videoListTeacher = document.getElementById("videoListTeacher")
+  if (videoListTeacher) {
+    let { data: videos } = await supabase.from("videos")
+      .select("*")
+      .eq("teacher_id", currentUser.id)
+      .order("id", { ascending: false })
+
+    videoListTeacher.innerHTML = ""
+    if (videos && videos.length > 0) {
+      videos.forEach(v => {
+        videoListTeacher.innerHTML += `
+          <div style="margin:10px 0;">
+            <iframe width="100%" height="200" src="${v.url}" allowfullscreen style="border-radius:10px; border:none;"></iframe>
+            <button onclick="window._deleteVideo('${v.id}')" style="margin-top:5px; padding:5px 12px; width:auto; background:#ff4d4d;">🗑 حذف</button>
+          </div>`
+      })
+    } else {
+      videoListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش فيديوهات لحد دلوقتي</p>"
+    }
+  }
+
+  // Notes
+  let noteListTeacher = document.getElementById("noteListTeacher")
+  if (noteListTeacher) {
+    let { data: notes } = await supabase.from("notes")
+      .select("*")
+      .eq("teacher_id", currentUser.id)
+      .order("id", { ascending: false })
+
+    noteListTeacher.innerHTML = ""
+    if (notes && notes.length > 0) {
+      notes.forEach(n => {
+        noteListTeacher.innerHTML += `
+          <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
+            <p style="flex:1; margin:0;">📝 ${n.content}</p>
+            <button onclick="window._deleteNote('${n.id}')" style="width:auto; padding:5px 12px; background:#ff4d4d;">🗑 حذف</button>
+          </div>`
+      })
+    } else {
+      noteListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش ملاحظات لحد دلوقتي</p>"
+    }
+  }
+}
+
+async function deletePDF(id) {
+  if (!confirm("تحذف الملف؟")) return
+  await supabase.from("pdfs").delete().eq("id", id)
+  loadTeacherContent()
+}
+
+async function deleteVideo(id) {
+  if (!confirm("تحذف الفيديو؟")) return
+  await supabase.from("videos").delete().eq("id", id)
+  loadTeacherContent()
+}
+
+async function deleteNote(id) {
+  if (!confirm("تحذف الملاحظة؟")) return
+  await supabase.from("notes").delete().eq("id", id)
+  loadTeacherContent()
 }
 
 // ================== Profile ==================
@@ -223,23 +316,71 @@ async function saveProfile() {
   let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
   if (!currentUser) return alert("❗ مش مسجل دخول")
-  if (!file) return alert("❗ اختار صورة")
 
-  let safeName = file.name.replace(/\s+/g, "_")
-  let path = "profile/" + Date.now() + "_" + safeName
+  let status = document.getElementById("profileStatus")
+  if (status) status.innerText = "⏳ جاري الحفظ..."
 
-  let { error: uploadError } = await supabase.storage.from("files").upload(path, file)
-  if (uploadError) return alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+  let image_url = null
 
-  let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
+  if (file) {
+    let safeName = file.name.replace(/\s+/g, "_")
+    let path = "profile/" + currentUser.id + "_" + safeName
 
-  let { error: dbError } = await supabase.from("teacher_profile").upsert([
-    { teacher_id: currentUser.id, bio, image_url: urlData.publicUrl }
-  ])
+    let { error: uploadError } = await supabase.storage
+      .from("files")
+      .upload(path, file, { upsert: true })
 
-  if (dbError) return alert("❌ خطأ في الحفظ: " + dbError.message)
+    if (uploadError) {
+      if (status) status.innerText = "❌ خطأ في رفع الصورة: " + uploadError.message
+      return alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+    }
 
-  alert("✅ تم حفظ البروفايل")
+    let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
+    image_url = urlData.publicUrl
+  }
+
+  // جيب البروفايل الحالي
+  let { data: existing } = await supabase.from("teacher_profile")
+    .select("*")
+    .eq("teacher_id", currentUser.id)
+    .single()
+
+  let updateData = { teacher_id: currentUser.id, bio }
+  if (image_url) updateData.image_url = image_url
+  else if (existing?.image_url) updateData.image_url = existing.image_url
+
+  let { error: dbError } = await supabase.from("teacher_profile").upsert([updateData])
+
+  if (dbError) {
+    if (status) status.innerText = "❌ خطأ في الحفظ"
+    return alert("❌ خطأ في الحفظ: " + dbError.message)
+  }
+
+  if (status) status.innerText = "✅ تم حفظ البروفايل"
+  else alert("✅ تم حفظ البروفايل")
+
+  loadCurrentProfile()
+}
+
+// تحميل البروفايل الحالي للمدرس عشان يشوفه
+async function loadCurrentProfile() {
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+  if (!currentUser) return
+
+  let { data } = await supabase.from("teacher_profile")
+    .select("*")
+    .eq("teacher_id", currentUser.id)
+    .single()
+
+  if (!data) return
+
+  let bioInput = document.getElementById("bio")
+  if (bioInput) bioInput.value = data.bio || ""
+
+  let previewDiv = document.getElementById("profilePreview")
+  if (previewDiv && data.image_url) {
+    previewDiv.innerHTML = `<img src="${data.image_url}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #4facfe; margin-top:10px;">`
+  }
 }
 
 // ================== Social ==================
@@ -258,6 +399,27 @@ async function saveSocial() {
 
   if (error) return alert("❌ خطأ: " + error.message)
   alert("✅ تم حفظ الروابط")
+}
+
+// تحميل الروابط الحالية للمدرس
+async function loadCurrentSocial() {
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+  if (!currentUser) return
+
+  let { data } = await supabase.from("social_links")
+    .select("*")
+    .eq("teacher_id", currentUser.id)
+    .single()
+
+  if (!data) return
+
+  let fb = document.getElementById("facebook")
+  let wa = document.getElementById("whatsapp")
+  let yt = document.getElementById("youtube")
+
+  if (fb) fb.value = data.facebook || ""
+  if (wa) wa.value = data.whatsapp || ""
+  if (yt) yt.value = data.youtube || ""
 }
 
 // ================== Student - تحميل البيانات ==================
@@ -422,14 +584,18 @@ window.saveProfile = saveProfile
 window.saveSocial = saveSocial
 window.uploadSolution = uploadSolution
 window.loadSolutions = loadSolutions
+window.loadTeacherContent = loadTeacherContent
 window.openTab = openTab
 window.scrollToTop = scrollToTop
 window.scrollToBottom = scrollToBottom
 window.logout = logout
 
-// دالتين داخليتين للـ onclick الـ dynamic في HTML
+// دوال داخلية للـ onclick الـ dynamic
 window._deleteUser = deleteUser
 window._toggleUser = toggleUser
+window._deletePDF = deletePDF
+window._deleteVideo = deleteVideo
+window._deleteNote = deleteNote
 
 // ================== Init ==================
 window.onload = function () {
@@ -446,10 +612,13 @@ window.onload = function () {
     loadStudentData()
   }
 
-  // صفحة المدرس - تحميل الحلول
+  // صفحة المدرس
   if (document.getElementById("solutionsList")) {
     openTab("profile")
     loadSolutions()
+    loadCurrentProfile()
+    loadCurrentSocial()
+    loadTeacherContent()
   }
 }
 
