@@ -512,7 +512,7 @@ async function loadTeacherProfile() {
   let { data: socials } = await supabase.from("social_links").select("*")
 
   if (profileDiv && profiles && profiles.length > 0) {
-    let p = profiles[0]
+    .eq("teacher_id", teacherId)
     profileDiv.innerHTML = `
       <div style="text-align:center;">
         <img src="${p.image_url}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #4facfe;">
@@ -674,7 +674,7 @@ async function uploadPDF2() {
 
   status.innerText = "⏳ جاري الرفع..."
 
-  let path = "pdfs2/" + currentUser.id + "_" + Date.now()
+  let path = "pdfs2/" + currentUser.id + "_" + Date.now()+ "_" + file.name
 
   let { error } = await supabase.storage.from("files").upload(path, file, { upsert: true })
   if (error) return (status.innerText = error.message)
