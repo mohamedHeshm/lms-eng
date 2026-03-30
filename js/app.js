@@ -306,3 +306,12 @@ window.onload = function () {
     loadSolutions()
   }
 }
+console.log("🔥 Supabase Connected:", supabase)
+async function testConnection() {
+  let { data, error } = await supabase.from("users").select("*")
+
+  console.log("DATA:", data)
+  console.log("ERROR:", error)
+}
+
+testConnection()
