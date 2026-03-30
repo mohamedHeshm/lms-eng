@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>Student Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
 <body class="dashboard">
 
@@ -16,45 +16,50 @@
   <div class="tabs">
     <button onclick="openTab('profile')">👤 المدرس</button>
     <button onclick="openTab('social')">🔗 التواصل</button>
-    <button onclick="openTab('videos')">🎥 الفيديوهات</button>
-    <button onclick="openTab('pdfs')">📁 PDF</button>
-    <button onclick="openTab('notes')">📝 الملاحظات</button>
+    <button onclick="openTab('videosTab')">🎥 الفيديوهات</button>
+    <button onclick="openTab('pdfsTab')">📁 PDF</button>
+    <button onclick="openTab('notesTab')">📝 الملاحظات</button>
   </div>
 
   <!-- PROFILE -->
   <div id="profile" class="tab-content">
-    <div class="card" id="teacherProfile"></div>
+    <div class="card" id="teacherProfile">
+      <p style="text-align:center; color:#aaa;">⏳ جاري التحميل...</p>
+    </div>
   </div>
 
   <!-- SOCIAL -->
   <div id="social" class="tab-content">
-    <div class="card" id="teacherSocial"></div>
+    <div class="card" id="teacherSocial">
+      <p style="text-align:center; color:#aaa;">⏳ جاري التحميل...</p>
+    </div>
   </div>
 
   <!-- VIDEOS -->
-  <div id="videos" class="tab-content">
+  <div id="videosTab" class="tab-content">
     <div class="card">
       <h3>🎥 الفيديوهات</h3>
-      <div id="videos"></div>
+      <div id="videoContainer"></div>
     </div>
   </div>
 
   <!-- PDF -->
-  <div id="pdfs" class="tab-content">
+  <div id="pdfsTab" class="tab-content">
     <div class="card">
       <h3>📁 الملفات</h3>
       <ul id="pdfList"></ul>
     </div>
-    <h3>📤 تسليم الواجب</h3>
 
-<input type="file" id="solutionFile" accept="application/pdf">
-<button onclick="uploadSolution()">رفع الحل</button>
-
-<p id="uploadStatus"></p>
+    <div class="card" style="margin-top:15px;">
+      <h3>📤 تسليم الواجب</h3>
+      <input type="file" id="solutionFile" accept="application/pdf">
+      <button onclick="uploadSolution()">رفع الحل</button>
+      <p id="uploadStatus"></p>
+    </div>
   </div>
 
   <!-- NOTES -->
-  <div id="notes" class="tab-content">
+  <div id="notesTab" class="tab-content">
     <div class="card">
       <h3>📝 الملاحظات</h3>
       <ul id="noteList"></ul>
