@@ -7,31 +7,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
 <body class="dashboard">
-
 <div class="container">
 
   <h2>👨‍🎓 لوحة الطالب</h2>
 
-  <!-- Tabs -->
   <div class="tabs">
     <button onclick="openTab('profile')">👤 المدرس</button>
     <button onclick="openTab('social')">🔗 التواصل</button>
     <button onclick="openTab('videosTab')">🎥 الفيديوهات</button>
-    <button onclick="openTab('pdfsTab')">📁 PDF</button>
+    <button onclick="openTab('pdfsTab')">📁 PDF 1</button>
+    <button onclick="openTab('pdfs2Tab')">📁 PDF 2</button>
     <button onclick="openTab('notesTab')">📝 الملاحظات</button>
   </div>
 
   <!-- PROFILE -->
   <div id="profile" class="tab-content">
     <div class="card" id="teacherProfile">
-      <p style="text-align:center; color:#aaa;">⏳ جاري التحميل...</p>
+      <p style="text-align:center;color:#aaa;">⏳ جاري التحميل...</p>
     </div>
   </div>
 
   <!-- SOCIAL -->
   <div id="social" class="tab-content">
     <div class="card" id="teacherSocial">
-      <p style="text-align:center; color:#aaa;">⏳ جاري التحميل...</p>
+      <p style="text-align:center;color:#aaa;">⏳ جاري التحميل...</p>
     </div>
   </div>
 
@@ -43,18 +42,25 @@
     </div>
   </div>
 
-  <!-- PDF -->
+  <!-- PDF الأول -->
   <div id="pdfsTab" class="tab-content">
     <div class="card">
-      <h3>📁 الملفات</h3>
+      <h3>📁 الملفات (الأول)</h3>
       <ul id="pdfList"></ul>
     </div>
-
     <div class="card" style="margin-top:15px;">
       <h3>📤 تسليم الواجب</h3>
       <input type="file" id="solutionFile" accept="application/pdf">
       <button onclick="uploadSolution()">رفع الحل</button>
       <p id="uploadStatus"></p>
+    </div>
+  </div>
+
+  <!-- PDF الثاني -->
+  <div id="pdfs2Tab" class="tab-content">
+    <div class="card">
+      <h3>📁 الملفات (الثاني)</h3>
+      <ul id="pdf2List"></ul>
     </div>
   </div>
 
@@ -67,7 +73,6 @@
   </div>
 
   <button class="logout" onclick="logout()">تسجيل خروج</button>
-
 </div>
 
 <script type="module" src="js/app.js"></script>
