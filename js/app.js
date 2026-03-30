@@ -504,21 +504,56 @@ function onRoleChange() {
 }
 
 window.onRoleChange = onRoleChange
+
 async function loadTeacherProfile() {
   let profileDiv = document.getElementById("teacherProfile")
   let socialDiv = document.getElementById("teacherSocial")
 
-  let { data: profiles } = await supabase.from("teacher_profile").select("*")
-  let { data: socials } = await supabase.from("social_links").select("*")
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
-  if (profileDiv && profiles && profiles.length > 0) {
+  // هات المدرس بتاع الطالب
+  let { data: user } = await supabase
+    .from("users")
+    .select("teacher_id")
+    .eq("id", currentUser.id)
+    .single()
+
+  let teacherId = user.teacher_id
+
+  // 🔥 هنا الصح
+  let { data: profiles } = await supabase
+    .from("teacher_profile")
+    .select("*")
     .eq("teacher_id", teacherId)
+
+  let { data: socials } = await supabase
+    .from("social_links")
+    .select("*")
+    .eq("teacher_id", teacherId)
+
+  // PROFILE
+  if (profileDiv && profiles && profiles.length > 0) {
+    let p = profiles[0]
+
     profileDiv.innerHTML = `
       <div style="text-align:center;">
         <img src="${p.image_url}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #4facfe;">
         <p style="font-size:16px; color:#444;">${p.bio || ""}</p>
       </div>`
   }
+
+  // SOCIAL
+  if (socialDiv && socials && socials.length > 0) {
+    let s = socials[0]
+
+    socialDiv.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${s.facebook ? `<a href="${s.facebook}" target="_blank">📘 فيسبوك</a>` : ""}
+        ${s.whatsapp ? `<a href="${s.whatsapp}" target="_blank">💬 واتساب</a>` : ""}
+        ${s.youtube ? `<a href="${s.youtube}" target="_blank">▶️ يوتيوب</a>` : ""}
+      </div>`
+  }
+}
 
   if (socialDiv && socials && socials.length > 0) {
     let s = socials[0]
@@ -713,5 +748,6 @@ async function loadTeachers() {
   data.forEach(t => {
     select.innerHTML += `<option value="${t.id}">${t.name}</option>`
   })
+}
 }
 console.log("🔥 Supabase Connected:", supabase)
