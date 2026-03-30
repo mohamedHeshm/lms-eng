@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>LMS Login</title>
-<link rel="stylesheet" href="css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>LMS Login</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
 
 <body class="login-body">
@@ -28,7 +28,8 @@
       <label>🔒 الباسورد</label>
     </div>
 
-    <button onclick="login()">🚀 دخول</button>
+    <!-- 🔥 تعديل هنا -->
+    <button id="loginBtn">🚀 دخول</button>
 
     <div class="footer-text">
       ✨ صنع من المهندس محمد هشام ✨
@@ -39,9 +40,24 @@
 </div>
 
 <!-- Scroll -->
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<button id="scrollTopBtn">⬆</button>
+<button id="scrollBottomBtn">⬇</button>
 
-<script type="module" src="js/app.js"></script>
+<script type="module">
+  import { login } from "./js/app.js"
+
+  // زر الدخول
+  document.getElementById("loginBtn").onclick = login
+
+  // Scroll
+  document.getElementById("scrollTopBtn").onclick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  document.getElementById("scrollBottomBtn").onclick = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+  }
+</script>
+
 </body>
 </html>
