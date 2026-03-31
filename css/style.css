@@ -535,3 +535,42 @@ iframe {
   font-size: 14px;
   opacity: 0.9;
 }
+
+/* ================= STUDENT TEACHER PROFILE ================= */
+
+.teacher-profile-card {
+  text-align: center;
+  padding: 25px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border-radius: 15px;
+}
+
+/* الصورة */
+.teacher-profile-card img {
+  width: 180px;   /* كبرنا الصورة */
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 5px solid white;
+  box-shadow: 0 0 30px rgba(255,255,255,0.7);
+  transition: 0.3s;
+}
+
+/* تأثير احترافي */
+.teacher-profile-card img:hover {
+  transform: scale(1.1);
+}
+
+/* الاسم */
+.teacher-profile-card h3 {
+  margin-top: 10px;
+  font-size: 22px;
+}
+
+/* البايو */
+.teacher-profile-card p {
+  font-size: 15px;
+  opacity: 0.9;
+}
