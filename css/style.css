@@ -490,3 +490,48 @@ iframe {
   opacity: 0.3;
   z-index: -1;
 }
+
+/* ================= PROFILE DESIGN ================= */
+
+.profile-preview {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-radius: 15px;
+  margin-bottom: 15px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+.profile-preview:hover {
+  transform: translateY(-5px);
+}
+
+/* صورة البروفايل */
+.profile-preview img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 0 25px rgba(255,255,255,0.7);
+  transition: 0.3s;
+}
+
+/* تأثير احترافي */
+.profile-preview img:hover {
+  transform: scale(1.1);
+}
+
+/* الاسم */
+.profile-preview h4 {
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+/* البايو */
+.profile-preview p {
+  font-size: 14px;
+  opacity: 0.9;
+}
