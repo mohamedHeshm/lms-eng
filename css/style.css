@@ -547,20 +547,22 @@ iframe {
 }
 
 /* الصورة */
+/* الصورة مربعة احترافية */
 .teacher-profile-card img {
-  width: 180px;   /* كبرنا الصورة */
-  height: 180px;
-  border-radius: 50%;
+  width: 220px;   /* كبرناها */
+  height: 220px;
+  border-radius: 15px; /* بدل دايرة → مربع بحواف ناعمة */
   object-fit: cover;
-  margin-bottom: 10px;
-  border: 5px solid white;
-  box-shadow: 0 0 30px rgba(255,255,255,0.7);
+  margin-bottom: 12px;
+
+  border: 4px solid white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: 0.3s;
 }
 
 /* تأثير احترافي */
 .teacher-profile-card img:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 /* الاسم */
