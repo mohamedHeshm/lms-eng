@@ -538,14 +538,6 @@ iframe {
 
 /* ================= STUDENT TEACHER PROFILE ================= */
 
-.teacher-profile-card {
-  text-align: center;
-  padding: 25px;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
-  color: white;
-  border-radius: 15px;
-}
-
 /* الصورة */
 /* الصورة مربعة احترافية */
 .teacher-profile-card img {
