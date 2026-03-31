@@ -29,10 +29,10 @@
     </div>
 
     <!-- زر الدخول -->
-    <button onclick="login()" id="loginBtn">دخول</button>
+    <button onclick="handleLogin()" id="loginBtn">دخول</button>
 
     <!-- حالة تسجيل الدخول -->
-    <p id="loginStatus" style="text-align:center; margin-top:10px;"></p>
+    <p id="loginStatus" style="text-align:center; margin-top:10px; color:#ff4d4d;"></p>
 
     <div class="footer-text">
       ✨ Developer by Mohamed Hesham ✨
@@ -50,26 +50,28 @@
 
 <script>
   // 🔥 تحسين تجربة تسجيل الدخول
-  async function login() {
+  async function handleLogin() {
     let btn = document.getElementById("loginBtn")
     let status = document.getElementById("loginStatus")
 
     btn.disabled = true
-    status.innerText = "⏳ جاري تسجيل الدخول..."
+    btn.innerText = "⏳ جاري..."
+    status.innerText = ""
 
     try {
       await window.login()
     } catch (e) {
-      status.innerText = "❌ حصل خطأ"
+      status.innerText = "❌ حصل خطأ: " + e.message
     }
 
     btn.disabled = false
+    btn.innerText = "دخول"
   }
 
   // 🔥 Enter للدخول
   document.addEventListener("keypress", function(e) {
     if (e.key === "Enter") {
-      login()
+      handleLogin()
     }
   })
 </script>

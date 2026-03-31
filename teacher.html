@@ -13,7 +13,7 @@
 
   <!-- زرار الحلول -->
   <div style="margin-bottom:15px;">
-    <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px;">
+    <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer;">
       📥 حلول الطلاب
     </button>
   </div>
@@ -23,7 +23,7 @@
     <button onclick="openTab('social')">🔗 التواصل</button>
     <button onclick="openTab('video')">🎥 فيديو</button>
     <button onclick="openTab('pdf')">📁 رفع شيتات</button>
-    <button onclick="openTab('pdf2')">📁 رفع مذكرات </button>
+    <button onclick="openTab('pdf2')">📁 رفع مذكرات</button>
     <button onclick="openTab('note')">📝 ملاحظات</button>
   </div>
 
@@ -80,14 +80,13 @@
   <!-- PDF الثاني -->
   <div id="pdf2" class="tab-content">
     <div class="card">
-      <h3>📁 رفع مذكرات </h3>
+      <h3>📁 رفع مذكرات</h3>
       <input type="file" id="pdf2File" accept="application/pdf">
       <button onclick="uploadPDF2()">رفع</button>
       <p id="status2"></p>
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الملفات المرفوعة</h3>
-      <!-- 🔥 تم تصحيح الـ id هنا -->
       <div id="pdfListTeacher2"></div>
     </div>
   </div>

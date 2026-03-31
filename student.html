@@ -52,7 +52,7 @@
     <!-- رفع الحل -->
     <div class="card" style="margin-top:15px;">
       <h3>📤 تسليم الواجب</h3>
-      <input type="file" id="solutionFile" accept="application/pdf">
+      <input type="file" id="solutionFile">
       <button onclick="uploadSolution()">رفع الحل</button>
       <p id="uploadStatus"></p>
     </div>
@@ -62,7 +62,6 @@
   <div id="pdfs2Tab" class="tab-content">
     <div class="card">
       <h3>📁 الملفات (الثاني)</h3>
-      <!-- 🔥 مهم: مطابق للكود -->
       <ul id="pdfList2"></ul>
     </div>
   </div>
@@ -82,13 +81,6 @@
 
 <button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
 <button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
-
-<script>
-  // 🔥 فتح أول تاب تلقائي
-  window.onload = function () {
-    openTab("profile")
-  }
-</script>
 
 </body>
 </html>
