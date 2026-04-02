@@ -964,13 +964,6 @@ window.addEventListener("load", function() {
     loadTeacherContent()
   }
 })
-window.goToComments = function() {
-  const teacherId = localStorage.getItem("selectedTeacherId")
-
-  if (!teacherId) {
-    alert("❌ مفيش مدرس محدد")
-    return
-  }
 
   // تحويل لصفحة التقييم مع ID المدرس
   window.location.href = `teacher-profile.html?id=${teacherId}`
