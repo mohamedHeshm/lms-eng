@@ -6,11 +6,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
-<script>
-  function goHome() {
-    window.location.href = "dashboard-home.html";
-  }
-</script>
+
 <body class="login-body">
 
 <div class="login-container">
@@ -43,8 +39,11 @@
     </div>
 
     <!-- زر الرجوع -->
-    <button onclick="goHome()" style="margin-top:15px; background:#6c757d; width:100%; padding:10px; border:none; border-radius:8px; color:white; cursor:pointer; font-family:'Cairo', sans-serif;">🏠 الرجوع للرئيسية</button>
-
+    <a href="dashboard-home.html">
+      <button style="margin-top:15px; background:#6c757d; width:100%; padding:10px; border:none; border-radius:8px; color:white; cursor:pointer; font-family:'Cairo', sans-serif;">
+        🏠 الرجوع للرئيسية
+      </button>
+    </a>
   </div>
 
 </div>
