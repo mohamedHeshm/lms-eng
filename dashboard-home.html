@@ -691,7 +691,7 @@
   <!-- ==================== FOOTER ==================== -->
   <div class="footer">
     <p>💡 منصة تعليمية موثوقة وآمنة</p>
-    <p>جميع الحقوق محفوظة © 2024 | طورها مهندس محمد حشام 👨🏻‍💻</p>
+    <p>جميع الحقوق محفوظة © 2026 | طورها مهندس محمد هشام 👨🏻‍💻</p>
   </div>
 </div>
 
@@ -852,7 +852,7 @@
             <div class="stat-label">تقييم</div>
           </div>
           <div class="stat">
-            <div class="stat-number">16</div>
+            <div class="stat-number">12</div>
             <div class="stat-label">دورة</div>
           </div>
         </div>
@@ -862,8 +862,8 @@
         </div>
 
         <div class="card-buttons">
-
-          <button class="btn btn-secondary" onclick="goToLogin()"> Log in 🔐</button>
+          <button class="btn btn-primary" onclick="goToProfile('${teacher.id}')">👤 عرض البروفايل</button>
+          <button class="btn btn-secondary" onclick="goToLogin()">🔐 دخول</button>
         </div>
       </div>
     `
@@ -910,9 +910,8 @@
   }
 
   // Navigation
-  window.goToTeacher = function(teacherId) {
-    localStorage.setItem("selectedTeacherId", teacherId)
-    window.location.href = "teacher-profile.html"
+  window.goToProfile = function(teacherId) {
+    window.location.href = `teacher-profile.html?id=${teacherId}`
   }
 
   window.goToLogin = function() {
