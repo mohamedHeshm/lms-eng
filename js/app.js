@@ -968,7 +968,7 @@ window.goToTeacherProfile = function() {
   const teacherId = localStorage.getItem("selectedTeacherId")
 
   if (!teacherId) {
-    alert("❌ مفيش مدرس محدد")
+    alert("❌ ناسف هناك تحديث")
     return
   }
 
