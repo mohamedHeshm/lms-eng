@@ -8,6 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ================== Helper Functions ==================
 function escapeHtml(text) {
+  if (!text) return ''
   const div = document.createElement('div')
   div.textContent = text
   return div.innerHTML
@@ -23,13 +24,32 @@ function getCurrentUser() {
   }
 }
 
+function showStatus(message, type = 'info') {
+  const status = document.getElementById("loginStatus")
+  if (status) {
+    status.innerText = message
+    status.style.color = type === 'error' ? '#ff4d4d' : type === 'success' ? '#25d366' : '#4facfe'
+  }
+}
+
 // ================== تسجيل دخول ==================
-async function login() {
+window.login = async function() {
   try {
     let email = document.getElementById("email")?.value.trim()
     let pass = document.getElementById("password")?.value.trim()
+    let status = document.getElementById("loginStatus")
 
-    if (!email || !pass) return alert("❗ اكتب الايميل والباسورد")
+    if (!email || !pass) {
+      showStatus("❌ يجب ملء جميع الحقول", 'error')
+      return false
+    }
+
+    if (!email.includes('@')) {
+      showStatus("❌ الايميل غير صحيح", 'error')
+      return false
+    }
+
+    showStatus("⏳ جاري التحقق...", 'info')
 
     let { data, error } = await supabase
       .from("users")
@@ -38,23 +58,36 @@ async function login() {
       .eq("password", pass)
       .single()
 
-    if (error || !data) return alert("❌ بيانات غلط")
-    if (data.is_active === false) return alert("🚫 الحساب موقوف")
+    if (error || !data) {
+      showStatus("❌ بيانات دخول خاطئة", 'error')
+      return false
+    }
+
+    if (data.is_active === false) {
+      showStatus("🚫 حسابك موقوف", 'error')
+      return false
+    }
 
     localStorage.setItem("currentUser", JSON.stringify(data))
+    showStatus("✅ تم! جاري التوجيه...", 'success')
 
-    if (data.role === "admin") location.href = "admin.html"
-    else if (data.role === "teacher") location.href = "teacher.html"
-    else if (data.role === "student") location.href = "student.html"
+    setTimeout(() => {
+      if (data.role === "admin") location.href = "admin.html"
+      else if (data.role === "teacher") location.href = "teacher.html"
+      else if (data.role === "student") location.href = "student.html"
+    }, 500)
+
+    return true
 
   } catch (error) {
     console.error("Login error:", error)
-    alert("❌ حصل خطأ في تسجيل الدخول")
+    showStatus("❌ خطأ في الاتصال", 'error')
+    return false
   }
 }
 
 // ================== Admin - إضافة مستخدم ==================
-async function addUser() {
+window.addUser = async function() {
   try {
     let name = document.getElementById("name")?.value.trim()
     let email = document.getElementById("userEmail")?.value.trim()
@@ -62,7 +95,15 @@ async function addUser() {
     let role = document.getElementById("role")?.value
     let teacherId = document.getElementById("teacherSelect")?.value
 
-    if (!name || !email || !pass) return alert("❗ اكتب كل البيانات")
+    if (!name || !email || !pass) {
+      alert("❗ اكتب كل البيانات")
+      return
+    }
+
+    if (!email.includes('@')) {
+      alert("❌ الايميل غير صحيح")
+      return
+    }
 
     // شيك البريد موجود؟
     let { data: exists } = await supabase
@@ -70,7 +111,10 @@ async function addUser() {
       .select("id")
       .eq("email", email)
 
-    if (exists && exists.length > 0) return alert("⚠️ الايميل موجود بالفعل")
+    if (exists && exists.length > 0) {
+      alert("⚠️ الايميل موجود بالفعل")
+      return
+    }
 
     // إضافة
     let { error } = await supabase.from("users").insert([
@@ -84,7 +128,10 @@ async function addUser() {
       }
     ])
 
-    if (error) return alert("❌ حصل خطأ: " + error.message)
+    if (error) {
+      alert("❌ حصل خطأ: " + error.message)
+      return
+    }
 
     alert("✅ تم إضافة المستخدم")
     document.getElementById("name").value = ""
@@ -100,13 +147,13 @@ async function addUser() {
   }
 }
 
-function togglePass() {
+window.togglePass = function() {
   let input = document.getElementById("userPass")
   if (input) input.type = input.type === "password" ? "text" : "password"
 }
 
 // ================== Users ==================
-async function loadUsers() {
+window.loadUsers = async function() {
   try {
     searchUsers()
   } catch (error) {
@@ -114,7 +161,7 @@ async function loadUsers() {
   }
 }
 
-async function searchUsers() {
+window.searchUsers = async function() {
   try {
     let search = document.getElementById("search")?.value.toLowerCase() || ""
     let { data: users, error } = await supabase.from("users").select("*")
@@ -140,21 +187,25 @@ async function searchUsers() {
           <p>👤 ${u.role === "teacher" ? "مدرس" : "طالب"}</p>
           <p>${u.is_active ? "🟢 نشط" : "🔴 متوقف"}</p>
 
-          <button onclick="window._toggleUser('${u.id}')">
+          <button onclick="window.toggleUser('${u.id}')">
             ${u.is_active ? "⏸ إيقاف" : "▶️ تشغيل"}
           </button>
 
-          <button onclick="window._deleteUser('${u.id}')" class="danger">🗑 حذف</button>
+          <button onclick="window.deleteUser('${u.id}')" class="danger">🗑 حذف</button>
         </div>
       `
     })
+
+    if (container.innerHTML === "") {
+      container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد نتائج</p>"
+    }
 
   } catch (error) {
     console.error("Search error:", error)
   }
 }
 
-async function deleteUser(id) {
+window.deleteUser = async function(id) {
   try {
     if (!confirm("هل متأكد من حذف المستخدم؟")) return
 
@@ -164,8 +215,12 @@ async function deleteUser(id) {
     }
 
     let { error } = await supabase.from("users").delete().eq("id", id)
-    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
 
+    alert("✅ تم حذف المستخدم")
     loadUsers()
     loadStats()
 
@@ -175,7 +230,7 @@ async function deleteUser(id) {
   }
 }
 
-async function toggleUser(id) {
+window.toggleUser = async function(id) {
   try {
     let { data } = await supabase.from("users").select("is_active").eq("id", id).single()
     if (!data) return
@@ -184,15 +239,17 @@ async function toggleUser(id) {
       .update({ is_active: !data.is_active })
       .eq("id", id)
 
+    alert(`✅ تم ${!data.is_active ? 'تفعيل' : 'إيقاف'} المستخدم`)
     loadUsers()
 
   } catch (error) {
     console.error("Toggle error:", error)
+    alert("❌ خطأ: " + error.message)
   }
 }
 
 // ================== Stats ==================
-async function loadStats() {
+window.loadStats = async function() {
   try {
     let { data: users } = await supabase.from("users").select("role")
     if (!users) return
@@ -208,20 +265,29 @@ async function loadStats() {
 }
 
 // ================== Notes ==================
-async function addNote() {
+window.addNote = async function() {
   try {
     let noteInput = document.getElementById("noteInput")
     let note = noteInput?.value.trim()
     let currentUser = getCurrentUser()
 
-    if (!note) return alert("❗ اكتب الملاحظة")
-    if (!currentUser) return alert("❗ مش مسجل دخول")
+    if (!note) {
+      alert("❗ اكتب الملاحظة")
+      return
+    }
+    if (!currentUser) {
+      alert("❗ مش مسجل دخول")
+      return
+    }
 
     let { error } = await supabase.from("notes").insert([
       { teacher_id: currentUser.id, content: note }
     ])
 
-    if (error) return alert("❌ خطأ: " + error.message)
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
 
     noteInput.value = ""
     alert("✅ تم النشر")
@@ -243,20 +309,29 @@ function convertToEmbed(url) {
   return url
 }
 
-async function addVideo() {
+window.addVideo = async function() {
   try {
     let input = document.getElementById("videoInput")
     let url = input?.value.trim()
     let currentUser = getCurrentUser()
 
-    if (!url) return alert("❗ حط رابط الفيديو")
-    if (!currentUser) return alert("❗ مش مسجل دخول")
+    if (!url) {
+      alert("❗ حط رابط الفيديو")
+      return
+    }
+    if (!currentUser) {
+      alert("❗ مش مسجل دخول")
+      return
+    }
 
     let { error } = await supabase.from("videos").insert([
       { teacher_id: currentUser.id, url: convertToEmbed(url) }
     ])
 
-    if (error) return alert("❌ خطأ: " + error.message)
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
 
     input.value = ""
     alert("✅ تم نشر الفيديو")
@@ -269,14 +344,20 @@ async function addVideo() {
 }
 
 // ================== PDF ==================
-async function uploadPDF() {
+window.uploadPDF = async function() {
   try {
     let file = document.getElementById("pdfFile")?.files[0]
     let status = document.getElementById("status")
     let currentUser = getCurrentUser()
 
-    if (!file) return (status.innerText = "❗ اختار ملف PDF")
-    if (!currentUser) return (status.innerText = "❗ مش مسجل دخول")
+    if (!file) {
+      status.innerText = "❗ اختار ملف PDF"
+      return
+    }
+    if (!currentUser) {
+      status.innerText = "❗ مش مسجل دخول"
+      return
+    }
 
     status.innerText = "⏳ جاري الرفع..."
 
@@ -287,7 +368,10 @@ async function uploadPDF() {
       .from("files")
       .upload(path, file, { upsert: true })
 
-    if (uploadError) return (status.innerText = "❌ خطأ في الرفع: " + uploadError.message)
+    if (uploadError) {
+      status.innerText = "❌ خطأ في الرفع: " + uploadError.message
+      return
+    }
 
     let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
     let publicUrl = urlData.publicUrl
@@ -296,7 +380,10 @@ async function uploadPDF() {
       { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name }
     ])
 
-    if (dbError) return (status.innerText = "❌ خطأ في الحفظ: " + dbError.message)
+    if (dbError) {
+      status.innerText = "❌ خطأ في الحفظ: " + dbError.message
+      return
+    }
 
     status.innerText = "✅ تم النشر بنجاح"
     document.getElementById("pdfFile").value = ""
@@ -309,22 +396,34 @@ async function uploadPDF() {
   }
 }
 
-async function uploadPDF2() {
+window.uploadPDF2 = async function() {
   try {
     let file = document.getElementById("pdf2File")?.files[0]
     let status = document.getElementById("status2")
     let currentUser = getCurrentUser()
 
-    if (!file) return (status.innerText = "❗ اختار ملف PDF")
-    if (file.type !== "application/pdf") return (status.innerText = "❌ لازم PDF")
-    if (!currentUser) return (status.innerText = "❗ مش مسجل دخول")
+    if (!file) {
+      status.innerText = "❗ اختار ملف PDF"
+      return
+    }
+    if (file.type !== "application/pdf") {
+      status.innerText = "❌ لازم PDF"
+      return
+    }
+    if (!currentUser) {
+      status.innerText = "❗ مش مسجل دخول"
+      return
+    }
 
     status.innerText = "⏳ جاري الرفع..."
 
     let path = "pdfs2/" + currentUser.id + "_" + Date.now() + "_" + file.name
 
     let { error } = await supabase.storage.from("files").upload(path, file, { upsert: true })
-    if (error) return (status.innerText = "❌ " + error.message)
+    if (error) {
+      status.innerText = "❌ " + error.message
+      return
+    }
 
     let { data } = supabase.storage.from("files").getPublicUrl(path)
 
@@ -332,7 +431,10 @@ async function uploadPDF2() {
       { teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name }
     ])
 
-    if (dbError) return (status.innerText = "❌ خطأ: " + dbError.message)
+    if (dbError) {
+      status.innerText = "❌ خطأ: " + dbError.message
+      return
+    }
 
     status.innerText = "✅ تم"
     document.getElementById("pdf2File").value = ""
@@ -346,7 +448,7 @@ async function uploadPDF2() {
 }
 
 // ================== تحميل محتوى المدرس ==================
-async function loadTeacherContent() {
+window.loadTeacherContent = async function() {
   try {
     let currentUser = getCurrentUser()
     if (!currentUser) return
@@ -373,7 +475,7 @@ async function loadTeacherContent() {
           pdfListTeacher.innerHTML += `
             <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
               <a href="${escapeHtml(p.file_url)}" target="_blank" style="flex:1; color:#4facfe;">📄 ${escapeHtml(p.file_name || "ملف PDF")}</a>
-              <button onclick="window._deletePDF('${p.id}')" style="width:auto; padding:5px 12px; background:#ff4d4d; color:white; border:none; border-radius:6px; cursor:pointer;">🗑 حذف</button>
+              <button onclick="window.deletePDF('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
             </div>`
         })
       } else {
@@ -390,7 +492,7 @@ async function loadTeacherContent() {
           pdfListTeacher2.innerHTML += `
             <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
               <a href="${escapeHtml(p.file_url)}" target="_blank" style="flex:1; color:#4facfe;">📄 ${escapeHtml(p.file_name || "ملف PDF")}</a>
-              <button onclick="window._deletePDF2('${p.id}')" style="width:auto; padding:5px 12px; background:#ff4d4d; color:white; border:none; border-radius:6px; cursor:pointer;">🗑 حذف</button>
+              <button onclick="window.deletePDF2('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
             </div>`
         })
       } else {
@@ -407,7 +509,7 @@ async function loadTeacherContent() {
           videoListTeacher.innerHTML += `
             <div style="margin:10px 0;">
               <iframe width="100%" height="200" src="${escapeHtml(v.url)}" allowfullscreen style="border-radius:10px; border:none;"></iframe>
-              <button onclick="window._deleteVideo('${v.id}')" style="margin-top:5px; padding:5px 12px; width:auto; background:#ff4d4d; color:white; border:none; border-radius:6px; cursor:pointer;">🗑 حذف</button>
+              <button onclick="window.deleteVideo('${v.id}')" class="danger" style="margin-top:5px; padding:5px 12px; width:auto;">🗑 حذف</button>
             </div>`
         })
       } else {
@@ -424,7 +526,7 @@ async function loadTeacherContent() {
           noteListTeacher.innerHTML += `
             <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
               <p style="flex:1; margin:0;">📝 ${escapeHtml(n.content)}</p>
-              <button onclick="window._deleteNote('${n.id}')" style="width:auto; padding:5px 12px; background:#ff4d4d; color:white; border:none; border-radius:6px; cursor:pointer;">🗑 حذف</button>
+              <button onclick="window.deleteNote('${n.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
             </div>`
         })
       } else {
@@ -437,18 +539,25 @@ async function loadTeacherContent() {
   }
 }
 
-async function deletePDF(id) {
+window.deletePDF = async function(id) {
   try {
     if (!confirm("تحذف الملف؟")) return
 
     let currentUser = getCurrentUser()
-    if (!currentUser) return alert("❌ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❌ مش مسجل دخول")
+      return
+    }
 
     // شيك الملكية
     let { data: pdf } = await supabase.from("pdfs").select("teacher_id").eq("id", id).single()
-    if (pdf?.teacher_id !== currentUser.id) return alert("❌ ما عندك صلاحية")
+    if (pdf?.teacher_id !== currentUser.id) {
+      alert("❌ ما عندك صلاحية")
+      return
+    }
 
     await supabase.from("pdfs").delete().eq("id", id)
+    alert("✅ تم الحذف")
     loadTeacherContent()
 
   } catch (error) {
@@ -457,17 +566,24 @@ async function deletePDF(id) {
   }
 }
 
-async function deletePDF2(id) {
+window.deletePDF2 = async function(id) {
   try {
     if (!confirm("تحذف الملف؟")) return
 
     let currentUser = getCurrentUser()
-    if (!currentUser) return alert("❌ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❌ مش مسجل دخول")
+      return
+    }
 
     let { data: pdf } = await supabase.from("pdfs2").select("teacher_id").eq("id", id).single()
-    if (pdf?.teacher_id !== currentUser.id) return alert("❌ ما عندك صلاحية")
+    if (pdf?.teacher_id !== currentUser.id) {
+      alert("❌ ما عندك صلاحية")
+      return
+    }
 
     await supabase.from("pdfs2").delete().eq("id", id)
+    alert("✅ تم الحذف")
     loadTeacherContent()
 
   } catch (error) {
@@ -476,50 +592,69 @@ async function deletePDF2(id) {
   }
 }
 
-async function deleteVideo(id) {
+window.deleteVideo = async function(id) {
   try {
     if (!confirm("تحذف الفيديو؟")) return
 
     let currentUser = getCurrentUser()
-    if (!currentUser) return alert("❌ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❌ مش مسجل دخول")
+      return
+    }
 
     let { data: video } = await supabase.from("videos").select("teacher_id").eq("id", id).single()
-    if (video?.teacher_id !== currentUser.id) return alert("❌ ما عندك صلاحية")
+    if (video?.teacher_id !== currentUser.id) {
+      alert("❌ ما عندك صلاحية")
+      return
+    }
 
     await supabase.from("videos").delete().eq("id", id)
+    alert("✅ تم الحذف")
     loadTeacherContent()
 
   } catch (error) {
     console.error("Delete video error:", error)
+    alert("❌ خطأ: " + error.message)
   }
 }
 
-async function deleteNote(id) {
+window.deleteNote = async function(id) {
   try {
     if (!confirm("تحذف الملاحظة؟")) return
 
     let currentUser = getCurrentUser()
-    if (!currentUser) return alert("❌ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❌ مش مسجل دخول")
+      return
+    }
 
     let { data: note } = await supabase.from("notes").select("teacher_id").eq("id", id).single()
-    if (note?.teacher_id !== currentUser.id) return alert("❌ ما عندك صلاحية")
+    if (note?.teacher_id !== currentUser.id) {
+      alert("❌ ما عندك صلاحية")
+      return
+    }
 
     await supabase.from("notes").delete().eq("id", id)
+    alert("✅ تم الحذف")
     loadTeacherContent()
 
   } catch (error) {
     console.error("Delete note error:", error)
+    alert("❌ خطأ: " + error.message)
   }
 }
 
 // ================== Profile ==================
-async function saveProfile() {
+window.saveProfile = async function() {
   try {
     let bio = document.getElementById("bio")?.value.trim()
     let file = document.getElementById("imgFile")?.files[0]
     let currentUser = getCurrentUser()
 
-    if (!currentUser) return alert("❗ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❗ مش مسجل دخول")
+      return
+    }
 
     let status = document.getElementById("profileStatus")
     if (status) status.innerText = "⏳ جاري الحفظ..."
@@ -535,8 +670,9 @@ async function saveProfile() {
         .upload(path, file, { upsert: true })
 
       if (uploadError) {
-        if (status) status.innerText = "❌ خطأ في رفع الصورة: " + uploadError.message
-        return alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+        if (status) status.innerText = "❌ خطأ في رفع الصورة"
+        alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+        return
       }
 
       let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
@@ -556,7 +692,8 @@ async function saveProfile() {
 
     if (dbError) {
       if (status) status.innerText = "❌ خطأ في الحفظ"
-      return alert("❌ خطأ في الحفظ: " + dbError.message)
+      alert("❌ خطأ في الحفظ: " + dbError.message)
+      return
     }
 
     if (status) status.innerText = "✅ تم حفظ البروفايل"
@@ -570,7 +707,7 @@ async function saveProfile() {
   }
 }
 
-async function loadCurrentProfile() {
+window.loadCurrentProfile = async function() {
   try {
     let currentUser = getCurrentUser()
     if (!currentUser) return
@@ -596,10 +733,13 @@ async function loadCurrentProfile() {
 }
 
 // ================== Social ==================
-async function saveSocial() {
+window.saveSocial = async function() {
   try {
     let currentUser = getCurrentUser()
-    if (!currentUser) return alert("❗ مش مسجل دخول")
+    if (!currentUser) {
+      alert("❗ مش مسجل دخول")
+      return
+    }
 
     let { error } = await supabase.from("social_links").upsert([
       {
@@ -610,7 +750,10 @@ async function saveSocial() {
       }
     ])
 
-    if (error) return alert("❌ خطأ: " + error.message)
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
     alert("✅ تم حفظ الروابط")
 
   } catch (error) {
@@ -619,7 +762,7 @@ async function saveSocial() {
   }
 }
 
-async function loadCurrentSocial() {
+window.loadCurrentSocial = async function() {
   try {
     let currentUser = getCurrentUser()
     if (!currentUser) return
@@ -645,7 +788,7 @@ async function loadCurrentSocial() {
 }
 
 // ================== Student - تحميل البيانات ==================
-async function loadStudentData() {
+window.loadStudentData = async function() {
   try {
     let currentUser = getCurrentUser()
     if (!currentUser) return
@@ -656,7 +799,13 @@ async function loadStudentData() {
       .eq("id", currentUser.id)
       .single()
 
-    if (!user?.teacher_id) return alert("❌ مش موجود معلم متربوط بك")
+    if (!user?.teacher_id) {
+      alert("❌ لم يتم تعيين معلم لك")
+      return
+    }
+
+    // احفظ معرف المدرس في global variable
+    window.studentTeacherId = user.teacher_id
 
     let teacherId = user.teacher_id
 
@@ -692,7 +841,7 @@ async function loadStudentData() {
       videoContainer.innerHTML = ""
       if (videos.length > 0) {
         videos.forEach(v => {
-          videoContainer.innerHTML += `<iframe src="${escapeHtml(v.url)}" width="100%" height="200" style="border-radius:10px; margin:10px 0;"></iframe>`
+          videoContainer.innerHTML += `<iframe src="${escapeHtml(v.url)}" width="100%" height="200" style="border-radius:10px; margin:10px 0; border:none;"></iframe>`
         })
       } else {
         videoContainer.innerHTML = "<p>مفيش فيديوهات</p>"
@@ -734,7 +883,7 @@ async function loadStudentData() {
   }
 }
 
-async function loadTeachers() {
+window.loadTeachers = async function() {
   try {
     let select = document.getElementById("teacherSelect")
     if (!select) return
@@ -762,13 +911,13 @@ async function loadTeachers() {
   }
 }
 
-function onRoleChange() {
+window.onRoleChange = function() {
   let role = document.getElementById("role")?.value
   let row = document.getElementById("teacherSelectRow")
   if (row) row.style.display = role === "student" ? "block" : "none"
 }
 
-async function loadTeacherProfile(teacherId) {
+window.loadTeacherProfile = async function(teacherId) {
   try {
     let profileDiv = document.getElementById("teacherProfile")
     let socialDiv = document.getElementById("teacherSocial")
@@ -814,14 +963,20 @@ async function loadTeacherProfile(teacherId) {
 }
 
 // ================== رفع حل الطالب ==================
-async function uploadSolution() {
+window.uploadSolution = async function() {
   try {
     let file = document.getElementById("solutionFile")?.files[0]
     let status = document.getElementById("uploadStatus")
     let currentUser = getCurrentUser()
 
-    if (!file) return (status.innerText = "❗ اختار ملف")
-    if (!currentUser) return (status.innerText = "❗ مش مسجل دخول")
+    if (!file) {
+      status.innerText = "❗ اختار ملف"
+      return
+    }
+    if (!currentUser) {
+      status.innerText = "❗ مش مسجل دخول"
+      return
+    }
 
     status.innerText = "⏳ جاري الرفع..."
 
@@ -829,7 +984,10 @@ async function uploadSolution() {
     let path = "solutions/" + currentUser.id + "_" + Date.now() + "_" + safeName
 
     let { error: uploadError } = await supabase.storage.from("files").upload(path, file)
-    if (uploadError) return (status.innerText = "❌ خطأ في الرفع: " + uploadError.message)
+    if (uploadError) {
+      status.innerText = "❌ خطأ في الرفع: " + uploadError.message
+      return
+    }
 
     let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
 
@@ -837,7 +995,10 @@ async function uploadSolution() {
       { student_id: currentUser.id, file_url: urlData.publicUrl }
     ])
 
-    if (dbError) return (status.innerText = "❌ خطأ في الحفظ: " + dbError.message)
+    if (dbError) {
+      status.innerText = "❌ خطأ في الحفظ: " + dbError.message
+      return
+    }
 
     status.innerText = "✅ تم رفع الحل بنجاح"
     document.getElementById("solutionFile").value = ""
@@ -850,7 +1011,7 @@ async function uploadSolution() {
 }
 
 // ================== تحميل الحلول (للمدرس) ==================
-async function loadSolutions() {
+window.loadSolutions = async function() {
   try {
     let container = document.getElementById("solutionsList")
     if (!container) return
@@ -884,95 +1045,83 @@ async function loadSolutions() {
 }
 
 // ================== Tabs ==================
-function openTab(id) {
-  document.querySelectorAll(".tab-content").forEach(t => t.style.display = "none")
+window.openTab = function(id) {
+  document.querySelectorAll(".tab-content").forEach(t => {
+    t.style.display = "none"
+    t.classList.remove("active")
+  })
   let el = document.getElementById(id)
-  if (el) el.style.display = "block"
+  if (el) {
+    el.style.display = "block"
+    el.classList.add("active")
+  }
+}
+
+// ================== Teacher Profile Navigation ==================
+window.goToTeacherProfile = function() {
+  if (!window.studentTeacherId) {
+    alert("❌ لم يتم تعيين معلم لك")
+    return
+  }
+  localStorage.setItem("selectedTeacherId", window.studentTeacherId)
+  window.location.href = `teacher-profile.html?id=${window.studentTeacherId}`
+}
+
+window.viewTeacherProfile = function(teacherId) {
+  if (!teacherId) {
+    alert("❌ خطأ: لم يتم تحديد معلم")
+    return
+  }
+  localStorage.setItem("selectedTeacherId", teacherId)
+  window.location.href = `teacher-profile.html?id=${teacherId}`
 }
 
 // ================== Scroll ==================
-function scrollToTop() {
+window.scrollToTop = function() {
   window.scrollTo({ top: 0, behavior: "smooth" })
 }
 
-function scrollToBottom() {
+window.scrollToBottom = function() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
 }
 
 // ================== Logout ==================
-function logout() {
+window.logout = function() {
   localStorage.removeItem("currentUser")
-  location.href = "index.html"
+  window.location.href = "index.html"
 }
-
-// ================== Export to Window ==================
-window.login = login
-window.addUser = addUser
-window.togglePass = togglePass
-window.searchUsers = searchUsers
-window.loadUsers = loadUsers
-window.loadStats = loadStats
-window.addNote = addNote
-window.addVideo = addVideo
-window.uploadPDF = uploadPDF
-window.uploadPDF2 = uploadPDF2
-window.saveProfile = saveProfile
-window.saveSocial = saveSocial
-window.uploadSolution = uploadSolution
-window.loadSolutions = loadSolutions
-window.loadTeacherContent = loadTeacherContent
-window.loadStudentData = loadStudentData
-window.loadTeachers = loadTeachers
-window.onRoleChange = onRoleChange
-window.openTab = openTab
-window.scrollToTop = scrollToTop
-window.scrollToBottom = scrollToBottom
-window.logout = logout
-window.loadCurrentProfile = loadCurrentProfile
-window.loadCurrentSocial = loadCurrentSocial
-
-// دوال داخلية
-window._deleteUser = deleteUser
-window._toggleUser = toggleUser
-window._deletePDF = deletePDF
-window._deletePDF2 = deletePDF2
-window._deleteVideo = deleteVideo
-window._deleteNote = deleteNote
 
 // ================== Init ==================
 window.addEventListener("load", function() {
   // صفحة الأدمن
   if (document.getElementById("users")) {
-    openTab("addUserTab")
-    loadUsers()
-    loadStats()
-    loadTeachers()
+    window.openTab("addUserTab")
+    window.loadUsers()
+    window.loadStats()
+    window.loadTeachers()
   }
 
   // صفحة الطالب
   if (document.getElementById("noteList")) {
-    openTab("profile")
-    loadStudentData()
+    window.openTab("profile")
+    window.loadStudentData()
   }
 
   // صفحة المدرس
   if (document.getElementById("solutionsList")) {
-    openTab("profile")
-    loadSolutions()
-    loadCurrentProfile()
-    loadCurrentSocial()
-    loadTeacherContent()
+    window.openTab("profile")
+    window.loadSolutions()
+    window.loadCurrentProfile()
+    window.loadCurrentSocial()
+    window.loadTeacherContent()
   }
 })
-window.goToTeacherProfile = function() {
-  const teacherId = localStorage.getItem("selectedTeacherId")
 
-  if (!teacherId) {
-    alert("❌ ناسف هناك تحديث")
-    return
+// تحديث الإحصائيات كل 30 ثانية
+setInterval(() => {
+  if (document.getElementById("totalUsers")) {
+    window.loadStats()
   }
-
-  window.location.href = `teacher-profile.html?id=${teacherId}`
-}
+}, 30000)
 
 console.log("✅ LMS Loaded Successfully")
