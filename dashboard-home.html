@@ -891,11 +891,13 @@
       return 4.8
     }
   }
-    let buttons = document.querySelectorAll('.tab-btn')
-    buttons.forEach(btn => btn.classList.remove('active'))
-    event.target.classList.add('active')
-    displayTeachers(filter)
-  }
+    function filterTeachers(filter) {
+  let buttons = document.querySelectorAll('.tab-btn')
+  buttons.forEach(btn => btn.classList.remove('active'))
+
+  event.target.classList.add('active')
+  displayTeachers(filter)
+}
 
   // عرض الحالة الفارغة
   function showEmpty() {
