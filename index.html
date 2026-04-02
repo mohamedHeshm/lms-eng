@@ -2,18 +2,215 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>LMS Login</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
-</head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Ma'moun - تسجيل الدخول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 
-<body class="login-body">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box-pro {
+      background: white;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .login-box-pro h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-box-pro > p {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      padding-right: 35px;
+    }
+
+    .input-group label {
+      position: absolute;
+      top: 15px;
+      right: 12px;
+      color: #999;
+      font-size: 0.9rem;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus ~ label {
+      top: -10px;
+      right: 0;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    #loginBtn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: 10px;
+    }
+
+    #loginBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    #loginBtn:active {
+      transform: translateY(-1px);
+    }
+
+    #loginBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #loginStatus {
+      text-align: center;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      min-height: 20px;
+      display: none;
+    }
+
+    #loginStatus.error {
+      background: rgba(255, 77, 77, 0.2);
+      color: #ff4d4d;
+      border: 2px solid #ff4d4d;
+      display: block;
+    }
+
+    #loginStatus.success {
+      background: rgba(37, 211, 102, 0.2);
+      color: #25d366;
+      border: 2px solid #25d366;
+      display: block;
+    }
+
+    #loginStatus.info {
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+      border: 2px solid #667eea;
+      display: block;
+    }
+
+    .footer-text {
+      text-align: center;
+      color: #999;
+      font-size: 0.85rem;
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #eee;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      .login-box-pro {
+        padding: 30px;
+      }
+
+      .login-box-pro h2 {
+        font-size: 1.8rem;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group input {
+        padding: 12px;
+      }
+
+      #loginBtn {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
 
 <div class="login-container">
-
   <div class="login-box-pro">
 
-    <h2>🎓 Al-Ma'moun 🎓</h2>
+    <h2>🎓 Al-Ma'moun</h2>
     <p>تسجيل الدخول</p>
 
     <!-- Email -->
@@ -28,50 +225,58 @@
       <label>🔒 الباسورد</label>
     </div>
 
-    <!-- زر الدخول -->
-    <button onclick="handleLogin()" id="loginBtn">دخول</button>
-
     <!-- حالة تسجيل الدخول -->
-    <p id="loginStatus" style="text-align:center; margin-top:10px; color:#ff4d4d;"></p>
+    <p id="loginStatus"></p>
+
+    <!-- زر الدخول -->
+    <button onclick="window.handleLogin()" id="loginBtn">دخول</button>
 
     <div class="footer-text">
-       Developer by Eng Mohamed Hesham 👨🏻‍💻
+      Developer by Eng Mohamed Hesham 👨🏻‍💻
     </div>
 
   </div>
-
 </div>
-
-<!-- Scroll -->
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
 
 <script type="module" src="js/app.js"></script>
 
 <script>
   // 🔥 تحسين تجربة تسجيل الدخول
-  async function handleLogin() {
+  window.handleLogin = async function() {
     let btn = document.getElementById("loginBtn")
     let status = document.getElementById("loginStatus")
 
     btn.disabled = true
-    btn.innerText = "⏳ جاري..."
-    status.innerText = ""
+    btn.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> جاري...'
+    status.className = ''
+    status.style.display = 'none'
 
     try {
-      await window.login()
+      const result = await window.login()
+      if (result) {
+        btn.innerHTML = '✅ تم! جاري التوجيه...'
+        // سيتم التوجيه من داخل دالة login
+      } else {
+        // الخطأ سيتم عرضه من خلال showStatus
+        btn.disabled = false
+        btn.innerHTML = 'دخول'
+      }
     } catch (e) {
+      status.className = 'error'
       status.innerText = "❌ حصل خطأ: " + e.message
+      status.style.display = 'block'
+      btn.disabled = false
+      btn.innerHTML = 'دخول'
     }
-
-    btn.disabled = false
-    btn.innerText = "دخول"
   }
 
   // 🔥 Enter للدخول
   document.addEventListener("keypress", function(e) {
     if (e.key === "Enter") {
-      handleLogin()
+      const activeElement = document.activeElement
+      if (activeElement.id === "email" || activeElement.id === "password") {
+        window.handleLogin()
+      }
     }
   })
 </script>

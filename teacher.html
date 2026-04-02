@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>Teacher Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة المدرس</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
@@ -13,33 +14,33 @@
 
   <!-- زرار الحلول -->
   <div style="margin-bottom:15px;">
-    <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer;">
+    <button onclick="window.openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer; font-weight:600;">
       📥 حلول الطلاب
     </button>
   </div>
 
   <div class="tabs">
-    <button onclick="openTab('profile')">👤 البروفايل</button>
-    <button onclick="openTab('social')">🔗 التواصل</button>
-    <button onclick="openTab('video')">🎥 فيديو</button>
-    <button onclick="openTab('pdf')">📁الواجب </button>
-    <button onclick="openTab('pdf2')">📁 مذكرات</button>
-    <button onclick="openTab('note')">📝تنبيهات</button>
+    <button onclick="window.openTab('profile')">👤 البروفايل</button>
+    <button onclick="window.openTab('social')">🔗 التواصل</button>
+    <button onclick="window.openTab('video')">🎥 فيديو</button>
+    <button onclick="window.openTab('pdf')">📁 الواجب</button>
+    <button onclick="window.openTab('pdf2')">📁 مذكرات</button>
+    <button onclick="window.openTab('note')">📝 تنبيهات</button>
   </div>
 
   <!-- PROFILE -->
   <div id="profile" class="tab-content">
     <div class="card">
       <h3>👤 صفحتي</h3>
-      <div id="profilePreview" class="profile-preview">
-        <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile">
-        <h4 id="profileName">اسم المدرس</h4>
-        <p id="profileBio">نبذة بسيطة...</p>
+      <div id="profilePreview" class="profile-preview" style="text-align:center; margin-bottom:20px;">
+        <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile" style="width:150px; height:150px; border-radius:50%; object-fit:cover; border:3px solid #667eea;">
+        <h4 id="profileName" style="margin-top:15px;">اسم المدرس</h4>
+        <p id="profileBio" style="color:#666;">نبذة بسيطة...</p>
       </div>
-      <input type="text" id="bio" placeholder="عرف نفسك">
+      <input type="text" id="bio" placeholder="عرّف نفسك...">
       <input type="file" id="imgFile" accept="image/*">
-      <p id="profileStatus"></p>
-      <button onclick="saveProfile()">حفظ</button>
+      <p id="profileStatus" style="text-align:center; margin-top:10px; font-weight:600;"></p>
+      <button onclick="window.saveProfile()" style="width:100%;">💾 حفظ</button>
     </div>
   </div>
 
@@ -47,10 +48,10 @@
   <div id="social" class="tab-content">
     <div class="card">
       <h3>🔗 روابط التواصل</h3>
-      <input type="text" id="facebook" placeholder="رابط فيسبوك">
-      <input type="text" id="whatsapp" placeholder="رابط واتساب">
-      <input type="text" id="youtube" placeholder="رابط يوتيوب">
-      <button onclick="saveSocial()">حفظ</button>
+      <input type="text" id="facebook" placeholder="رابط فيسبوك (مثال: https://facebook.com/yourpage)">
+      <input type="text" id="whatsapp" placeholder="رابط واتساب (مثال: https://wa.me/201234567890)">
+      <input type="text" id="youtube" placeholder="رابط يوتيوب (مثال: https://youtube.com/@yourpage)">
+      <button onclick="window.saveSocial()" style="width:100%;">💾 حفظ</button>
     </div>
   </div>
 
@@ -58,8 +59,8 @@
   <div id="video" class="tab-content">
     <div class="card">
       <h3>🎥 نشر فيديو</h3>
-      <input type="text" id="videoInput" placeholder="رابط الفيديو">
-      <button onclick="addVideo()">نشر</button>
+      <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
+      <button onclick="window.addVideo()" style="width:100%;">📤 نشر</button>
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الفيديوهات المنشورة</h3>
@@ -70,10 +71,10 @@
   <!-- PDF الأول -->
   <div id="pdf" class="tab-content">
     <div class="card">
-      <h3>📁 رفع شيتات</h3>
+      <h3>📁 رفع شيتات الواجب</h3>
       <input type="file" id="pdfFile" accept="application/pdf">
-      <button onclick="uploadPDF()">رفع</button>
-      <p id="status"></p>
+      <button onclick="window.uploadPDF()" style="width:100%; margin-top:10px;">📤 رفع</button>
+      <p id="status" style="text-align:center; margin-top:10px; font-weight:600;"></p>
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الملفات المرفوعة</h3>
@@ -84,10 +85,10 @@
   <!-- PDF الثاني -->
   <div id="pdf2" class="tab-content">
     <div class="card">
-      <h3>📁 رفع مذكرات</h3>
+      <h3>📁 رفع المذكرات</h3>
       <input type="file" id="pdf2File" accept="application/pdf">
-      <button onclick="uploadPDF2()">رفع</button>
-      <p id="status2"></p>
+      <button onclick="window.uploadPDF2()" style="width:100%; margin-top:10px;">📤 رفع</button>
+      <p id="status2" style="text-align:center; margin-top:10px; font-weight:600;"></p>
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الملفات المرفوعة</h3>
@@ -99,8 +100,8 @@
   <div id="note" class="tab-content">
     <div class="card">
       <h3>📝 نشر ملاحظة</h3>
-      <input type="text" id="noteInput" placeholder="اكتب ملاحظة">
-      <button onclick="addNote()">نشر</button>
+      <input type="text" id="noteInput" placeholder="اكتب ملاحظة أو تنبيه...">
+      <button onclick="window.addNote()" style="width:100%; margin-top:10px;">📤 نشر</button>
     </div>
     <div class="card" style="margin-top:15px;">
       <h3>📋 الملاحظات المنشورة</h3>
@@ -116,13 +117,13 @@
     </div>
   </div>
 
-  <button class="logout" onclick="logout()">تسجيل خروج</button>
+  <button class="logout" onclick="window.logout()">تسجيل خروج</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
 
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<button id="scrollTopBtn" onclick="window.scrollToTop()">⬆</button>
+<button id="scrollBottomBtn" onclick="window.scrollToBottom()">⬇</button>
 
 </body>
 </html>

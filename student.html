@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>Student Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الطالب</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
 </head>
@@ -12,15 +13,14 @@
   <h2>👨‍🎓 لوحة الطالب</h2>
 
   <div class="tabs">
-    <button onclick="openTab('profile')">👤 المدرس</button>
-    <button onclick="openTab('social')">🔗 التواصل</button>
-    <button onclick="openTab('videosTab')">🎥 الفيديوهات</button>
-    <button onclick="openTab('pdfsTab')">📁 شيت الواجب</button>
-    <button onclick="openTab('pdfs2Tab')">📁 المذكرات</button>
-    <button onclick="openTab('notesTab')">📝 تنبيهات </button>
-    <button onclick="goToTeacherProfile()">⭐ التقييم</button>
+    <button onclick="window.openTab('profile')">👤 المدرس</button>
+    <button onclick="window.openTab('social')">🔗 التواصل</button>
+    <button onclick="window.openTab('videosTab')">🎥 الفيديوهات</button>
+    <button onclick="window.openTab('pdfsTab')">📁 الواجبات</button>
+    <button onclick="window.openTab('pdfs2Tab')">📁 المذكرات</button>
+    <button onclick="window.openTab('notesTab')">📝 التنبيهات</button>
+    <button onclick="window.goToTeacherProfile()" style="background:#ff6b35; color:white;">⭐ التقييم</button>
   </div>
-
 
   <!-- PROFILE -->
   <div id="profile" class="tab-content">
@@ -47,7 +47,7 @@
   <!-- PDF الأول -->
   <div id="pdfsTab" class="tab-content">
     <div class="card">
-      <h3>📁 الواجبات </h3>
+      <h3>📁 الواجبات</h3>
       <ul id="pdfList"></ul>
     </div>
 
@@ -55,8 +55,8 @@
     <div class="card" style="margin-top:15px;">
       <h3>📤 تسليم الواجب</h3>
       <input type="file" id="solutionFile">
-      <button onclick="uploadSolution()">رفع الحل</button>
-      <p id="uploadStatus"></p>
+      <button onclick="window.uploadSolution()" style="width:100%; margin-top:10px;">رفع الحل</button>
+      <p id="uploadStatus" style="text-align:center; margin-top:10px; font-weight:600;"></p>
     </div>
   </div>
 
@@ -71,18 +71,18 @@
   <!-- NOTES -->
   <div id="notesTab" class="tab-content">
     <div class="card">
-      <h3>📝التنبيهات</h3>
+      <h3>📝 التنبيهات</h3>
       <ul id="noteList"></ul>
     </div>
   </div>
 
-  <button class="logout" onclick="logout()">تسجيل خروج</button>
+  <button class="logout" onclick="window.logout()">تسجيل خروج</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
 
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<button id="scrollTopBtn" onclick="window.scrollToTop()">⬆</button>
+<button id="scrollBottomBtn" onclick="window.scrollToBottom()">⬇</button>
 
 </body>
 </html>

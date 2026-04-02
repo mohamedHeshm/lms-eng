@@ -31,7 +31,6 @@
       overflow-x: hidden;
     }
 
-    /* ==================== SCROLL BAR ==================== */
     ::-webkit-scrollbar {
       width: 12px;
     }
@@ -187,22 +186,6 @@
       box-shadow: 0 40px 80px rgba(102, 126, 234, 0.3);
     }
 
-    .teacher-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .teacher-card:hover::before {
-      opacity: 1;
-    }
-
     /* CARD HEADER */
     .card-header {
       position: relative;
@@ -320,8 +303,8 @@
     }
 
     .social-icon {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -330,74 +313,22 @@
       cursor: pointer;
       background: white;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      position: relative;
+      font-size: 1.2rem;
       border: 2px solid transparent;
     }
 
-    .social-icon img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      transition: all 0.3s ease;
-    }
-
-    .social-icon.facebook {
-      border-color: #1877f2;
-    }
-
-    .social-icon.whatsapp {
-      border-color: #25d366;
-    }
-
-    .social-icon.youtube {
-      border-color: #ff0000;
-    }
+    .social-icon.facebook { border-color: #1877f2; }
+    .social-icon.whatsapp { border-color: #25d366; }
+    .social-icon.youtube { border-color: #ff0000; }
 
     .social-icon:hover {
       transform: translateY(-12px) scale(1.25) rotate(10deg);
       box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5);
     }
 
-    .social-icon.facebook:hover {
-      background: #1877f2;
-      box-shadow: 0 20px 50px rgba(24, 119, 242, 0.5);
-    }
-
-    .social-icon.facebook:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon.whatsapp:hover {
-      background: #25d366;
-      box-shadow: 0 20px 50px rgba(37, 211, 102, 0.5);
-    }
-
-    .social-icon.whatsapp:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon.youtube:hover {
-      background: #ff0000;
-      box-shadow: 0 20px 50px rgba(255, 0, 0, 0.5);
-    }
-
-    .social-icon.youtube:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .social-icon:hover::before {
-      opacity: 1;
-    }
+    .social-icon.facebook:hover { background: #1877f2; color: white; }
+    .social-icon.whatsapp:hover { background: #25d366; color: white; }
+    .social-icon.youtube:hover { background: #ff0000; color: white; }
 
     /* BUTTONS */
     .card-buttons {
@@ -628,22 +559,6 @@
         font-size: 0.9rem;
       }
     }
-
-    /* ==================== TRANSITIONS ==================== */
-    .fade-exit {
-      animation: fadeOut 0.4s ease-out forwards;
-    }
-
-    @keyframes fadeOut {
-      from {
-        opacity: 1;
-        transform: scale(1);
-      }
-      to {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-    }
   </style>
 </head>
 <body>
@@ -675,9 +590,9 @@
 
   <!-- ==================== TABS ==================== -->
   <div class="tabs-container">
-    <button class="tab-btn active" onclick="filterTeachers('all')">👥 جميع المعلمين</button>
-    <button class="tab-btn" onclick="filterTeachers('top')">⭐ الأفضل تقييماً</button>
-    <button class="tab-btn" onclick="filterTeachers('new')">🆕 الجدد</button>
+    <button class="tab-btn active" onclick="window.filterTeachers('all', this)">👥 جميع المعلمين</button>
+    <button class="tab-btn" onclick="window.filterTeachers('top', this)">⭐ الأفضل تقييماً</button>
+    <button class="tab-btn" onclick="window.filterTeachers('new', this)">🆕 الجدد</button>
   </div>
 
   <!-- ==================== TEACHERS CONTAINER ==================== -->
@@ -743,28 +658,25 @@
 
       allTeachers = []
 
-      // تحميل بيانات كل معلم
-      for (let teacher of teachers) {
-        const [
-          { data: profile },
-          { data: social },
-          { data: students }
-        ] = await Promise.all([
+      // تحميل بيانات كل معلم بشكل متوازي
+      const profilesPromises = teachers.map(teacher =>
+        Promise.all([
           supabase.from("teacher_profile").select("*").eq("teacher_id", teacher.id),
           supabase.from("social_links").select("*").eq("teacher_id", teacher.id),
-          supabase.from("users").select("id").eq("teacher_id", teacher.id)
-        ])
-
-        allTeachers.push({
+          supabase.from("users").select("id").eq("teacher_id", teacher.id),
+          getTeacherRating(teacher.id)
+        ]).then(([profile, social, students, rating]) => ({
           id: teacher.id,
           name: teacher.name,
           created_at: teacher.created_at,
           profile: profile?.[0] || {},
           social: social?.[0] || {},
-          students: students?.length || 0
-        })
-      }
+          students: students?.length || 0,
+          rating: rating
+        }))
+      )
 
+      allTeachers = await Promise.all(profilesPromises)
       displayTeachers('all')
 
     } catch (error) {
@@ -773,7 +685,7 @@
   }
 
   // عرض المعلمين
-  async function displayTeachers(filter) {
+  function displayTeachers(filter) {
     currentFilter = filter
     let container = document.getElementById("teachersContainer")
 
@@ -791,14 +703,10 @@
 
     container.innerHTML = ""
 
-    for (let i = 0; i < filtered.length; i++) {
-      let teacher = filtered[i]
-      // جلب التقييم الفعلي للمدرس
-      teacher.rating = await getTeacherRating(teacher.id)
-
+    filtered.forEach((teacher, i) => {
       let card = createTeacherCard(teacher, i)
       container.appendChild(card)
-    }
+    })
 
     if (filtered.length === 0) {
       showEmpty()
@@ -813,25 +721,13 @@
 
     let socialLinks = ""
     if (teacher.social?.facebook) {
-      socialLinks += `
-        <a href="${teacher.social.facebook}" target="_blank" class="social-icon facebook" title="فيسبوك">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231877f2'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E" alt="Facebook">
-        </a>
-      `
+      socialLinks += `<a href="${teacher.social.facebook}" target="_blank" class="social-icon facebook" title="فيسبوك">📘</a>`
     }
     if (teacher.social?.whatsapp) {
-      socialLinks += `
-        <a href="${teacher.social.whatsapp}" target="_blank" class="social-icon whatsapp" title="واتساب">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325d366'%3E%3Cpath d='M17.6915026,2.4744748 C15.6694941,0.35868815 12.8999937,0.704299632 10.8144196,2.47234803 C9.70185869,3.51155381 8.75760457,4.66886393 8.03987712,5.89893101 C7.06914294,7.62868966 6.84795877,9.81639207 7.42286399,11.8721952 C8.03265842,14.141159 9.53850715,16.0316265 11.3888097,17.2788956 C13.4052088,18.6318667 15.8799096,19.4250301 18.3994893,19.4250301 C19.7970267,19.4250301 21.1648788,19.1468661 22.4406092,18.6112267 L23.8326707,22.0511284 C24.8104635,24.4065034 27.0611316,25.0624779 28.9916158,24.0842851 L42.2373504,13.9975816 C44.1671216,12.3126984 44.4346099,9.71506892 43.2048541,7.79076172 C42.6326519,6.85865123 41.8076308,5.97859699 40.7314816,5.36507778 C39.0922155,4.32587201 36.844637,3.94705055 34.6363042,4.35490159 C34.1370559,4.08944266 33.6271006,3.82398373 33.1068377,3.5585248 C31.1048285,2.39239162 28.9912597,1.42815968 26.5654937,1.66874848 C23.9800669,1.93420741 21.6331019,4.13869356 17.6915026,2.4744748 Z M11.2491408,11.4471373 C11.2491408,9.65653855 12.7009465,8.21256813 14.5046667,8.21256813 C16.3090822,8.21256813 17.7606945,9.65653855 17.7606945,11.4471373 C17.7606945,13.238136 16.3090822,14.6821065 14.5046667,14.6821065 C12.7009465,14.6821065 11.2491408,13.238136 11.2491408,11.4471373 Z M21.6331019,11.4471373 C21.6331019,9.65653855 23.0849075,8.21256813 24.8886278,8.21256813 C26.6930432,8.21256813 28.144655,9.65653855 28.144655,11.4471373 C28.144655,13.238136 26.6930432,14.6821065 24.8886278,14.6821065 C23.0849075,14.6821065 21.6331019,13.238136 21.6331019,11.4471373 Z' transform='translate(-7 -1)'/%3E%3C/svg%3E" alt="WhatsApp">
-        </a>
-      `
+      socialLinks += `<a href="${teacher.social.whatsapp}" target="_blank" class="social-icon whatsapp" title="واتساب">💬</a>`
     }
     if (teacher.social?.youtube) {
-      socialLinks += `
-        <a href="${teacher.social.youtube}" target="_blank" class="social-icon youtube" title="يوتيوب">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff0000'%3E%3Cpath d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/%3E%3C/svg%3E" alt="YouTube">
-        </a>
-      `
+      socialLinks += `<a href="${teacher.social.youtube}" target="_blank" class="social-icon youtube" title="يوتيوب">▶️</a>`
     }
 
     let imageUrl = teacher.profile?.image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
@@ -852,7 +748,7 @@
             <div class="stat-label">طالب</div>
           </div>
           <div class="stat">
-          <div class="stat-number">${teacher.rating}</div>
+            <div class="stat-number">${teacher.rating}</div>
             <div class="stat-label">تقييم</div>
           </div>
           <div class="stat">
@@ -866,8 +762,8 @@
         </div>
 
         <div class="card-buttons">
-          <button class="btn btn-primary" onclick="goToProfile('${teacher.id}')">👤 عرض البروفايل</button>
-          <button class="btn btn-secondary" onclick="goToLogin()">🔐 دخول</button>
+          <button class="btn btn-primary" onclick="window.viewTeacherProfile('${teacher.id}')">👤 عرض البروفايل</button>
+          <button class="btn btn-secondary" onclick="window.goToLogin()">🔐 دخول</button>
         </div>
       </div>
     `
@@ -891,13 +787,6 @@
       return 4.8
     }
   }
-    function filterTeachers(filter) {
-  let buttons = document.querySelectorAll('.tab-btn')
-  buttons.forEach(btn => btn.classList.remove('active'))
-
-  event.target.classList.add('active')
-  displayTeachers(filter)
-}
 
   // عرض الحالة الفارغة
   function showEmpty() {
@@ -930,7 +819,19 @@
   }
 
   // Navigation
-  window.goToProfile = function(teacherId) {
+  window.filterTeachers = function(filter, button) {
+    let buttons = document.querySelectorAll('.tab-btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    if (button) button.classList.add('active')
+    displayTeachers(filter)
+  }
+
+  window.viewTeacherProfile = function(teacherId) {
+    if (!teacherId) {
+      alert("❌ خطأ: لم يتم تحديد معلم")
+      return
+    }
+    localStorage.setItem("selectedTeacherId", teacherId)
     window.location.href = `teacher-profile.html?id=${teacherId}`
   }
 
@@ -941,7 +842,7 @@
   // تحميل البيانات عند فتح الصفحة
   window.addEventListener("load", loadData)
 
-  // تحديث البيانات كل 5 ثواني (أسرع)
+  // تحديث البيانات كل 30 ثانية
   setInterval(loadData, 30000)
 </script>
 </body>
