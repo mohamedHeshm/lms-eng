@@ -773,7 +773,7 @@
   }
 
   // عرض المعلمين
-  function displayTeachers(filter) {
+  async function displayTeachers(filter) {
     currentFilter = filter
     let container = document.getElementById("teachersContainer")
 
@@ -791,10 +791,14 @@
 
     container.innerHTML = ""
 
-    filtered.forEach((teacher, index) => {
-      let card = createTeacherCard(teacher, index)
+    for (let i = 0; i < filtered.length; i++) {
+      let teacher = filtered[i]
+      // جلب التقييم الفعلي للمدرس
+      teacher.rating = await getTeacherRating(teacher.id)
+
+      let card = createTeacherCard(teacher, i)
       container.appendChild(card)
-    })
+    }
 
     if (filtered.length === 0) {
       showEmpty()
@@ -871,8 +875,22 @@
     return card
   }
 
-  // تصفية المعلمين
-  window.filterTeachers = function(filter) {
+  // حساب التقييم العام للمدرس
+  async function getTeacherRating(teacherId) {
+    try {
+      const { data: comments } = await supabase
+        .from('teacher_comments')
+        .select('rating')
+        .eq('teacher_id', teacherId)
+
+      if (!comments || comments.length === 0) return 4.8
+
+      let avg = comments.reduce((sum, c) => sum + (c.rating || 0), 0) / comments.length
+      return parseFloat(avg.toFixed(1))
+    } catch (error) {
+      return 4.8
+    }
+  }
     let buttons = document.querySelectorAll('.tab-btn')
     buttons.forEach(btn => btn.classList.remove('active'))
     event.target.classList.add('active')
@@ -921,8 +939,8 @@
   // تحميل البيانات عند فتح الصفحة
   window.addEventListener("load", loadData)
 
-  // تحديث البيانات كل 10 ثواني
-  setInterval(loadData, 10000)
+  // تحديث البيانات كل 5 ثواني (أسرع)
+  setInterval(loadData, 5000)
 </script>
 </body>
 </html>
