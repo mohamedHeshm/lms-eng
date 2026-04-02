@@ -2,82 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة الأدمن</title>
+  <title>Admin Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #f5f7fb; }
+    .container { width: 90%; max-width: 900px; margin: auto; padding: 20px; }
+    h2 { text-align: center; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tabs button { flex: 1; padding: 10px; background: #e9eefc; border: none; border-radius: 8px; cursor: pointer; }
+    .tabs button:hover { background: #4facfe; color: white; }
+    .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+    .password-box { position: relative; }
+    .password-box span { position: absolute; left: 10px; top: 12px; cursor: pointer; }
+    button { width: 100%; padding: 10px; border: none; background: #4facfe; color: white; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #3a8be0; }
+    .logout { background: #ff4d4d; margin-top: 20px; }
+    .logout:hover { background: #cc0000; }
+    .user-card { background: #f1f5ff; padding: 15px; margin: 10px 0; border-radius: 12px; }
+    .user-card button { width: auto; padding: 6px 14px; margin: 4px; }
+    .danger { background: #ff4d4d; }
+    .danger:hover { background: #cc0000; }
+    .stats { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stat-box { flex: 1; background: white; padding: 15px; text-align: center; border-radius: 12px; }
+    .stat-box h3 { color: #4facfe; }
+    .tab-content { display: none; }
+  </style>
 </head>
-<body class="dashboard">
+<body>
 <div class="container">
 
   <h2>👑 لوحة الأدمن</h2>
 
-  <!-- إحصائيات -->
   <div class="stats">
-    <div class="stat-box">
-      <h3 id="totalUsers">0</h3>
-      <p>👥 المستخدمين</p>
-    </div>
-    <div class="stat-box">
-      <h3 id="teachersCount">0</h3>
-      <p>👨‍🏫 المدرسين</p>
-    </div>
-    <div class="stat-box">
-      <h3 id="studentsCount">0</h3>
-      <p>👨‍🎓 الطلاب</p>
-    </div>
+    <div class="stat-box"><h3 id="totalUsers">0</h3><p>👥 المستخدمين</p></div>
+    <div class="stat-box"><h3 id="teachersCount">0</h3><p>👨‍🏫 المدرسين</p></div>
+    <div class="stat-box"><h3 id="studentsCount">0</h3><p>👨‍🎓 الطلاب</p></div>
   </div>
 
-  <!-- التاب -->
   <div class="tabs">
-    <button onclick="window.openTab('addUserTab')">➕ إضافة مستخدم</button>
-    <button onclick="window.openTab('usersTab')">👥 إدارة المستخدمين</button>
+    <button onclick="openTab('addUserTab')">➕ إضافة</button>
+    <button onclick="openTab('usersTab')">👥 المستخدمين</button>
   </div>
 
-  <!-- إضافة مستخدم -->
   <div id="addUserTab" class="tab-content">
     <div class="card">
-      <h3>➕ إضافة مستخدم جديد</h3>
+      <h3>إضافة مستخدم</h3>
+      <input type="text" id="name" placeholder="الاسم">
+      <input type="email" id="userEmail" placeholder="الايميل">
 
-      <input type="text" id="name" placeholder="اسم المستخدم">
-      <input type="email" id="userEmail" placeholder="البريد الإلكتروني">
-
-      <div style="position:relative;">
-        <input type="password" id="userPass" placeholder="كلمة السر">
-        <span onclick="window.togglePass()" style="position:absolute; left:10px; top:12px; cursor:pointer; font-size:18px;">👁️</span>
+      <div class="password-box">
+        <input type="password" id="userPass" placeholder="الباسورد">
+        <span onclick="togglePass()">👁️</span>
       </div>
 
-      <select id="role" onchange="window.onRoleChange()">
+      <select id="role" onchange="onRoleChange()">
         <option value="teacher">مدرس</option>
         <option value="student">طالب</option>
       </select>
 
       <!-- اختيار المدرس -->
       <div id="teacherSelectRow" style="display:none;">
-        <label style="display:block; margin-bottom:8px; font-weight:600;">اختر المدرس:</label>
         <select id="teacherSelect"></select>
       </div>
 
-      <button onclick="window.addUser()" style="width:100%; margin-top:15px;">✅ إضافة المستخدم</button>
+      <button onclick="addUser()">إضافة</button>
     </div>
   </div>
 
-  <!-- إدارة المستخدمين -->
   <div id="usersTab" class="tab-content">
     <div class="card">
-      <h3>👥 إدارة المستخدمين</h3>
-      <input type="text" id="search" placeholder="🔍 ابحث عن مستخدم..." oninput="window.searchUsers()" style="margin-bottom:15px;">
+      <input type="text" id="search" placeholder="🔍 ابحث..." oninput="searchUsers()">
       <div id="users"></div>
     </div>
   </div>
 
-  <button class="logout" onclick="window.logout()">تسجيل خروج</button>
+  <button class="logout" onclick="logout()">تسجيل خروج</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
-
-<button id="scrollTopBtn" onclick="window.scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="window.scrollToBottom()">⬇</button>
-
 </body>
 </html>
