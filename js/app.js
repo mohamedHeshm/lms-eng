@@ -964,15 +964,6 @@ window.addEventListener("load", function() {
     loadTeacherContent()
   }
 })
-document.getElementById("goCommentsBtn")?.addEventListener("click", () => {
-  const teacherId = localStorage.getItem("selectedTeacherId")
 
-  if (!teacherId) {
-    alert("❌ مفيش مدرس محدد")
-    return
-  }
-
-  window.location.href = `teacher-profile.html?id=${teacherId}`
-})
 
 console.log("✅ LMS Loaded Successfully")
