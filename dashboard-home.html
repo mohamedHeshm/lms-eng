@@ -891,14 +891,11 @@
       return 4.8
     }
   }
-  function handleTabClick(event, filter) {
-  let buttons = document.querySelectorAll('.tab-btn')
-  buttons.forEach(btn => btn.classList.remove('active'))
-
-  event.target.classList.add('active')
-
-  displayTeachers(filter)
-}
+    let buttons = document.querySelectorAll('.tab-btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    event.target.classList.add('active')
+    displayTeachers(filter)
+  }
 
   // عرض الحالة الفارغة
   function showEmpty() {

@@ -965,17 +965,4 @@ window.addEventListener("load", function() {
   }
 })
 
-  // تحويل لصفحة التقييم مع ID المدرس
-  window.location.href = `teacher-profile.html?id=${teacherId}`
-}
-document.getElementById("goCommentsBtn")?.addEventListener("click", () => {
-  const teacherId = localStorage.getItem("selectedTeacherId")
-
-  if (!teacherId) {
-    alert("❌ مفيش مدرس محدد")
-    return
-  }
-
-  window.location.href = `teacher-profile.html?id=${teacherId}`
-})
 console.log("✅ LMS Loaded Successfully")
