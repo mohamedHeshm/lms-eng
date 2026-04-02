@@ -1173,5 +1173,7 @@ setInterval(() => {
     window.loadStats()
   }
 }, 30000)
-
+function goHome() {
+  window.location.href = "dashboard-home.html";
+}
 console.log("✅ LMS Loaded Successfully")
