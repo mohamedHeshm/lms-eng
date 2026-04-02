@@ -32,6 +32,43 @@ function showStatus(message, type = 'info') {
   }
 }
 
+// ================== تأمين الصفحات ==================
+function protectPage() {
+  const currentUser = getCurrentUser()
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html'
+
+  // الصفحات المحمية
+  const protectedPages = ['student.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html']
+
+  // إذا كان على صفحة محمية وما في user مسجل دخول
+  if (protectedPages.includes(currentPage) && !currentUser) {
+    alert('❌ يجب تسجيل الدخول أولاً')
+    window.location.href = 'index.html'
+    return false
+  }
+
+  // تحقق من الصفحة المناسبة للدور
+  if (currentUser) {
+    if (currentPage === 'admin.html' && currentUser.role !== 'admin') {
+      alert('❌ صفحة الأدمن حصرية للأدمن')
+      window.location.href = 'index.html'
+      return false
+    }
+    if (currentPage === 'teacher.html' && currentUser.role !== 'teacher') {
+      alert('❌ صفحة المدرس حصرية للمدرسين')
+      window.location.href = 'index.html'
+      return false
+    }
+    if (currentPage === 'student.html' && currentUser.role !== 'student') {
+      alert('❌ صفحة الطالب حصرية للطلاب')
+      window.location.href = 'index.html'
+      return false
+    }
+  }
+
+  return true
+}
+
 // ================== تسجيل دخول ==================
 window.login = async function() {
   try {
@@ -74,7 +111,7 @@ window.login = async function() {
     setTimeout(() => {
       if (data.role === "admin") location.href = "admin.html"
       else if (data.role === "teacher") location.href = "teacher.html"
-      else if (data.role === "student") location.href = "student.html"
+      else if (data.role === "student") location.href = "student-modern.html"
     }, 500)
 
     return true
@@ -84,6 +121,11 @@ window.login = async function() {
     showStatus("❌ خطأ في الاتصال", 'error')
     return false
   }
+}
+
+// ================== الرجوع للرئيسية ==================
+window.goHome = function() {
+  window.location.href = 'index.html'
 }
 
 // ================== Admin - إضافة مستخدم ==================
@@ -262,6 +304,11 @@ window.loadStats = async function() {
   } catch (error) {
     console.error("Stats error:", error)
   }
+}
+
+// ================== تغيير الباسورد ==================
+window.goToChangePassword = function() {
+  window.location.href = 'change-password.html'
 }
 
 // ================== Notes ==================
@@ -1093,6 +1140,9 @@ window.logout = function() {
 
 // ================== Init ==================
 window.addEventListener("load", function() {
+  // تأمين الصفحات
+  protectPage()
+
   // صفحة الأدمن
   if (document.getElementById("users")) {
     window.openTab("addUserTab")
