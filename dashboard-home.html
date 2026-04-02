@@ -171,12 +171,17 @@
       margin-bottom: 80px;
       animation: fadeInUp 0.8s ease-out 0.6s both;
     }
+.teacher-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 0;
+}
 
-   .teacher-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: white;
+.teacher-card * {
+  position: relative;
+  z-index: 1;
 }
 
     .teacher-card:hover {
@@ -184,17 +189,7 @@
       box-shadow: 0 40px 80px rgba(102, 126, 234, 0.3);
     }
 
-    .teacher-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+  
 
     .teacher-card:hover::before {
       opacity: 1;
