@@ -975,5 +975,15 @@ window.goToComments = function() {
   // تحويل لصفحة التقييم مع ID المدرس
   window.location.href = `teacher-profile.html?id=${teacherId}`
 }
+window.goToTeacherProfile = function() {
+  const teacherId = localStorage.getItem("selectedTeacherId")
 
+  if (!teacherId) {
+    alert("❌ مفيش مدرس محدد")
+    return
+  }
+
+  // 👇 يفتح صفحة التقييم بنفس الشكل اللي انت بعتو
+  window.location.href = `teacher-profile.html?id=${teacherId}`
+}
 console.log("✅ LMS Loaded Successfully")
