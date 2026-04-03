@@ -798,16 +798,11 @@
           }
 
           // عد الطلاب المسجلين مع هذا المعلم
-         const { data: studentCourses } = await supabase
-  .from("teacher_comments")
-  .select("student_id")
-  .eq("teacher_id", teacher.id)
+          const { data: studentCourses } = await supabase
+            .from("teacher_comments")
+            .select("id")
+            .eq("teacher_id", teacher.id)
 
-let uniqueStudents = new Set(
-  (studentCourses || []).map(s => s.student_id)
-)
-
-students: uniqueStudents.size
           return {
             id: teacher.id,
             name: teacher.name,
@@ -917,7 +912,7 @@ students: uniqueStudents.size
         <div class="card-stats">
           <div class="stat">
             <div class="stat-number">${teacher.students}</div>
-            <div class="stat-label">طالب</div>
+            <div class="stat-label">تعليقات الطلاب </div>
           </div>
           <div class="stat">
             <div class="stat-number">${teacher.rating}</div>
