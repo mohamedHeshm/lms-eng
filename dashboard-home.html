@@ -799,7 +799,7 @@
 
           // عد الطلاب المسجلين مع هذا المعلم
           const { data: studentCourses } = await supabase
-            .from("user_courses")
+            .from("teacher_comments")
             .select("id")
             .eq("teacher_id", teacher.id)
 
