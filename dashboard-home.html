@@ -189,8 +189,6 @@
       box-shadow: 0 40px 80px rgba(102, 126, 234, 0.3);
     }
 
-  
-
     .teacher-card:hover::before {
       opacity: 1;
     }
@@ -241,14 +239,45 @@
       flex-direction: column;
     }
 
-    .teacher-name {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 8px;
-      text-align: center;
-    }
+   .teacher-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 10px;
 
+  /* لون متدرج احترافي */
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* ظل خفيف */
+  text-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+  /* حركة */
+  transition: all 0.4s ease;
+}
+
+/* تأثير عند الوقوف */
+.teacher-card:hover .teacher-name {
+  transform: scale(1.08);
+  letter-spacing: 1px;
+}
+
+/* أنيميشن دخول */
+.teacher-name {
+  animation: fadeUp 0.8s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
     .teacher-badge {
       display: inline-block;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
