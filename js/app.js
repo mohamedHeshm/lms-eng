@@ -1166,6 +1166,88 @@ window.addEventListener("load", function() {
     window.loadTeacherContent()
   }
 })
+window.onRoleChange = function () {
+  let role = document.getElementById("role").value;
+  document.getElementById("teacherSelectRow").style.display =
+    role === "student" ? "block" : "none";
+
+  document.getElementById("gradeRow").style.display =
+    role === "teacher" ? "block" : "none";
+};
+async function addUser() {
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("userEmail").value;
+  let password = document.getElementById("userPass").value;
+  let role = document.getElementById("role").value;
+  let grade = document.getElementById("grade").value;
+
+  let { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (data.user) {
+    await supabase.from("users").insert({
+      id: data.user.id,
+      name,
+      role,
+      grade: role === "teacher" ? grade : null,
+    });
+
+    alert("تم الإضافة ✅");
+  }
+}
+let currentGrade = null;
+
+function changeGrade() {
+  currentGrade = document.getElementById("teacherGrade").value;
+
+  if (!currentGrade) return;
+
+  // اظهار التابات بعد الاختيار
+  document.querySelectorAll(".tab-content").forEach(tab => {
+    tab.style.display = "none";
+  });
+
+  alert("تم اختيار السنة ✅");
+}
+async function uploadPDF() {
+  if (!currentGrade) {
+    alert("اختار السنة الأول ❗");
+    return;
+  }
+
+  let file = document.getElementById("pdfFile").files[0];
+
+  let { data, error } = await supabase.storage
+    .from("pdfs")
+    .upload(`grade_${currentGrade}/${Date.now()}_${file.name}`, file);
+
+  if (!error) {
+    await supabase.from("pdfs").insert({
+      file_name: file.name,
+      grade: currentGrade,
+      teacher_id: currentUser.id,
+    });
+
+    alert("تم الرفع ✅");
+  }
+}
+async function loadPDFs() {
+  if (!currentGrade) return;
+
+  let { data } = await supabase
+    .from("pdfs")
+    .select("*")
+    .eq("grade", currentGrade);
+
+  let container = document.getElementById("pdfListTeacher");
+  container.innerHTML = "";
+
+  data.forEach(file => {
+    container.innerHTML += `<p>${file.file_name}</p>`;
+  });
+}
 
 // تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
