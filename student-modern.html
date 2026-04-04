@@ -2,1064 +2,201 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      min-height: 100vh;
-      color: #333;
-      position: relative;
-      overflow-x: hidden;
-      transition: background-image 0.8s ease-in-out;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
-      z-index: 0;
-      pointer-events: none;
-    }
-
+    * { box-sizing: border-box; }
+    body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; }
+    .container { width: 95%; max-width: 1200px; margin: auto; padding: 20px; }
+    
     /* Header */
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      z-index: 2;
-    }
-
-    @keyframes wave {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(600px); }
-    }
-
-    .header-content {
-      position: relative;
-      z-index: 1;
-      animation: slideDown 0.6s ease-out;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .header h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-      font-weight: 700;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .header p {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    /* الحاوية الرئيسية */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 30px 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* التابز الحديثة */
-    .tabs-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      overflow-x: auto;
-      padding: 10px 0;
-      scroll-behavior: smooth;
-      animation: fadeInUp 0.6s ease-out 0.2s both;
-      position: relative;
-      z-index: 2;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .tabs-container::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    .tabs-container::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-    }
-
-    .tabs-container::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.3);
-      border-radius: 2px;
-    }
-
-    .tab-btn {
-      padding: 12px 24px;
-      border: 2px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.1);
-      color: white;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 15px;
-      font-family: 'Cairo', sans-serif;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .tab-btn:hover {
-      background: rgba(255,255,255,0.2);
-      border-color: rgba(255,255,255,0.4);
-      transform: translateY(-2px);
-    }
-
-    .tab-btn.active {
-      background: white;
-      color: #667eea;
-      border-color: white;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-
-    /* محتوى التابز */
-    .tab-content {
-      display: none;
-      animation: fadeInUp 0.5s ease-out;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* البطاقات */
-    .card {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      border: 1px solid rgba(255,255,255,0.5);
-      transition: all 0.3s ease;
-      animation: scaleIn 0.5s ease-out;
-    }
-
-    @keyframes scaleIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-      border-color: rgba(102,126,234,0.3);
-    }
-
-    .card h3 {
-      color: #667eea;
-      margin-bottom: 20px;
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    /* حقول الإدخال */
-    input[type="file"],
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 14px;
-      font-family: 'Cairo', sans-serif;
-      transition: all 0.3s ease;
-      background: #f8f9fa;
-    }
-
-    input[type="file"]:focus,
-    input[type="text"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
-      transform: translateY(-2px);
-    }
-
-    /* الأزرار */
-    button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: 'Cairo', sans-serif;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      width: 100%;
-      box-shadow: 0 8px 20px rgba(102,126,234,0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(102,126,234,0.4);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: #333;
-      margin-right: 10px;
-    }
-
-    .btn-secondary:hover {
-      background: #e0e0e0;
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: #ff4d4d;
-      color: white;
-      padding: 8px 16px;
-      font-size: 13px;
-    }
-
-    .btn-danger:hover {
-      background: #cc0000;
-    }
-
+    .header { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+    .header h2 { margin: 0 0 10px 0; color: #333; text-align: center; }
+    .student-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; text-align: center; }
+    .student-info p { margin: 5px 0; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tabs button { flex: 1; min-width: 120px; padding: 12px; background: white; border: 2px solid #667eea; color: #667eea; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600; transition: all 0.3s; }
+    .tabs button:hover { background: #667eea; color: white; }
+    .tabs button.active { background: #667eea; color: white; }
+    
+    .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* قائمة المحتوى */
+    .content-list { list-style: none; padding: 0; margin: 0; }
+    .content-item { background: #f5f7ff; padding: 15px; margin: 10px 0; border-radius: 10px; border-right: 4px solid #667eea; display: flex; align-items: center; justify-content: space-between; }
+    .content-item a { color: #667eea; text-decoration: none; flex: 1; margin: 0 10px; }
+    .content-item a:hover { text-decoration: underline; }
+    
     /* البروفايل */
-    .profile-card {
-      text-align: center;
-    }
-
-    .profile-image {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 50px;
-      border: 4px solid white;
-      box-shadow: 0 10px 30px rgba(102,126,234,0.3);
-      animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    @keyframes popIn {
-      0% {
-        transform: scale(0);
-        opacity: 0;
-      }
-      50% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .profile-image img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .profile-info h2 {
-      color: #333;
-      margin: 15px 0;
-      font-size: 20px;
-    }
-
-    .profile-info p {
-      color: #666;
-      font-size: 15px;
-      line-height: 1.6;
-    }
-
-    /* القوائم */
-    ul, li {
-      list-style: none;
-    }
-
-    ul {
-      padding: 0;
-    }
-
-    li {
-      padding: 15px;
-      margin: 10px 0;
-      background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
-      border-radius: 12px;
-      border-right: 4px solid #667eea;
-      transition: all 0.3s ease;
-      animation: slideInLeft 0.5s ease-out;
-    }
-
-    @keyframes slideInLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    li:hover {
-      transform: translateX(5px);
-      box-shadow: 0 5px 15px rgba(102,126,234,0.2);
-    }
-
-    li a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    li a:hover {
-      color: #764ba2;
-    }
-
-    /* الفيديوهات */
-    #videoContainer {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    iframe {
-      border-radius: 15px;
-      border: none;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-    }
-
-    iframe:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(102,126,234,0.3);
-    }
-
-    /* رسالة الحالة */
-    .status {
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: 600;
-      animation: slideDown 0.3s ease-out;
-    }
-
-    .status.success {
-      background: rgba(37,211,102,0.1);
-      color: #25d366;
-      border: 1px solid rgba(37,211,102,0.3);
-    }
-
-    .status.error {
-      background: rgba(255,77,77,0.1);
-      color: #ff4d4d;
-      border: 1px solid rgba(255,77,77,0.3);
-    }
-
-    .status.info {
-      background: rgba(102,126,234,0.1);
-      color: #667eea;
-      border: 1px solid rgba(102,126,234,0.3);
-    }
-
-    /* الزر العائم */
-    .floating-btn {
-      position: fixed;
-      bottom: 30px;
-      left: 30px;
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      color: white;
-      font-size: 28px;
-      cursor: pointer;
-      box-shadow: 0 10px 30px rgba(102,126,234,0.4);
-      transition: all 0.3s ease;
-      z-index: 100;
-      animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    @keyframes bounceIn {
-      0% {
-        transform: scale(0);
-        opacity: 0;
-      }
-      50% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .floating-btn:hover {
-      transform: scale(1.15);
-      box-shadow: 0 15px 40px rgba(102,126,234,0.5);
-    }
-
-    .floating-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* زرار الخروج */
-    .logout-btn {
-      width: 100%;
-      padding: 14px;
-      margin-top: 30px;
-      background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4d 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 20px rgba(255,77,77,0.3);
-    }
-
-    .logout-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(255,77,77,0.4);
-    }
-
-    /* أزرار التمرير */
-    .scroll-btn {
-      position: fixed;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(102,126,234,0.8);
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      z-index: 99;
-      display: none;
-    }
-
-    .scroll-btn.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #scrollTopBtn {
-      bottom: 110px;
-      left: 30px;
-    }
-
-    #scrollBottomBtn {
-      bottom: 30px;
-      left: 30px;
-    }
-
-    .scroll-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
-    }
-
-    /* شبكة المحتوى */
-    .content-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .content-card {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.5);
-    }
-
-    .content-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(102,126,234,0.2);
-    }
-
-    /* Loading state */
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-      color: #999;
-      font-size: 16px;
-    }
-
-    .loader {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(102,126,234,0.2);
-      border-top: 4px solid #667eea;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header h1 {
-        font-size: 24px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      #videoContainer {
-        grid-template-columns: 1fr;
-      }
-
-      .content-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .floating-btn {
-        width: 55px;
-        height: 55px;
-        font-size: 24px;
-        bottom: 20px;
-        left: 20px;
-      }
-
-      #scrollTopBtn,
-      #scrollBottomBtn {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-        bottom: auto;
-        left: 20px;
-      }
-
-      #scrollTopBtn {
-        bottom: 85px;
-      }
-
-      #scrollBottomBtn {
-        bottom: 20px;
-      }
-
-      .tabs-container {
-        gap: 8px;
-      }
-
-      .tab-btn {
-        padding: 10px 16px;
-        font-size: 13px;
-      }
-    }
+    .profile-card { text-align: center; }
+    .profile-image { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #667eea; margin: 0 auto 15px; }
+    .profile-card h4 { color: #333; margin: 10px 0; }
+    .profile-card p { color: #666; margin: 5px 0; }
+    
+    .teacher-social { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    .social-btn { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; font-family: 'Cairo', sans-serif; transition: all 0.3s; }
+    .social-btn:hover { transform: translateY(-2px); }
+    
+    .empty-state { text-align: center; padding: 30px; color: #999; }
+    
+    /* فيديو */
+    iframe { border-radius: 10px; border: 2px solid #667eea; }
+    
+    /* زر الخروج */
+    .logout { background: #ff4d4d; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-family: 'Cairo', sans-serif; font-weight: 600; transition: all 0.3s; }
+    .logout:hover { background: #cc0000; }
+    
+    /* شريط التمرير */
+    .scroll-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: #667eea; color: white; border: none; cursor: pointer; display: none; z-index: 100; transition: all 0.3s; }
+    .scroll-btn:hover { background: #764ba2; transform: scale(1.1); }
   </style>
 </head>
 <body>
-
-<!-- Header -->
-<div class="header">
-  <div class="header-content">
-    <h1>👨‍🎓 لوحة الطالب</h1>
-    <p id="studentName">مرحباً بك!</p>
-  </div>
-</div>
-
-<!-- الحاوية الرئيسية -->
 <div class="container">
 
-  <!-- التابز -->
-  <div class="tabs-container">
-    <button class="tab-btn active" onclick="openTab('profile', this)">👤 المدرس</button>
-    <button class="tab-btn" onclick="openTab('videosTab', this)">🎥 الفيديوهات</button>
-    <button class="tab-btn" onclick="openTab('pdfsTab', this)">📁 الواجبات</button>
-    <button class="tab-btn" onclick="openTab('pdfs2Tab', this)">📚 المذكرات</button>
-    <button class="tab-btn" onclick="openTab('notesTab', this)">📝 التنبيهات</button>
-    <button class="tab-btn" onclick="goToTeacherProfile(this)">⭐ التقييم</button>
+  <!-- Header -->
+  <div class="header">
+    <h2>👨‍🎓 لوحة الطالب</h2>
+    <div class="student-info" id="studentInfo">
+      <p><strong>👤 الطالب:</strong> <span id="studentName">...</span></p>
+      <p><strong>📚 السنة:</strong> <span id="studentYear">...</span></p>
+      <p><strong>👨‍🏫 المدرس:</strong> <span id="teacherName">...</span></p>
+    </div>
   </div>
 
-  <!-- PROFILE -->
+  <!-- التنقل -->
+  <div class="tabs" id="navTabs">
+    <button class="tab-btn active" onclick="openStudentTab('profile')">👤 البروفايل</button>
+    <button class="tab-btn" onclick="openStudentTab('videos')">🎥 الفيديوهات</button>
+    <button class="tab-btn" onclick="openStudentTab('sheets')">📄 الشيتات</button>
+    <button class="tab-btn" onclick="openStudentTab('notes')">📚 المذكرات</button>
+    <button class="tab-btn" onclick="openStudentTab('announcements')">📝 الملاحظات</button>
+  </div>
+
+  <!-- البروفايل والمدرس -->
   <div id="profile" class="tab-content active">
-    <div class="card profile-card" id="teacherProfile">
-      <div class="loading">
-        <div class="loader"></div>
-        جاري التحميل...
-      </div>
-    </div>
-  </div>
-
-  <!-- SOCIAL -->
-  <div id="social" class="tab-content">
-    <div class="card" id="teacherSocial">
-      <div class="loading">
-        <div class="loader"></div>
-        جاري التحميل...
-      </div>
-    </div>
-  </div>
-
-  <!-- VIDEOS -->
-  <div id="videosTab" class="tab-content">
     <div class="card">
-      <h3>🎥 الفيديوهات</h3>
-      <div id="videoContainer" class="content-grid">
-        <div class="loading">
-          <div class="loader"></div>
-          جاري تحميل الفيديوهات...
+      <h3>👤 بروفايل المدرس</h3>
+      <div class="profile-card">
+        <div id="teacherProfile">
+          <p class="empty-state">جاري التحميل...</p>
         </div>
+        <div id="teacherSocial" class="teacher-social"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- PDF الأول - الواجبات -->
-  <div id="pdfsTab" class="tab-content">
-    <div class="card">
-      <h3>📁 الواجبات</h3>
-      <ul id="pdfList">
-        <li class="loading">
-          <div class="loader"></div>
-          جاري تحميل الواجبات...
-        </li>
-      </ul>
     </div>
 
     <!-- رفع الحل -->
     <div class="card">
-      <h3>📤 تسليم الواجب</h3>
-      <input type="file" id="solutionFile" placeholder="اختر ملف">
-      <button class="btn-primary" onclick="uploadSolution()">🚀 رفع الحل</button>
-      <div id="uploadStatus"></div>
+      <h3>📤 رفع حلك</h3>
+      <input type="file" id="solutionFile" accept=".pdf,.doc,.docx,.jpg,.png,.txt">
+      <button onclick="uploadSolution()" style="background:#25d366; color:white; padding:10px; border:none; border-radius:8px; cursor:pointer; margin-top:10px; width:100%; font-family:'Cairo', sans-serif;">📤 رفع</button>
+      <p id="uploadStatus" style="text-align:center; margin-top:10px; font-weight:600;"></p>
     </div>
   </div>
 
-  <!-- PDF الثاني - المذكرات -->
-  <div id="pdfs2Tab" class="tab-content">
+  <!-- الفيديوهات -->
+  <div id="videos" class="tab-content">
+    <div class="card">
+      <h3>🎥 الفيديوهات</h3>
+      <div id="videoContainer">
+        <p class="empty-state">جاري التحميل...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- الشيتات -->
+  <div id="sheets" class="tab-content">
+    <div class="card">
+      <h3>📄 الشيتات</h3>
+      <ul class="content-list" id="pdfList">
+        <li class="empty-state">جاري التحميل...</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- المذكرات -->
+  <div id="notes" class="tab-content">
     <div class="card">
       <h3>📚 المذكرات</h3>
-      <ul id="pdfList2">
-        <li class="loading">
-          <div class="loader"></div>
-          جاري تحميل المذكرات...
-        </li>
+      <ul class="content-list" id="pdfList2">
+        <li class="empty-state">جاري التحميل...</li>
       </ul>
     </div>
   </div>
 
-  <!-- NOTES - التنبيهات -->
-  <div id="notesTab" class="tab-content">
+  <!-- الملاحظات -->
+  <div id="announcements" class="tab-content">
     <div class="card">
-      <h3>📝 التنبيهات</h3>
-      <ul id="noteList">
-        <li class="loading">
-          <div class="loader"></div>
-          جاري تحميل التنبيهات...
-        </li>
+      <h3>📝 الملاحظات المهمة</h3>
+      <ul class="content-list" id="noteList">
+        <li class="empty-state">جاري التحميل...</li>
       </ul>
     </div>
   </div>
 
-  <!-- زرار الخروج -->
-  <button class="logout-btn" onclick="logout()">🚪 تسجيل خروج</button>
+  <!-- الخروج -->
+  <button class="logout" onclick="logout()">🚪 تسجيل خروج</button>
 </div>
 
-<!-- الزرار العائم لتغيير الباسورد -->
-<button class="floating-btn" onclick="goToChangePassword()" title="تغيير الباسورد">
-  🔐
-</button>
-
 <!-- أزرار التمرير -->
-<button id="scrollTopBtn" class="scroll-btn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" class="scroll-btn" onclick="scrollToBottom()">⬇</button>
+<button id="scrollTopBtn" class="scroll-btn" onclick="scrollToTop()" style="bottom:100px; right:20px;">⬆</button>
+<button id="scrollBottomBtn" class="scroll-btn" onclick="scrollToBottom()" style="bottom:30px; right:20px;">⬇</button>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+<script type="module" src="js/app.js"></script>
 
-  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
-  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
-  const supabase = createClient(supabaseUrl, supabaseKey)
-
-  // الحصول على المستخدم الحالي
-  function getCurrentUser() {
-    try {
-      const userJson = localStorage.getItem("currentUser")
-      return userJson ? JSON.parse(userJson) : null
-    } catch (e) {
-      console.error("Error parsing user:", e)
-      return null
-    }
-  }
-
-  // تأمين الصفحة
-  window.addEventListener('load', () => {
-    const currentUser = getCurrentUser()
-    if (!currentUser || currentUser.role !== 'student') {
-      alert('❌ يجب تسجيل الدخول كطالب أولاً')
-      window.location.href = 'index.html'
-      return
-    }
-
-    // تحديث اسم الطالب
-    const studentNameEl = document.getElementById('studentName')
-    if (studentNameEl) {
-      studentNameEl.textContent = `مرحباً ${currentUser.name}! 👋`
-    }
-
-    // تحميل البيانات
-    loadStudentData()
-
-    // عرض/إخفاء أزرار التمرير
-    updateScrollButtons()
-  })
-
-  // فتح التابز
-  window.openTab = function(tabId, btn) {
-    // إخفاء جميع التابز
+<script>
+  // إدارة التنقل
+  window.openStudentTab = function(tabName) {
+    // إخفاء جميع التبويبات
     document.querySelectorAll('.tab-content').forEach(tab => {
-      tab.classList.remove('active')
-    })
-
-    // إزالة الفئة active من جميع الأزرار
-    document.querySelectorAll('.tab-btn').forEach(button => {
-      button.classList.remove('active')
-    })
-
-    // إظهار التابز المختار وتفعيل الزرار
-    document.getElementById(tabId).classList.add('active')
-    if (btn) btn.classList.add('active')
-  }
-
-  // الذهاب لصفحة تغيير الباسورد
-  window.goToChangePassword = function() {
-    window.location.href = 'change-password.html'
-  }
-
-  // الذهاب لصفحة تقييم المدرس
-  window.goToTeacherProfile = function(btn) {
-    if (!window.studentTeacherId) {
-      alert("❌ لم يتم تعيين معلم لك")
-      return
+      tab.classList.remove('active');
+    });
+    
+    // إزالة active من جميع الأزرار
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // عرض التبويب المختار
+    let selectedTab = document.getElementById(tabName);
+    if (selectedTab) {
+      selectedTab.classList.add('active');
     }
-    localStorage.setItem("selectedTeacherId", window.studentTeacherId)
-    window.location.href = `teacher-profile.html?id=${window.studentTeacherId}`
-  }
-
-  // تحميل بيانات الطالب
-  window.loadStudentData = async function() {
-    try {
-      const currentUser = getCurrentUser()
-      if (!currentUser) return
-
-      const { data: user } = await supabase
-        .from("users")
-        .select("teacher_id")
-        .eq("id", currentUser.id)
-        .single()
-
-      if (!user?.teacher_id) {
-        alert("❌ لم يتم تعيين معلم لك")
-        return
-      }
-
-      window.studentTeacherId = user.teacher_id
-      const teacherId = user.teacher_id
-
-      // تحميل جميع البيانات
-      const [
-        { data: notes },
-        { data: videos },
-        { data: pdfs },
-        { data: pdfs2 },
-        { data: profiles },
-        { data: socials }
-      ] = await Promise.all([
-        supabase.from("notes").select("*").eq("teacher_id", teacherId),
-        supabase.from("videos").select("*").eq("teacher_id", teacherId),
-        supabase.from("pdfs").select("*").eq("teacher_id", teacherId),
-        supabase.from("pdfs2").select("*").eq("teacher_id", teacherId),
-        supabase.from("teacher_profile").select("*").eq("teacher_id", teacherId),
-        supabase.from("social_links").select("*").eq("teacher_id", teacherId)
-      ])
-
-      // تحميل البيانات
-      loadNotes(notes)
-      loadVideos(videos)
-      loadPDFs(pdfs, 'pdfList')
-      loadPDFs(pdfs2, 'pdfList2')
-      loadTeacherProfile(profiles, socials)
-
-    } catch (error) {
-      console.error("Load student data error:", error)
-    }
-  }
-
-  // تحميل الملاحظات
-  function loadNotes(notes) {
-    const noteList = document.getElementById('noteList')
-    if (!noteList) return
-
-    noteList.innerHTML = ''
-    if (notes && notes.length > 0) {
-      notes.forEach(n => {
-        noteList.innerHTML += `<li>📌 ${escapeHtml(n.content)}</li>`
-      })
-    } else {
-      noteList.innerHTML = '<li style="text-align:center; color:#999;">📭 لا توجد تنبيهات حالياً</li>'
-    }
-  }
-
-  // تحميل الفيديوهات
-  function loadVideos(videos) {
-    const videoContainer = document.getElementById('videoContainer')
-    if (!videoContainer) return
-
-    videoContainer.innerHTML = ''
-    if (videos && videos.length > 0) {
-      videos.forEach(v => {
-        videoContainer.innerHTML += `
-          <div class="content-card">
-            <iframe width="100%" height="200" src="${escapeHtml(v.url)}" allowfullscreen></iframe>
-          </div>
-        `
-      })
-    } else {
-      videoContainer.innerHTML = '<div style="text-align:center; color:#999; padding:40px;">🎬 لا توجد فيديوهات حالياً</div>'
-    }
-  }
-
-  // تحميل PDFs
-  function loadPDFs(pdfs, elementId) {
-    const pdfList = document.getElementById(elementId)
-    if (!pdfList) return
-
-    pdfList.innerHTML = ''
-    if (pdfs && pdfs.length > 0) {
-      pdfs.forEach(p => {
-        pdfList.innerHTML += `
-          <li>
-            <a href="${escapeHtml(p.file_url)}" target="_blank">
-              📄 ${escapeHtml(p.file_name)}
-            </a>
-          </li>
-        `
-      })
-    } else {
-      pdfList.innerHTML = '<li style="text-align:center; color:#999;">📂 لا توجد ملفات حالياً</li>'
-    }
-  }
-
-  // تحميل بروفايل المدرس
-  function loadTeacherProfile(profiles, socials) {
-    const profileDiv = document.getElementById('teacherProfile')
-    if (!profileDiv) return
-
-    profileDiv.innerHTML = ''
-
-    if (profiles && profiles.length > 0) {
-      const p = profiles[0]
-
-      // تحديث خلفية الصفحة بصورة المدرس
-      if (p.image_url) {
-        document.body.style.backgroundImage = `url('${p.image_url}')`
-      }
-
-      let html = `
-        <div class="profile-image">
-          ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="Teacher">` : '👨‍🏫'}
-        </div>
-        <div class="profile-info">
-          <h2>👨‍🏫 المدرس</h2>
-          <p style="font-size:16px; color:#667eea; margin:15px 0;">${escapeHtml(p.bio || 'نبذة غير متوفرة')}</p>
-        </div>
-      `
-
-      if (socials && socials.length > 0) {
-        const s = socials[0]
-        html += '<div style="margin-top:25px;">'
-        if (s.facebook) html += `<a href="${escapeHtml(s.facebook)}" target="_blank" style="display:inline-block; margin:8px; padding:10px 20px; background:rgba(24, 119, 242, 0.1); color:#1877f2; border-radius:10px; text-decoration:none; font-weight:600; transition:all 0.3s; border:2px solid #1877f2;">📘 فيسبوك</a>`
-        if (s.whatsapp) html += `<a href="${escapeHtml(s.whatsapp)}" target="_blank" style="display:inline-block; margin:8px; padding:10px 20px; background:rgba(37, 211, 102, 0.1); color:#25d366; border-radius:10px; text-decoration:none; font-weight:600; transition:all 0.3s; border:2px solid #25d366;">💬 واتساب</a>`
-        if (s.youtube) html += `<a href="${escapeHtml(s.youtube)}" target="_blank" style="display:inline-block; margin:8px; padding:10px 20px; background:rgba(255, 0, 0, 0.1); color:#ff0000; border-radius:10px; text-decoration:none; font-weight:600; transition:all 0.3s; border:2px solid #ff0000;">▶️ يوتيوب</a>`
-        html += '</div>'
-      }
-
-      profileDiv.innerHTML = html
-    }
-  }
-
-  // رفع حل الطالب
-  window.uploadSolution = async function() {
-    try {
-      const file = document.getElementById('solutionFile')?.files[0]
-      const statusDiv = document.getElementById('uploadStatus')
-      const currentUser = getCurrentUser()
-
-      if (!file) {
-        showStatus('❌ يرجى اختيار ملف', 'error', statusDiv)
-        return
-      }
-
-      if (!currentUser) {
-        showStatus('❌ يجب تسجيل الدخول', 'error', statusDiv)
-        return
-      }
-
-      showStatus('⏳ جاري رفع الملف...', 'info', statusDiv)
-
-      const safeName = file.name.replace(/\s+/g, "_")
-      const path = "solutions/" + currentUser.id + "_" + Date.now() + "_" + safeName
-
-      const { error: uploadError } = await supabase.storage
-        .from("files")
-        .upload(path, file)
-
-      if (uploadError) {
-        showStatus('❌ خطأ في الرفع: ' + uploadError.message, 'error', statusDiv)
-        return
-      }
-
-      const { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
-
-      const { error: dbError } = await supabase.from("solutions").insert([
-        { student_id: currentUser.id, file_url: urlData.publicUrl }
-      ])
-
-      if (dbError) {
-        showStatus('❌ خطأ في الحفظ: ' + dbError.message, 'error', statusDiv)
-        return
-      }
-
-      showStatus('✅ تم رفع الحل بنجاح!', 'success', statusDiv)
-      document.getElementById('solutionFile').value = ''
-
-    } catch (error) {
-      console.error('Upload error:', error)
-      showStatus('❌ خطأ: ' + error.message, 'error', document.getElementById('uploadStatus'))
-    }
-  }
-
-  // عرض الرسالة
-  function showStatus(message, type, element) {
-    if (!element) return
-    element.innerHTML = `<div class="status ${type}">${message}</div>`
-  }
-
-  // escape HTML
-  function escapeHtml(text) {
-    if (!text) return ''
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
-  }
-
-  // تحديث أزرار التمرير
-  window.updateScrollButtons = function() {
-    const topBtn = document.getElementById('scrollTopBtn')
-    const bottomBtn = document.getElementById('scrollBottomBtn')
-
-    if (topBtn && bottomBtn) {
-      if (window.scrollY > 300) {
-        topBtn.classList.add('show')
-      } else {
-        topBtn.classList.remove('show')
-      }
-
-      if (window.scrollY < document.body.scrollHeight - window.innerHeight - 300) {
-        bottomBtn.classList.add('show')
-      } else {
-        bottomBtn.classList.remove('show')
-      }
-    }
-  }
+    
+    // إضافة active للزر المختار
+    event.target.classList.add('active');
+  };
 
   // التمرير
   window.scrollToTop = function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   window.scrollToBottom = function() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-  }
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
 
-  // الخروج
-  window.logout = function() {
-    localStorage.removeItem("currentUser")
-    window.location.href = "index.html"
-  }
-
-  // تحديث أزرار التمرير عند التمرير
-  window.addEventListener('scroll', updateScrollButtons)
+  // عرض/إخفاء أزرار التمرير
+  window.addEventListener('scroll', function() {
+    let topBtn = document.getElementById('scrollTopBtn');
+    let bottomBtn = document.getElementById('scrollBottomBtn');
+    if (window.scrollY > 300) {
+      topBtn.style.display = 'block';
+    } else {
+      topBtn.style.display = 'none';
+    }
+    if (window.scrollY < document.body.scrollHeight - window.innerHeight - 300) {
+      bottomBtn.style.display = 'block';
+    } else {
+      bottomBtn.style.display = 'none';
+    }
+  });
 </script>
 
 </body>

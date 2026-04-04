@@ -32,22 +32,28 @@ function showStatus(message, type = 'info') {
   }
 }
 
+// ================== Password Hashing (بسيط وآمن) ==================
+async function hashPassword(password) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 // ================== تأمين الصفحات ==================
 function protectPage() {
   const currentUser = getCurrentUser()
   const currentPage = window.location.pathname.split('/').pop() || 'index.html'
 
-  // الصفحات المحمية
-  const protectedPages = ['student.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html']
+  const protectedPages = ['student-modern.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html', 'change-password.html']
 
-  // إذا كان على صفحة محمية وما في user مسجل دخول
   if (protectedPages.includes(currentPage) && !currentUser) {
     alert('❌ يجب تسجيل الدخول أولاً')
     window.location.href = 'index.html'
     return false
   }
 
-  // تحقق من الصفحة المناسبة للدور
   if (currentUser) {
     if (currentPage === 'admin.html' && currentUser.role !== 'admin') {
       alert('❌ صفحة الأدمن حصرية للأدمن')
@@ -59,7 +65,7 @@ function protectPage() {
       window.location.href = 'index.html'
       return false
     }
-    if (currentPage === 'student.html' && currentUser.role !== 'student') {
+    if (currentPage === 'student-modern.html' && currentUser.role !== 'student') {
       alert('❌ صفحة الطالب حصرية للطلاب')
       window.location.href = 'index.html'
       return false
@@ -74,7 +80,6 @@ window.login = async function() {
   try {
     let email = document.getElementById("email")?.value.trim()
     let pass = document.getElementById("password")?.value.trim()
-    let status = document.getElementById("loginStatus")
 
     if (!email || !pass) {
       showStatus("❌ يجب ملء جميع الحقول", 'error')
@@ -88,11 +93,14 @@ window.login = async function() {
 
     showStatus("⏳ جاري التحقق...", 'info')
 
+    // Hash الباسورد
+    let hashedPass = await hashPassword(pass)
+
     let { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("email", email)
-      .eq("password", pass)
+      .eq("password", hashedPass)
       .single()
 
     if (error || !data) {
@@ -105,7 +113,17 @@ window.login = async function() {
       return false
     }
 
-    localStorage.setItem("currentUser", JSON.stringify(data))
+    // احفظ البيانات بدون الباسورد
+    let safeUser = {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      teacher_id: data.teacher_id,
+      academic_year: data.academic_year
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(safeUser))
     showStatus("✅ تم! جاري التوجيه...", 'success')
 
     setTimeout(() => {
@@ -123,11 +141,6 @@ window.login = async function() {
   }
 }
 
-// ================== الرجوع للرئيسية ==================
-window.goHome = function() {
-  window.location.href = 'index.html'
-}
-
 // ================== Admin - إضافة مستخدم ==================
 window.addUser = async function() {
   try {
@@ -136,6 +149,7 @@ window.addUser = async function() {
     let pass = document.getElementById("userPass")?.value.trim()
     let role = document.getElementById("role")?.value
     let teacherId = document.getElementById("teacherSelect")?.value
+    let academicYear = document.getElementById("academicYear")?.value
 
     if (!name || !email || !pass) {
       alert("❗ اكتب كل البيانات")
@@ -144,6 +158,16 @@ window.addUser = async function() {
 
     if (!email.includes('@')) {
       alert("❌ الايميل غير صحيح")
+      return
+    }
+
+    if (role === "student" && !teacherId) {
+      alert("❌ لازم تختار مدرس للطالب")
+      return
+    }
+
+    if (role === "student" && !academicYear) {
+      alert("❌ لازم تختار السنة الدراسية")
       return
     }
 
@@ -158,14 +182,18 @@ window.addUser = async function() {
       return
     }
 
+    // Hash الباسورد
+    let hashedPass = await hashPassword(pass)
+
     // إضافة
     let { error } = await supabase.from("users").insert([
       {
         name,
         email,
-        password: pass,
+        password: hashedPass,
         role,
         teacher_id: role === "student" ? teacherId : null,
+        academic_year: role === "student" ? academicYear : null,
         is_active: true
       }
     ])
@@ -179,6 +207,7 @@ window.addUser = async function() {
     document.getElementById("name").value = ""
     document.getElementById("userEmail").value = ""
     document.getElementById("userPass").value = ""
+    document.getElementById("academicYear").value = ""
 
     loadUsers()
     loadStats()
@@ -192,6 +221,54 @@ window.addUser = async function() {
 window.togglePass = function() {
   let input = document.getElementById("userPass")
   if (input) input.type = input.type === "password" ? "text" : "password"
+}
+
+// ================== تحديث بيانات الطالب ==================
+window.editStudent = async function(studentId) {
+  try {
+    let currentUser = getCurrentUser()
+    if (currentUser.role !== 'admin') {
+      alert("❌ ليس لديك صلاحية")
+      return
+    }
+
+    let { data: student } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", studentId)
+      .single()
+
+    if (!student) {
+      alert("❌ الطالب غير موجود")
+      return
+    }
+
+    let newTeacher = prompt("ادخل معرف المدرس الجديد (اتركه فارغ للإلغاء):", student.teacher_id)
+    if (newTeacher === null) return
+
+    let newYear = prompt("ادخل السنة الدراسية الجديدة (اتركها فارغة للإلغاء):", student.academic_year)
+    if (newYear === null) return
+
+    let { error } = await supabase
+      .from("users")
+      .update({
+        teacher_id: newTeacher || student.teacher_id,
+        academic_year: newYear || student.academic_year
+      })
+      .eq("id", studentId)
+
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
+
+    alert("✅ تم تحديث البيانات")
+    loadUsers()
+
+  } catch (error) {
+    console.error("Edit student error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
 }
 
 // ================== Users ==================
@@ -222,18 +299,23 @@ window.searchUsers = async function() {
 
       if (!match) return
 
+      let yearBadge = u.academic_year ? `<p>📚 السنة: ${u.academic_year}</p>` : ""
+
       container.innerHTML += `
         <div class="user-card">
           <h4>${escapeHtml(u.name || "بدون اسم")}</h4>
           <p>${escapeHtml(u.email)}</p>
           <p>👤 ${u.role === "teacher" ? "مدرس" : "طالب"}</p>
+          ${yearBadge}
           <p>${u.is_active ? "🟢 نشط" : "🔴 متوقف"}</p>
 
-          <button onclick="window.toggleUser('${u.id}')">
+          ${u.role === "student" ? `<button onclick="window.editStudent('${u.id}')" style="background:#ff9800; width:auto; padding:6px 14px; margin:4px;">✏️ تحديث</button>` : ""}
+
+          <button onclick="window.toggleUser('${u.id}')" style="width:auto; padding:6px 14px; margin:4px;">
             ${u.is_active ? "⏸ إيقاف" : "▶️ تشغيل"}
           </button>
 
-          <button onclick="window.deleteUser('${u.id}')" class="danger">🗑 حذف</button>
+          <button onclick="window.deleteUser('${u.id}')" class="danger" style="width:auto; padding:6px 14px; margin:4px;">🗑 حذف</button>
         </div>
       `
     })
@@ -306,9 +388,141 @@ window.loadStats = async function() {
   }
 }
 
-// ================== تغيير الباسورد ==================
-window.goToChangePassword = function() {
-  window.location.href = 'change-password.html'
+// ================== Teacher - اختيار السنة الدراسية ==================
+window.loadAcademicYears = async function() {
+  try {
+    let currentUser = getCurrentUser()
+    if (!currentUser) return
+
+    // احصل على السنوات الدراسية للطلاب عند هذا المدرس
+    let { data: students } = await supabase
+      .from("users")
+      .select("academic_year")
+      .eq("teacher_id", currentUser.id)
+      .eq("role", "student")
+
+    let years = [...new Set(students?.map(s => s.academic_year).filter(y => y))]
+
+    let yearSelect = document.getElementById("teacherYearSelect")
+    if (yearSelect) {
+      yearSelect.innerHTML = `<option value="">-- اختر السنة --</option>`
+      years.forEach(year => {
+        yearSelect.innerHTML += `<option value="${year}">${year}</option>`
+      })
+    }
+  } catch (error) {
+    console.error("Load academic years error:", error)
+  }
+}
+
+window.loadTeacherContentTable = async function() {
+  try {
+    let currentUser = getCurrentUser()
+    let selectedYear = document.getElementById("teacherYearSelect")?.value
+
+    if (!currentUser || !selectedYear) {
+      alert("❌ اختر السنة الدراسية أولاً")
+      return
+    }
+
+    const [
+      { data: pdfs },
+      { data: pdfs2 },
+      { data: videos },
+      { data: notes }
+    ] = await Promise.all([
+      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id).eq("academic_year", selectedYear),
+      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id).eq("academic_year", selectedYear),
+      supabase.from("videos").select("*").eq("teacher_id", currentUser.id).eq("academic_year", selectedYear),
+      supabase.from("notes").select("*").eq("teacher_id", currentUser.id).eq("academic_year", selectedYear)
+    ])
+
+    let table = document.getElementById("contentTable")
+    if (!table) return
+
+    table.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; background:white; border-radius:10px; margin-bottom:20px;">
+          <thead>
+            <tr style="background:#4facfe; color:white;">
+              <th style="padding:12px; text-align:right; border:1px solid #ddd;">النوع</th>
+              <th style="padding:12px; text-align:right; border:1px solid #ddd;">الاسم</th>
+              <th style="padding:12px; text-align:right; border:1px solid #ddd;">التاريخ</th>
+              <th style="padding:12px; text-align:center; border:1px solid #ddd;">الإجراء</th>
+            </tr>
+          </thead>
+          <tbody>`
+
+    if (pdfs && pdfs.length > 0) {
+      pdfs.forEach(p => {
+        let date = new Date(p.created_at).toLocaleDateString('ar-EG')
+        table.innerHTML += `
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:12px; text-align:right;">📄 شيت</td>
+            <td style="padding:12px; text-align:right;">${escapeHtml(p.file_name)}</td>
+            <td style="padding:12px; text-align:right;">${date}</td>
+            <td style="padding:12px; text-align:center;">
+              <button onclick="window.deletePDF('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑</button>
+            </td>
+          </tr>`
+      })
+    }
+
+    if (pdfs2 && pdfs2.length > 0) {
+      pdfs2.forEach(p => {
+        let date = new Date(p.created_at).toLocaleDateString('ar-EG')
+        table.innerHTML += `
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:12px; text-align:right;">📚 مذكرة</td>
+            <td style="padding:12px; text-align:right;">${escapeHtml(p.file_name)}</td>
+            <td style="padding:12px; text-align:right;">${date}</td>
+            <td style="padding:12px; text-align:center;">
+              <button onclick="window.deletePDF2('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑</button>
+            </td>
+          </tr>`
+      })
+    }
+
+    if (videos && videos.length > 0) {
+      videos.forEach(v => {
+        let date = new Date(v.created_at).toLocaleDateString('ar-EG')
+        table.innerHTML += `
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:12px; text-align:right;">🎥 فيديو</td>
+            <td style="padding:12px; text-align:right;"><a href="${escapeHtml(v.url)}" target="_blank" style="color:#4facfe;">اضغط هنا</a></td>
+            <td style="padding:12px; text-align:right;">${date}</td>
+            <td style="padding:12px; text-align:center;">
+              <button onclick="window.deleteVideo('${v.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑</button>
+            </td>
+          </tr>`
+      })
+    }
+
+    if (notes && notes.length > 0) {
+      notes.forEach(n => {
+        let date = new Date(n.created_at).toLocaleDateString('ar-EG')
+        table.innerHTML += `
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:12px; text-align:right;">📝 ملاحظة</td>
+            <td style="padding:12px; text-align:right;">${escapeHtml(n.content.substring(0, 50))}</td>
+            <td style="padding:12px; text-align:right;">${date}</td>
+            <td style="padding:12px; text-align:center;">
+              <button onclick="window.deleteNote('${n.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑</button>
+            </td>
+          </tr>`
+      })
+    }
+
+    table.innerHTML += `</tbody></table>`
+
+    if (!pdfs?.length && !pdfs2?.length && !videos?.length && !notes?.length) {
+      table.innerHTML = "<p style='text-align:center; color:#999; padding:20px;'>لا توجد محتويات للسنة المختارة</p>"
+    }
+
+  } catch (error) {
+    console.error("Load table error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
 }
 
 // ================== Notes ==================
@@ -317,6 +531,7 @@ window.addNote = async function() {
     let noteInput = document.getElementById("noteInput")
     let note = noteInput?.value.trim()
     let currentUser = getCurrentUser()
+    let selectedYear = document.getElementById("teacherYearSelect")?.value
 
     if (!note) {
       alert("❗ اكتب الملاحظة")
@@ -326,9 +541,13 @@ window.addNote = async function() {
       alert("❗ مش مسجل دخول")
       return
     }
+    if (!selectedYear) {
+      alert("❌ اختر السنة الدراسية أولاً")
+      return
+    }
 
     let { error } = await supabase.from("notes").insert([
-      { teacher_id: currentUser.id, content: note }
+      { teacher_id: currentUser.id, content: note, academic_year: selectedYear }
     ])
 
     if (error) {
@@ -338,7 +557,7 @@ window.addNote = async function() {
 
     noteInput.value = ""
     alert("✅ تم النشر")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Add note error:", error)
@@ -361,6 +580,7 @@ window.addVideo = async function() {
     let input = document.getElementById("videoInput")
     let url = input?.value.trim()
     let currentUser = getCurrentUser()
+    let selectedYear = document.getElementById("teacherYearSelect")?.value
 
     if (!url) {
       alert("❗ حط رابط الفيديو")
@@ -370,9 +590,13 @@ window.addVideo = async function() {
       alert("❗ مش مسجل دخول")
       return
     }
+    if (!selectedYear) {
+      alert("❌ اختر السنة الدراسية أولاً")
+      return
+    }
 
     let { error } = await supabase.from("videos").insert([
-      { teacher_id: currentUser.id, url: convertToEmbed(url) }
+      { teacher_id: currentUser.id, url: convertToEmbed(url), academic_year: selectedYear }
     ])
 
     if (error) {
@@ -382,7 +606,7 @@ window.addVideo = async function() {
 
     input.value = ""
     alert("✅ تم نشر الفيديو")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Add video error:", error)
@@ -396,6 +620,7 @@ window.uploadPDF = async function() {
     let file = document.getElementById("pdfFile")?.files[0]
     let status = document.getElementById("status")
     let currentUser = getCurrentUser()
+    let selectedYear = document.getElementById("teacherYearSelect")?.value
 
     if (!file) {
       status.innerText = "❗ اختار ملف PDF"
@@ -403,6 +628,10 @@ window.uploadPDF = async function() {
     }
     if (!currentUser) {
       status.innerText = "❗ مش مسجل دخول"
+      return
+    }
+    if (!selectedYear) {
+      status.innerText = "❌ اختر السنة الدراسية أولاً"
       return
     }
 
@@ -424,7 +653,7 @@ window.uploadPDF = async function() {
     let publicUrl = urlData.publicUrl
 
     let { error: dbError } = await supabase.from("pdfs").insert([
-      { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name }
+      { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name, academic_year: selectedYear }
     ])
 
     if (dbError) {
@@ -434,7 +663,7 @@ window.uploadPDF = async function() {
 
     status.innerText = "✅ تم النشر بنجاح"
     document.getElementById("pdfFile").value = ""
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Upload PDF error:", error)
@@ -448,6 +677,7 @@ window.uploadPDF2 = async function() {
     let file = document.getElementById("pdf2File")?.files[0]
     let status = document.getElementById("status2")
     let currentUser = getCurrentUser()
+    let selectedYear = document.getElementById("teacherYearSelect")?.value
 
     if (!file) {
       status.innerText = "❗ اختار ملف PDF"
@@ -459,6 +689,10 @@ window.uploadPDF2 = async function() {
     }
     if (!currentUser) {
       status.innerText = "❗ مش مسجل دخول"
+      return
+    }
+    if (!selectedYear) {
+      status.innerText = "❌ اختر السنة الدراسية أولاً"
       return
     }
 
@@ -475,7 +709,7 @@ window.uploadPDF2 = async function() {
     let { data } = supabase.storage.from("files").getPublicUrl(path)
 
     let { error: dbError } = await supabase.from("pdfs2").insert([
-      { teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name }
+      { teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, academic_year: selectedYear }
     ])
 
     if (dbError) {
@@ -485,7 +719,7 @@ window.uploadPDF2 = async function() {
 
     status.innerText = "✅ تم"
     document.getElementById("pdf2File").value = ""
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Upload PDF2 error:", error)
@@ -494,98 +728,7 @@ window.uploadPDF2 = async function() {
   }
 }
 
-// ================== تحميل محتوى المدرس ==================
-window.loadTeacherContent = async function() {
-  try {
-    let currentUser = getCurrentUser()
-    if (!currentUser) return
-
-    // استخدم Promise.all لتحميل سريع
-    const [
-      { data: pdfs },
-      { data: pdfs2 },
-      { data: videos },
-      { data: notes }
-    ] = await Promise.all([
-      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
-      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
-      supabase.from("videos").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
-      supabase.from("notes").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false })
-    ])
-
-    // PDFs الأول
-    let pdfListTeacher = document.getElementById("pdfListTeacher")
-    if (pdfListTeacher) {
-      pdfListTeacher.innerHTML = ""
-      if (pdfs && pdfs.length > 0) {
-        pdfs.forEach(p => {
-          pdfListTeacher.innerHTML += `
-            <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
-              <a href="${escapeHtml(p.file_url)}" target="_blank" style="flex:1; color:#4facfe;">📄 ${escapeHtml(p.file_name || "ملف PDF")}</a>
-              <button onclick="window.deletePDF('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
-            </div>`
-        })
-      } else {
-        pdfListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش ملفات لحد دلوقتي</p>"
-      }
-    }
-
-    // PDFs الثاني
-    let pdfListTeacher2 = document.getElementById("pdfListTeacher2")
-    if (pdfListTeacher2) {
-      pdfListTeacher2.innerHTML = ""
-      if (pdfs2 && pdfs2.length > 0) {
-        pdfs2.forEach(p => {
-          pdfListTeacher2.innerHTML += `
-            <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
-              <a href="${escapeHtml(p.file_url)}" target="_blank" style="flex:1; color:#4facfe;">📄 ${escapeHtml(p.file_name || "ملف PDF")}</a>
-              <button onclick="window.deletePDF2('${p.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
-            </div>`
-        })
-      } else {
-        pdfListTeacher2.innerHTML = "<p style='color:#aaa;'>مفيش ملفات لحد دلوقتي</p>"
-      }
-    }
-
-    // Videos
-    let videoListTeacher = document.getElementById("videoListTeacher")
-    if (videoListTeacher) {
-      videoListTeacher.innerHTML = ""
-      if (videos && videos.length > 0) {
-        videos.forEach(v => {
-          videoListTeacher.innerHTML += `
-            <div style="margin:10px 0;">
-              <iframe width="100%" height="200" src="${escapeHtml(v.url)}" allowfullscreen style="border-radius:10px; border:none;"></iframe>
-              <button onclick="window.deleteVideo('${v.id}')" class="danger" style="margin-top:5px; padding:5px 12px; width:auto;">🗑 حذف</button>
-            </div>`
-        })
-      } else {
-        videoListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش فيديوهات لحد دلوقتي</p>"
-      }
-    }
-
-    // Notes
-    let noteListTeacher = document.getElementById("noteListTeacher")
-    if (noteListTeacher) {
-      noteListTeacher.innerHTML = ""
-      if (notes && notes.length > 0) {
-        notes.forEach(n => {
-          noteListTeacher.innerHTML += `
-            <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding:10px; background:#f5f7ff; border-radius:10px;">
-              <p style="flex:1; margin:0;">📝 ${escapeHtml(n.content)}</p>
-              <button onclick="window.deleteNote('${n.id}')" class="danger" style="width:auto; padding:5px 12px;">🗑 حذف</button>
-            </div>`
-        })
-      } else {
-        noteListTeacher.innerHTML = "<p style='color:#aaa;'>مفيش ملاحظات لحد دلوقتي</p>"
-      }
-    }
-
-  } catch (error) {
-    console.error("Load teacher content error:", error)
-  }
-}
-
+// ================== Delete Functions ==================
 window.deletePDF = async function(id) {
   try {
     if (!confirm("تحذف الملف؟")) return
@@ -596,7 +739,6 @@ window.deletePDF = async function(id) {
       return
     }
 
-    // شيك الملكية
     let { data: pdf } = await supabase.from("pdfs").select("teacher_id").eq("id", id).single()
     if (pdf?.teacher_id !== currentUser.id) {
       alert("❌ ما عندك صلاحية")
@@ -605,7 +747,7 @@ window.deletePDF = async function(id) {
 
     await supabase.from("pdfs").delete().eq("id", id)
     alert("✅ تم الحذف")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Delete PDF error:", error)
@@ -631,7 +773,7 @@ window.deletePDF2 = async function(id) {
 
     await supabase.from("pdfs2").delete().eq("id", id)
     alert("✅ تم الحذف")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Delete PDF2 error:", error)
@@ -657,7 +799,7 @@ window.deleteVideo = async function(id) {
 
     await supabase.from("videos").delete().eq("id", id)
     alert("✅ تم الحذف")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Delete video error:", error)
@@ -683,7 +825,7 @@ window.deleteNote = async function(id) {
 
     await supabase.from("notes").delete().eq("id", id)
     alert("✅ تم الحذف")
-    loadTeacherContent()
+    loadTeacherContentTable()
 
   } catch (error) {
     console.error("Delete note error:", error)
@@ -842,7 +984,7 @@ window.loadStudentData = async function() {
 
     let { data: user } = await supabase
       .from("users")
-      .select("teacher_id")
+      .select("teacher_id, academic_year")
       .eq("id", currentUser.id)
       .single()
 
@@ -851,22 +993,21 @@ window.loadStudentData = async function() {
       return
     }
 
-    // احفظ معرف المدرس في global variable
     window.studentTeacherId = user.teacher_id
-
     let teacherId = user.teacher_id
+    let studentYear = user.academic_year
 
-    // تحميل جميع البيانات بشكل سريع
+    // تحميل جميع البيانات بشكل سريع - فقط بيانات السنة الخاصة بالطالب
     const [
       { data: notes },
       { data: videos },
       { data: pdfs },
       { data: pdfs2 }
     ] = await Promise.all([
-      supabase.from("notes").select("*").eq("teacher_id", teacherId),
-      supabase.from("videos").select("*").eq("teacher_id", teacherId),
-      supabase.from("pdfs").select("*").eq("teacher_id", teacherId),
-      supabase.from("pdfs2").select("*").eq("teacher_id", teacherId)
+      supabase.from("notes").select("*").eq("teacher_id", teacherId).eq("academic_year", studentYear),
+      supabase.from("videos").select("*").eq("teacher_id", teacherId).eq("academic_year", studentYear),
+      supabase.from("pdfs").select("*").eq("teacher_id", teacherId).eq("academic_year", studentYear),
+      supabase.from("pdfs2").select("*").eq("teacher_id", teacherId).eq("academic_year", studentYear)
     ])
 
     // Notes
@@ -961,7 +1102,9 @@ window.loadTeachers = async function() {
 window.onRoleChange = function() {
   let role = document.getElementById("role")?.value
   let row = document.getElementById("teacherSelectRow")
+  let yearRow = document.getElementById("yearSelectRow")
   if (row) row.style.display = role === "student" ? "block" : "none"
+  if (yearRow) yearRow.style.display = role === "student" ? "block" : "none"
 }
 
 window.loadTeacherProfile = async function(teacherId) {
@@ -969,7 +1112,6 @@ window.loadTeacherProfile = async function(teacherId) {
     let profileDiv = document.getElementById("teacherProfile")
     let socialDiv = document.getElementById("teacherSocial")
 
-    // تحميل الاثنين بسرعة
     const [
       { data: profiles },
       { data: socials }
@@ -978,10 +1120,8 @@ window.loadTeacherProfile = async function(teacherId) {
       supabase.from("social_links").select("*").eq("teacher_id", teacherId)
     ])
 
-    // PROFILE
     if (profileDiv && profiles && profiles.length > 0) {
       let p = profiles[0]
-
       profileDiv.innerHTML = `
         <div style="text-align:center;">
           ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #4facfe;" alt="Teacher">` : ""}
@@ -989,19 +1129,14 @@ window.loadTeacherProfile = async function(teacherId) {
         </div>`
     }
 
-    // SOCIAL
     if (socialDiv && socials && socials.length > 0) {
       let s = socials[0]
-
       let links = []
       if (s.facebook) links.push(`<a href="${escapeHtml(s.facebook)}" target="_blank" style="color:#1877f2; font-size:16px;">📘 فيسبوك</a>`)
       if (s.whatsapp) links.push(`<a href="${escapeHtml(s.whatsapp)}" target="_blank" style="color:#25d366; font-size:16px;">💬 واتساب</a>`)
       if (s.youtube) links.push(`<a href="${escapeHtml(s.youtube)}" target="_blank" style="color:#ff0000; font-size:16px;">▶️ يوتيوب</a>`)
 
-      socialDiv.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          ${links.join("")}
-        </div>`
+      socialDiv.innerHTML = `<div style="display:flex; flex-direction:column; gap:10px;">${links.join("")}</div>`
     }
 
   } catch (error) {
@@ -1132,6 +1267,79 @@ window.scrollToBottom = function() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
 }
 
+// ================== Change Password ==================
+window.changePassword = async function() {
+  try {
+    let currentPass = document.getElementById("currentPassword")?.value.trim()
+    let newPass = document.getElementById("newPassword")?.value.trim()
+    let confirmPass = document.getElementById("confirmPassword")?.value.trim()
+    let status = document.getElementById("changeStatus")
+    let currentUser = getCurrentUser()
+
+    if (!currentPass || !newPass || !confirmPass) {
+      status.innerText = "❌ ملء جميع الحقول"
+      status.style.color = "#ff4d4d"
+      return
+    }
+
+    if (newPass !== confirmPass) {
+      status.innerText = "❌ كلمات المرور الجديدة غير متطابقة"
+      status.style.color = "#ff4d4d"
+      return
+    }
+
+    if (newPass.length < 6) {
+      status.innerText = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+      status.style.color = "#ff4d4d"
+      return
+    }
+
+    status.innerText = "⏳ جاري التحقق..."
+    status.style.color = "#4facfe"
+
+    // Hash كلمات المرور
+    let hashedCurrent = await hashPassword(currentPass)
+    let hashedNew = await hashPassword(newPass)
+
+    // تحقق من كلمة المرور الحالية
+    let { data: user } = await supabase
+      .from("users")
+      .select("password")
+      .eq("id", currentUser.id)
+      .single()
+
+    if (user.password !== hashedCurrent) {
+      status.innerText = "❌ كلمة المرور الحالية خاطئة"
+      status.style.color = "#ff4d4d"
+      return
+    }
+
+    // تحديث كلمة المرور
+    let { error } = await supabase
+      .from("users")
+      .update({ password: hashedNew })
+      .eq("id", currentUser.id)
+
+    if (error) {
+      status.innerText = "❌ خطأ: " + error.message
+      status.style.color = "#ff4d4d"
+      return
+    }
+
+    status.innerText = "✅ تم تغيير كلمة المرور بنجاح"
+    status.style.color = "#25d366"
+    document.getElementById("currentPassword").value = ""
+    document.getElementById("newPassword").value = ""
+    document.getElementById("confirmPassword").value = ""
+
+  } catch (error) {
+    console.error("Change password error:", error)
+    let status = document.getElementById("changeStatus")
+    status.innerText = "❌ خطأ: " + error.message
+    status.style.color = "#ff4d4d"
+  }
+}
+
 // ================== Logout ==================
 window.logout = function() {
   localStorage.removeItem("currentUser")
@@ -1140,7 +1348,6 @@ window.logout = function() {
 
 // ================== Init ==================
 window.addEventListener("load", function() {
-  // تأمين الصفحات
   protectPage()
 
   // صفحة الأدمن
@@ -1160,18 +1367,17 @@ window.addEventListener("load", function() {
   // صفحة المدرس
   if (document.getElementById("solutionsList")) {
     window.openTab("profile")
+    window.loadAcademicYears()
     window.loadSolutions()
     window.loadCurrentProfile()
     window.loadCurrentSocial()
-    window.loadTeacherContent()
   }
 })
 
-// تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
   if (document.getElementById("totalUsers")) {
     window.loadStats()
   }
 }, 30000)
 
-console.log("✅ LMS Loaded Successfully")
+console.log("✅ LMS Loaded Successfully with Academic Years & Hashing")

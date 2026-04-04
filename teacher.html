@@ -5,16 +5,61 @@
   <title>Teacher Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #f5f7fb; }
+    .container { width: 95%; max-width: 1200px; margin: auto; padding: 20px; }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tabs button { flex: 1; min-width: 130px; padding: 12px; background: #e9eefc; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-family: 'Cairo', sans-serif; }
+    .tabs button:hover { background: #4facfe; color: white; }
+    .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    input[type="text"], input[type="file"], select, textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #4facfe; box-shadow: 0 0 5px rgba(79, 172, 254, 0.3); }
+    button { width: 100%; padding: 12px; border: none; background: #4facfe; color: white; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; transition: all 0.3s; }
+    button:hover { background: #3a8be0; }
+    .logout { background: #ff4d4d; margin-top: 20px; }
+    .logout:hover { background: #cc0000; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    /* نمط اختيار السنة */
+    .year-selector { background: #f0f4ff; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    .year-selector h4 { margin: 0 0 15px 0; color: #333; }
+    .year-options { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+    .year-btn { padding: 10px 20px; border: 2px solid #ddd; background: white; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-family: 'Cairo', sans-serif; }
+    .year-btn:hover { border-color: #4facfe; }
+    .year-btn.selected { background: #4facfe; color: white; border-color: #4facfe; }
+    
+    /* جدول المحتوى */
+    .content-table { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: white; margin: 20px 0; }
+    thead { background: #4facfe; color: white; }
+    th, td { padding: 12px; text-align: right; border: 1px solid #ddd; }
+    tr:hover { background: #f5f7ff; }
+    .delete-btn { background: #ff4d4d; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; }
+    .delete-btn:hover { background: #cc0000; }
+    
+    /* نمط رفع الملفات */
+    .upload-section { background: #f9fafb; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+    .upload-section label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+    .status { padding: 10px; margin-top: 10px; border-radius: 8px; text-align: center; }
+    
+    .danger { background: #ff4d4d !important; }
+    .danger:hover { background: #cc0000 !important; }
+    .success { color: #25d366; font-weight: 600; }
+    .error { color: #ff4d4d; font-weight: 600; }
+  </style>
 </head>
-<body class="dashboard">
+<body>
 <div class="container">
 
   <h2>👨‍🏫 لوحة المدرس</h2>
 
-  <!-- زرار الحلول -->
+  <!-- سريع الوصول -->
   <div style="margin-bottom:15px;">
-    <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer;">
-      📥 حلول الطلاب
+    <button onclick="openTab('profile')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer;">
+      📊 عرض جدول المحتوى
     </button>
   </div>
 
@@ -22,93 +67,118 @@
     <button onclick="openTab('profile')">👤 البروفايل</button>
     <button onclick="openTab('social')">🔗 التواصل</button>
     <button onclick="openTab('video')">🎥 فيديو</button>
-    <button onclick="openTab('pdf')">📁الواجب </button>
-    <button onclick="openTab('pdf2')">📁 مذكرات</button>
-    <button onclick="openTab('note')">📝تنبيهات</button>
+    <button onclick="openTab('pdf')">📁 شيت</button>
+    <button onclick="openTab('pdf2')">📚 مذكرات</button>
+    <button onclick="openTab('note')">📝 ملاحظات</button>
+    <button onclick="openTab('solutions')">📥 حلول</button>
   </div>
 
-  <!-- PROFILE -->
+  <!-- جدول المحتوى -->
   <div id="profile" class="tab-content">
+    <div class="card">
+      <div class="year-selector">
+        <h4>📚 اختر السنة الدراسية لعرض المحتوى</h4>
+        <div class="year-options" id="yearOptions"></div>
+        <button onclick="loadTeacherContentTable()" style="width: 100%; padding: 10px; margin-top: 10px;">🔍 عرض</button>
+      </div>
+      
+      <div class="content-table" id="contentTable"></div>
+    </div>
+  </div>
+
+  <!-- البروفايل -->
+  <div id="profileTab" class="tab-content">
     <div class="card">
       <h3>👤 صفحتي</h3>
       <div id="profilePreview" class="profile-preview">
-        <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile">
-        <h4 id="profileName">اسم المدرس</h4>
+        <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile" style="width:100px; height:100px; border-radius:50%; border:3px solid #4facfe;">
+        <h4 id="profileName" style="margin-top:10px;">اسم المدرس</h4>
         <p id="profileBio">نبذة بسيطة...</p>
       </div>
-      <input type="text" id="bio" placeholder="عرف نفسك">
-      <input type="file" id="imgFile" accept="image/*">
-      <p id="profileStatus"></p>
-      <button onclick="saveProfile()">حفظ</button>
+      <div style="margin-top:20px;">
+        <label>عن نفسك</label>
+        <textarea id="bio" placeholder="أكتب نبذة عنك..." style="min-height:80px;"></textarea>
+        <label style="margin-top:15px;">صورتك الشخصية</label>
+        <input type="file" id="imgFile" accept="image/*">
+      </div>
+      <p id="profileStatus" style="text-align:center; margin:10px 0; font-weight:600;"></p>
+      <button onclick="saveProfile()">💾 حفظ البروفايل</button>
     </div>
   </div>
 
-  <!-- SOCIAL -->
+  <!-- التواصل الاجتماعي -->
   <div id="social" class="tab-content">
     <div class="card">
       <h3>🔗 روابط التواصل</h3>
-      <input type="text" id="facebook" placeholder="رابط فيسبوك">
-      <input type="text" id="whatsapp" placeholder="رابط واتساب">
-      <input type="text" id="youtube" placeholder="رابط يوتيوب">
-      <button onclick="saveSocial()">حفظ</button>
+      <label>📘 رابط فيسبوك</label>
+      <input type="text" id="facebook" placeholder="https://facebook.com/yourprofile">
+      <label style="margin-top:15px;">💬 رابط واتساب</label>
+      <input type="text" id="whatsapp" placeholder="https://wa.me/201234567890">
+      <label style="margin-top:15px;">▶️ رابط يوتيوب</label>
+      <input type="text" id="youtube" placeholder="https://youtube.com/@yourChannel">
+      <button onclick="saveSocial()" style="margin-top:15px;">💾 حفظ الروابط</button>
     </div>
   </div>
 
-  <!-- VIDEO -->
+  <!-- الفيديو -->
   <div id="video" class="tab-content">
     <div class="card">
       <h3>🎥 نشر فيديو</h3>
-      <input type="text" id="videoInput" placeholder="رابط الفيديو">
-      <button onclick="addVideo()">نشر</button>
-    </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الفيديوهات المنشورة</h3>
-      <div id="videoListTeacher"></div>
+      <div class="year-selector">
+        <label>📚 اختر السنة الدراسية</label>
+        <div class="year-options" id="videoYearOptions"></div>
+      </div>
+      <label style="margin-top:15px;">🔗 رابط الفيديو</label>
+      <input type="text" id="videoInput" placeholder="https://youtube.com/watch?v=...">
+      <button onclick="addVideo()" style="margin-top:15px;">📤 نشر</button>
     </div>
   </div>
 
-  <!-- PDF الأول -->
+  <!-- الشيت -->
   <div id="pdf" class="tab-content">
     <div class="card">
-      <h3>📁 رفع شيتات</h3>
+      <h3>📁 رفع شيت</h3>
+      <div class="year-selector">
+        <label>📚 اختر السنة الدراسية</label>
+        <div class="year-options" id="pdfYearOptions"></div>
+      </div>
+      <label style="margin-top:15px;">📄 اختر ملف PDF</label>
       <input type="file" id="pdfFile" accept="application/pdf">
-      <button onclick="uploadPDF()">رفع</button>
-      <p id="status"></p>
-    </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملفات المرفوعة</h3>
-      <div id="pdfListTeacher"></div>
+      <button onclick="uploadPDF()" style="margin-top:15px;">📤 رفع</button>
+      <p id="status" class="status"></p>
     </div>
   </div>
 
-  <!-- PDF الثاني -->
+  <!-- المذكرات -->
   <div id="pdf2" class="tab-content">
     <div class="card">
-      <h3>📁 رفع مذكرات</h3>
+      <h3>📚 رفع مذكرة</h3>
+      <div class="year-selector">
+        <label>📚 اختر السنة الدراسية</label>
+        <div class="year-options" id="pdf2YearOptions"></div>
+      </div>
+      <label style="margin-top:15px;">📄 اختر ملف PDF</label>
       <input type="file" id="pdf2File" accept="application/pdf">
-      <button onclick="uploadPDF2()">رفع</button>
-      <p id="status2"></p>
-    </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملفات المرفوعة</h3>
-      <div id="pdfListTeacher2"></div>
+      <button onclick="uploadPDF2()" style="margin-top:15px;">📤 رفع</button>
+      <p id="status2" class="status"></p>
     </div>
   </div>
 
-  <!-- NOTE -->
+  <!-- الملاحظات -->
   <div id="note" class="tab-content">
     <div class="card">
       <h3>📝 نشر ملاحظة</h3>
-      <input type="text" id="noteInput" placeholder="اكتب ملاحظة">
-      <button onclick="addNote()">نشر</button>
-    </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملاحظات المنشورة</h3>
-      <div id="noteListTeacher"></div>
+      <div class="year-selector">
+        <label>📚 اختر السنة الدراسية</label>
+        <div class="year-options" id="noteYearOptions"></div>
+      </div>
+      <label style="margin-top:15px;">📝 نص الملاحظة</label>
+      <textarea id="noteInput" placeholder="اكتب ملاحظة..." style="min-height:80px;"></textarea>
+      <button onclick="addNote()" style="margin-top:15px;">📤 نشر</button>
     </div>
   </div>
 
-  <!-- SOLUTIONS -->
+  <!-- الحلول -->
   <div id="solutions" class="tab-content">
     <div class="card">
       <h3>📥 حلول الطلاب</h3>
@@ -116,13 +186,98 @@
     </div>
   </div>
 
-  <button class="logout" onclick="logout()">تسجيل خروج</button>
+  <button class="logout" onclick="logout()">🚪 تسجيل خروج</button>
 </div>
+
+<button id="scrollTopBtn" onclick="scrollToTop()" style="position:fixed; bottom:100px; right:20px; width:50px; height:50px; border-radius:50%; background:#4facfe; color:white; border:none; cursor:pointer; display:none;">⬆</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()" style="position:fixed; bottom:30px; right:20px; width:50px; height:50px; border-radius:50%; background:#4facfe; color:white; border:none; cursor:pointer; display:none;">⬇</button>
 
 <script type="module" src="js/app.js"></script>
 
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<script>
+  const academicYears = ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي', 'الأول الابتدائي', 'الثاني الابتدائي'];
+  let selectedYear = '';
+
+  function renderYearOptions(elementId) {
+    let container = document.getElementById(elementId);
+    if (!container) return;
+    container.innerHTML = '';
+    academicYears.forEach(year => {
+      container.innerHTML += `
+        <button type="button" class="year-btn" onclick="selectYearForTeacher('${year}', '${elementId}')">${year}</button>
+      `;
+    });
+  }
+
+  window.selectYearForTeacher = function(year, elementId) {
+    let container = document.getElementById(elementId);
+    container.querySelectorAll('.year-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+    
+    let clickedBtn = Array.from(container.querySelectorAll('.year-btn')).find(btn => btn.textContent === year);
+    if (clickedBtn) {
+      clickedBtn.classList.add('selected');
+      
+      // حدد السنة بناءً على حقل الإدخال
+      if (elementId === 'yearOptions') {
+        selectedYear = year;
+        document.getElementById('teacherYearSelect').value = year;
+      } else if (elementId === 'videoYearOptions') {
+        document.getElementById('videoYear').value = year;
+      } else if (elementId === 'pdfYearOptions') {
+        document.getElementById('pdfYear').value = year;
+      } else if (elementId === 'pdf2YearOptions') {
+        document.getElementById('pdf2Year').value = year;
+      } else if (elementId === 'noteYearOptions') {
+        document.getElementById('noteYear').value = year;
+      }
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderYearOptions('yearOptions');
+    renderYearOptions('videoYearOptions');
+    renderYearOptions('pdfYearOptions');
+    renderYearOptions('pdf2YearOptions');
+    renderYearOptions('noteYearOptions');
+    
+    // أنشئ حقول مخفية للسنوات
+    let form = document.querySelector('body');
+    form.innerHTML += `
+      <input type="hidden" id="teacherYearSelect">
+      <input type="hidden" id="videoYear">
+      <input type="hidden" id="pdfYear">
+      <input type="hidden" id="pdf2Year">
+      <input type="hidden" id="noteYear">
+    `;
+  });
+
+  window.openTab = function(id) {
+    document.querySelectorAll(".tab-content").forEach(t => {
+      t.style.display = "none"
+      t.classList.remove("active")
+    })
+    
+    // معالجة خاصة
+    if (id === 'profile') id = 'profile';
+    else if (id === 'profileTab') id = 'profileTab';
+    
+    let el = document.getElementById(id)
+    if (el) {
+      el.style.display = "block"
+      el.classList.add("active")
+    }
+  }
+
+  window.scrollToTop = function() {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  window.scrollToBottom = function() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+  }
+</script>
 
 </body>
 </html>
