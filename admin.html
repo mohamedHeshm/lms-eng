@@ -9,35 +9,25 @@
     body { font-family: 'Cairo', sans-serif; background: #f5f7fb; }
     .container { width: 90%; max-width: 900px; margin: auto; padding: 20px; }
     h2 { text-align: center; margin-bottom: 20px; }
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tabs button { flex: 1; min-width: 150px; padding: 10px; background: #e9eefc; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-    .tabs button:hover { background: #4facfe; color: white; transform: translateY(-2px); }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tabs button { flex: 1; padding: 10px; background: #e9eefc; border: none; border-radius: 8px; cursor: pointer; }
+    .tabs button:hover { background: #4facfe; color: white; }
     .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-    input:focus, select:focus { outline: none; border-color: #4facfe; box-shadow: 0 0 5px rgba(79, 172, 254, 0.3); }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
     .password-box { position: relative; }
-    .password-box span { position: absolute; left: 10px; top: 12px; cursor: pointer; font-size: 20px; }
-    button { width: 100%; padding: 10px; border: none; background: #4facfe; color: white; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; transition: all 0.3s; }
-    button:hover { background: #3a8be0; transform: translateY(-2px); }
-    button:active { transform: translateY(0); }
+    .password-box span { position: absolute; left: 10px; top: 12px; cursor: pointer; }
+    button { width: 100%; padding: 10px; border: none; background: #4facfe; color: white; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #3a8be0; }
     .logout { background: #ff4d4d; margin-top: 20px; }
     .logout:hover { background: #cc0000; }
-    .user-card { background: #f1f5ff; padding: 15px; margin: 10px 0; border-radius: 12px; border-right: 4px solid #4facfe; }
+    .user-card { background: #f1f5ff; padding: 15px; margin: 10px 0; border-radius: 12px; }
     .user-card button { width: auto; padding: 6px 14px; margin: 4px; }
     .danger { background: #ff4d4d; }
     .danger:hover { background: #cc0000; }
-    .stats { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-box { flex: 1; min-width: 150px; background: white; padding: 15px; text-align: center; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .stat-box h3 { color: #4facfe; margin: 0; font-size: 28px; }
-    .stat-box p { margin: 5px 0 0 0; color: #666; }
+    .stats { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stat-box { flex: 1; background: white; padding: 15px; text-align: center; border-radius: 12px; }
+    .stat-box h3 { color: #4facfe; }
     .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-    .year-options { display: flex; gap: 10px; flex-wrap: wrap; }
-    .year-btn { flex: 1; min-width: 100px; padding: 10px; border: 2px solid #ddd; background: white; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-    .year-btn.selected { background: #4facfe; color: white; border-color: #4facfe; }
   </style>
 </head>
 <body>
@@ -56,96 +46,41 @@
     <button onclick="openTab('usersTab')">👥 المستخدمين</button>
   </div>
 
-  <!-- إضافة مستخدم جديد -->
   <div id="addUserTab" class="tab-content">
     <div class="card">
-      <h3>➕ إضافة مستخدم جديد</h3>
-      
-      <div class="form-group">
-        <label>📝 الاسم</label>
-        <input type="text" id="name" placeholder="أدخل اسم المستخدم">
+      <h3>إضافة مستخدم</h3>
+      <input type="text" id="name" placeholder="الاسم">
+      <input type="email" id="userEmail" placeholder="الايميل">
+
+      <div class="password-box">
+        <input type="password" id="userPass" placeholder="الباسورد">
+        <span onclick="togglePass()">👁️</span>
       </div>
 
-      <div class="form-group">
-        <label>📧 الايميل</label>
-        <input type="email" id="userEmail" placeholder="أدخل الايميل">
-      </div>
+      <select id="role" onchange="onRoleChange()">
+        <option value="teacher">مدرس</option>
+        <option value="student">طالب</option>
+      </select>
 
-      <div class="form-group">
-        <label>🔒 كلمة المرور</label>
-        <div class="password-box">
-          <input type="password" id="userPass" placeholder="أدخل كلمة المرور">
-          <span onclick="togglePass()">👁️</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>👤 النوع</label>
-        <select id="role" onchange="onRoleChange()" style="margin:0;">
-          <option value="teacher">مدرس</option>
-          <option value="student">طالب</option>
-        </select>
-      </div>
-
-      <!-- اختيار المدرس للطالب -->
+      <!-- اختيار المدرس -->
       <div id="teacherSelectRow" style="display:none;">
-        <div class="form-group">
-          <label>👨‍🏫 المدرس المسؤول</label>
-          <select id="teacherSelect" style="margin:0;"></select>
-        </div>
+        <select id="teacherSelect"></select>
       </div>
 
-      <!-- اختيار السنة الدراسية -->
-      <div id="yearSelectRow" style="display:none;">
-        <div class="form-group">
-          <label>📚 السنة الدراسية</label>
-          <div class="year-options" id="yearOptions"></div>
-          <input type="text" id="customYear" placeholder="أو أدخل سنة مخصصة">
-        </div>
-      </div>
-
-      <button onclick="addUser()" style="background:#25d366;">✅ إضافة</button>
+      <button onclick="addUser()">إضافة</button>
     </div>
   </div>
 
-  <!-- عرض وإدارة المستخدمين -->
   <div id="usersTab" class="tab-content">
     <div class="card">
-      <h3>👥 المستخدمين</h3>
-      <input type="text" id="search" placeholder="🔍 ابحث باسم أو ايميل..." oninput="searchUsers()" style="margin-bottom:20px;">
+      <input type="text" id="search" placeholder="🔍 ابحث..." oninput="searchUsers()">
       <div id="users"></div>
     </div>
   </div>
 
-  <button class="logout" onclick="logout()">🚪 تسجيل خروج</button>
+  <button class="logout" onclick="logout()">تسجيل خروج</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
-
-<script>
-  // الخيارات الافتراضية للسنوات
-  const academicYears = ['الأول الثانوي', 'الثاني الثانوي', 'الثالث الثانوي', 'الأول الابتدائي', 'الثاني الابتدائي'];
-
-  document.addEventListener('DOMContentLoaded', function() {
-    let yearOptionsDiv = document.getElementById('yearOptions');
-    if (yearOptionsDiv) {
-      yearOptionsDiv.innerHTML = '';
-      academicYears.forEach(year => {
-        yearOptionsDiv.innerHTML += `
-          <button type="button" class="year-btn" onclick="selectYear('${year}')">${year}</button>
-        `;
-      });
-    }
-  });
-
-  window.selectYear = function(year) {
-    document.querySelectorAll('.year-btn').forEach(btn => {
-      btn.classList.remove('selected');
-    });
-    event.target.classList.add('selected');
-    document.getElementById('academicYear').value = year;
-  };
-</script>
-
 </body>
 </html>
