@@ -1166,8 +1166,6 @@ window.addEventListener("load", function() {
     window.loadTeacherContent()
   }
 })
-
-
 // تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
   if (document.getElementById("totalUsers")) {
