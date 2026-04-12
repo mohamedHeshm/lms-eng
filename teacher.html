@@ -506,15 +506,15 @@
     </div>
 
     <div class="sidebar-section">
-        <div class="sidebar-title">القائمة</div>
+      <div class="sidebar-title">القائمة</div>
 
-        <button class="stage-btn" onclick="openTab('profile')">👤 البروفايل</button>
-        <button class="stage-btn" onclick="openTab('social')">🔗 التواصل</button>
-        <button class="stage-btn" onclick="openTab('video')">🎥 فيديو</button>
-        <button class="stage-btn" onclick="openTab('pdf')">📁 الواجب</button>
-        <button class="stage-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
-        <button class="stage-btn" onclick="openTab('note')">📝 ملاحظات</button>
-        <button class="stage-btn" onclick="openTab('solutions')">📥 الحلول</button>
+      <button class="stage-btn" onclick="openTab('profile')">👤 البروفايل</button>
+      <button class="stage-btn" onclick="openTab('social')">🔗 التواصل</button>
+      <button class="stage-btn" onclick="openTab('video')">🎥 فيديو</button>
+      <button class="stage-btn" onclick="openTab('pdf')">📁 الواجب</button>
+      <button class="stage-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
+      <button class="stage-btn" onclick="openTab('note')">📝 ملاحظات</button>
+      <button class="stage-btn" onclick="openTab('solutions')">📥 الحلول</button>
       <button class="stage-btn" onclick="goHome()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
         🏠 الرئيسية
       </button>
@@ -570,14 +570,26 @@
     <div id="video" class="tab-content">
       <div class="card">
         <h3>🎥 نشر فيديو</h3>
+        <select id="videoStageSelect" style="margin-bottom:10px;">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
         <button onclick="addVideo()">🚀 نشر الفيديو</button>
       </div>
       <div class="card" style="margin-top:15px;">
         <h3>📋 الفيديوهات المنشورة</h3>
-        <ul id="videoListTeacher">
-          <li>جاري التحميل...</li>
-        </ul>
+        <div id="videoListTeacher">
+          <p>جاري التحميل...</p>
+        </div>
       </div>
     </div>
 
@@ -585,15 +597,27 @@
     <div id="pdf" class="tab-content">
       <div class="card">
         <h3>📁 رفع شيتات (الواجبات)</h3>
+        <select id="pdfStageSelect" style="margin-bottom:10px;">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <input type="file" id="pdfFile" accept="application/pdf">
         <button onclick="uploadPDF()">📤 رفع الملف</button>
         <p id="status"></p>
       </div>
       <div class="card" style="margin-top:15px;">
         <h3>📋 الملفات المرفوعة</h3>
-        <ul id="pdfListTeacher">
-          <li>جاري التحميل...</li>
-        </ul>
+        <div id="pdfListTeacher">
+          <p>جاري التحميل...</p>
+        </div>
       </div>
     </div>
 
@@ -601,15 +625,27 @@
     <div id="pdf2" class="tab-content">
       <div class="card">
         <h3>📁 رفع مذكرات</h3>
+        <select id="pdf2StageSelect" style="margin-bottom:10px;">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <input type="file" id="pdf2File" accept="application/pdf">
         <button onclick="uploadPDF2()">📤 رفع الملف</button>
         <p id="status2"></p>
       </div>
       <div class="card" style="margin-top:15px;">
         <h3>📋 الملفات المرفوعة</h3>
-        <ul id="pdfListTeacher2">
-          <li>جاري التحميل...</li>
-        </ul>
+        <div id="pdfListTeacher2">
+          <p>جاري التحميل...</p>
+        </div>
       </div>
     </div>
 
@@ -617,14 +653,26 @@
     <div id="note" class="tab-content">
       <div class="card">
         <h3>📝 نشر ملاحظة</h3>
+        <select id="noteStageSelect" style="margin-bottom:10px;">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <textarea id="noteInput" placeholder="اكتب ملاحظة مهمة للطلاب..."></textarea>
         <button onclick="addNote()">🚀 نشر الملاحظة</button>
       </div>
       <div class="card" style="margin-top:15px;">
         <h3>📋 الملاحظات المنشورة</h3>
-        <ul id="noteListTeacher">
-          <li>جاري التحميل...</li>
-        </ul>
+        <div id="noteListTeacher">
+          <p>جاري التحميل...</p>
+        </div>
       </div>
     </div>
 

@@ -106,6 +106,18 @@ window.login = async function() {
     }
 
     localStorage.setItem("currentUser", JSON.stringify(data))
+
+    // حفظ سجل الدخول
+    await supabase.from("login_logs").insert([
+      {
+        user_id: data.id,
+        user_name: data.name,
+        user_email: data.email,
+        user_role: data.role,
+        login_time: new Date().toISOString()
+      }
+    ])
+
     showStatus("✅ تم! جاري التوجيه...", 'success')
 
     setTimeout(() => {
@@ -317,6 +329,78 @@ window.loadStats = async function() {
   }
 }
 
+// ================== Login Logs ==================
+let allLoginLogs = []
+
+window.loadLoginLogs = async function() {
+  try {
+    let { data: logs, error } = await supabase
+      .from("login_logs")
+      .select("*")
+      .order("login_time", { ascending: false })
+
+    if (error) {
+      console.error("Login logs error:", error)
+      return
+    }
+
+    allLoginLogs = logs || []
+    displayLoginLogs('all')
+
+  } catch (error) {
+    console.error("Load login logs error:", error)
+  }
+}
+
+window.filterLogs = function(role) {
+  displayLoginLogs(role)
+}
+
+function displayLoginLogs(role) {
+  let container = document.getElementById("loginLogsContainer")
+  if (!container) return
+
+  let filtered = allLoginLogs
+  if (role !== 'all') {
+    filtered = allLoginLogs.filter(log => log.user_role === role)
+  }
+
+  container.innerHTML = ""
+
+  if (filtered.length === 0) {
+    container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد سجلات</p>"
+    return
+  }
+
+  filtered.forEach(log => {
+    let date = new Date(log.login_time)
+    let formattedDate = date.toLocaleDateString('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    let formattedTime = date.toLocaleTimeString('ar-EG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+
+    let roleIcon = log.user_role === 'student' ? '👨‍🎓' :
+                   log.user_role === 'teacher' ? '👨‍🏫' : '👑'
+    let roleText = log.user_role === 'student' ? 'طالب' :
+                   log.user_role === 'teacher' ? 'مدرس' : 'أدمن'
+
+    container.innerHTML += `
+      <div class="user-card" style="margin:10px 0;">
+        <h4>${roleIcon} ${escapeHtml(log.user_name)}</h4>
+        <p>📧 ${escapeHtml(log.user_email)}</p>
+        <p>👤 ${roleText}</p>
+        <p>📅 ${formattedDate} | ⏰ ${formattedTime}</p>
+      </div>
+    `
+  })
+}
+
 // ================== تغيير الباسورد ==================
 window.goToChangePassword = function() {
   window.location.href = 'change-password.html'
@@ -327,10 +411,16 @@ window.addNote = async function() {
   try {
     let noteInput = document.getElementById("noteInput")
     let note = noteInput?.value.trim()
+    let stageSelect = document.getElementById("noteStageSelect")
+    let stage = stageSelect?.value
     let currentUser = getCurrentUser()
 
     if (!note) {
       alert("❗ اكتب الملاحظة")
+      return
+    }
+    if (!stage) {
+      alert("❗ اختر المرحلة الدراسية أولاً")
       return
     }
     if (!currentUser) {
@@ -339,7 +429,7 @@ window.addNote = async function() {
     }
 
     let { error } = await supabase.from("notes").insert([
-      { teacher_id: currentUser.id, content: note }
+      { teacher_id: currentUser.id, content: note, stage: stage }
     ])
 
     if (error) {
@@ -348,6 +438,7 @@ window.addNote = async function() {
     }
 
     noteInput.value = ""
+    stageSelect.value = ""
     alert("✅ تم النشر")
     loadTeacherContent()
 
@@ -371,10 +462,16 @@ window.addVideo = async function() {
   try {
     let input = document.getElementById("videoInput")
     let url = input?.value.trim()
+    let stageSelect = document.getElementById("videoStageSelect")
+    let stage = stageSelect?.value
     let currentUser = getCurrentUser()
 
     if (!url) {
       alert("❗ حط رابط الفيديو")
+      return
+    }
+    if (!stage) {
+      alert("❗ اختر المرحلة الدراسية أولاً")
       return
     }
     if (!currentUser) {
@@ -383,7 +480,7 @@ window.addVideo = async function() {
     }
 
     let { error } = await supabase.from("videos").insert([
-      { teacher_id: currentUser.id, url: convertToEmbed(url) }
+      { teacher_id: currentUser.id, url: convertToEmbed(url), stage: stage }
     ])
 
     if (error) {
@@ -392,6 +489,7 @@ window.addVideo = async function() {
     }
 
     input.value = ""
+    stageSelect.value = ""
     alert("✅ تم نشر الفيديو")
     loadTeacherContent()
 
@@ -406,10 +504,16 @@ window.uploadPDF = async function() {
   try {
     let file = document.getElementById("pdfFile")?.files[0]
     let status = document.getElementById("status")
+    let stageSelect = document.getElementById("pdfStageSelect")
+    let stage = stageSelect?.value
     let currentUser = getCurrentUser()
 
     if (!file) {
       status.innerText = "❗ اختار ملف PDF"
+      return
+    }
+    if (!stage) {
+      status.innerText = "❗ اختر المرحلة الدراسية أولاً"
       return
     }
     if (!currentUser) {
@@ -435,7 +539,7 @@ window.uploadPDF = async function() {
     let publicUrl = urlData.publicUrl
 
     let { error: dbError } = await supabase.from("pdfs").insert([
-      { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name }
+      { teacher_id: currentUser.id, file_url: publicUrl, file_name: file.name, stage: stage }
     ])
 
     if (dbError) {
@@ -445,6 +549,7 @@ window.uploadPDF = async function() {
 
     status.innerText = "✅ تم النشر بنجاح"
     document.getElementById("pdfFile").value = ""
+    stageSelect.value = ""
     loadTeacherContent()
 
   } catch (error) {
@@ -458,6 +563,8 @@ window.uploadPDF2 = async function() {
   try {
     let file = document.getElementById("pdf2File")?.files[0]
     let status = document.getElementById("status2")
+    let stageSelect = document.getElementById("pdf2StageSelect")
+    let stage = stageSelect?.value
     let currentUser = getCurrentUser()
 
     if (!file) {
@@ -466,6 +573,10 @@ window.uploadPDF2 = async function() {
     }
     if (file.type !== "application/pdf") {
       status.innerText = "❌ لازم PDF"
+      return
+    }
+    if (!stage) {
+      status.innerText = "❗ اختر المرحلة الدراسية أولاً"
       return
     }
     if (!currentUser) {
@@ -486,7 +597,7 @@ window.uploadPDF2 = async function() {
     let { data } = supabase.storage.from("files").getPublicUrl(path)
 
     let { error: dbError } = await supabase.from("pdfs2").insert([
-      { teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name }
+      { teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, stage: stage }
     ])
 
     if (dbError) {
@@ -496,6 +607,7 @@ window.uploadPDF2 = async function() {
 
     status.innerText = "✅ تم"
     document.getElementById("pdf2File").value = ""
+    stageSelect.value = ""
     loadTeacherContent()
 
   } catch (error) {
@@ -517,10 +629,10 @@ window.loadTeacherContent = async function() {
       { data: pdfs2 },
       { data: notes }
     ] = await Promise.all([
-      supabase.from("videos").select("*").eq("teacher_id", currentUser.id),
-      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id),
-      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id),
-      supabase.from("notes").select("*").eq("teacher_id", currentUser.id)
+      supabase.from("videos").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+      supabase.from("notes").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false })
     ])
 
     // Videos
@@ -529,10 +641,16 @@ window.loadTeacherContent = async function() {
       videoList.innerHTML = ""
       if (videos.length > 0) {
         videos.forEach(v => {
-          videoList.innerHTML += `<li><a href="${escapeHtml(v.url)}" target="_blank">🎥 الفيديو</a></li>`
+          videoList.innerHTML += `
+            <div class="card" style="margin:10px 0; padding:15px; background:#f5f7ff; border-radius:10px;">
+              <p>📚 <strong>المرحلة:</strong> ${escapeHtml(v.stage || "غير محدد")}</p>
+              <p><a href="${escapeHtml(v.url)}" target="_blank" style="color:#667eea;">🎥 فتح الفيديو</a></p>
+              <button onclick="deleteVideo('${v.id}')" style="background:#ff4d4d; margin-top:10px; padding:8px 16px; width:auto;">🗑 حذف</button>
+            </div>
+          `
         })
       } else {
-        videoList.innerHTML = "<li>مفيش فيديوهات</li>"
+        videoList.innerHTML = "<p style='text-align:center; color:#999;'>مفيش فيديوهات</p>"
       }
     }
 
@@ -542,10 +660,16 @@ window.loadTeacherContent = async function() {
       noteList.innerHTML = ""
       if (notes.length > 0) {
         notes.forEach(n => {
-          noteList.innerHTML += `<li>${escapeHtml(n.content)}</li>`
+          noteList.innerHTML += `
+            <div class="card" style="margin:10px 0; padding:15px; background:#f5f7ff; border-radius:10px;">
+              <p>📚 <strong>المرحلة:</strong> ${escapeHtml(n.stage || "غير محدد")}</p>
+              <p>📝 ${escapeHtml(n.content)}</p>
+              <button onclick="deleteNote('${n.id}')" style="background:#ff4d4d; margin-top:10px; padding:8px 16px; width:auto;">🗑 حذف</button>
+            </div>
+          `
         })
       } else {
-        noteList.innerHTML = "<li>مفيش ملاحظات</li>"
+        noteList.innerHTML = "<p style='text-align:center; color:#999;'>مفيش ملاحظات</p>"
       }
     }
 
@@ -555,10 +679,16 @@ window.loadTeacherContent = async function() {
       pdfList.innerHTML = ""
       if (pdfs.length > 0) {
         pdfs.forEach(p => {
-          pdfList.innerHTML += `<li><a href="${escapeHtml(p.file_url)}" target="_blank">📄 ${escapeHtml(p.file_name)}</a></li>`
+          pdfList.innerHTML += `
+            <div class="card" style="margin:10px 0; padding:15px; background:#f5f7ff; border-radius:10px;">
+              <p>📚 <strong>المرحلة:</strong> ${escapeHtml(p.stage || "غير محدد")}</p>
+              <p><a href="${escapeHtml(p.file_url)}" target="_blank" style="color:#667eea;">📄 ${escapeHtml(p.file_name)}</a></p>
+              <button onclick="deletePDF('${p.id}')" style="background:#ff4d4d; margin-top:10px; padding:8px 16px; width:auto;">🗑 حذف</button>
+            </div>
+          `
         })
       } else {
-        pdfList.innerHTML = "<li>مفيش ملفات</li>"
+        pdfList.innerHTML = "<p style='text-align:center; color:#999;'>مفيش ملفات</p>"
       }
     }
 
@@ -568,15 +698,86 @@ window.loadTeacherContent = async function() {
       pdfList2.innerHTML = ""
       if (pdfs2.length > 0) {
         pdfs2.forEach(p => {
-          pdfList2.innerHTML += `<li><a href="${escapeHtml(p.file_url)}" target="_blank">📄 ${escapeHtml(p.file_name)}</a></li>`
+          pdfList2.innerHTML += `
+            <div class="card" style="margin:10px 0; padding:15px; background:#f5f7ff; border-radius:10px;">
+              <p>📚 <strong>المرحلة:</strong> ${escapeHtml(p.stage || "غير محدد")}</p>
+              <p><a href="${escapeHtml(p.file_url)}" target="_blank" style="color:#667eea;">📄 ${escapeHtml(p.file_name)}</a></p>
+              <button onclick="deletePDF2('${p.id}')" style="background:#ff4d4d; margin-top:10px; padding:8px 16px; width:auto;">🗑 حذف</button>
+            </div>
+          `
         })
       } else {
-        pdfList2.innerHTML = "<li>مفيش ملفات</li>"
+        pdfList2.innerHTML = "<p style='text-align:center; color:#999;'>مفيش ملفات</p>"
       }
     }
 
   } catch (error) {
     console.error("Load teacher content error:", error)
+  }
+}
+
+// ================== حذف المحتوى ==================
+window.deleteVideo = async function(id) {
+  if (!confirm("هل متأكد من حذف الفيديو؟")) return
+  try {
+    let { error } = await supabase.from("videos").delete().eq("id", id)
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  } catch (error) {
+    console.error("Delete video error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.deleteNote = async function(id) {
+  if (!confirm("هل متأكد من حذف الملاحظة؟")) return
+  try {
+    let { error } = await supabase.from("notes").delete().eq("id", id)
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  } catch (error) {
+    console.error("Delete note error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.deletePDF = async function(id) {
+  if (!confirm("هل متأكد من حذف الملف؟")) return
+  try {
+    let { error } = await supabase.from("pdfs").delete().eq("id", id)
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  } catch (error) {
+    console.error("Delete PDF error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.deletePDF2 = async function(id) {
+  if (!confirm("هل متأكد من حذف الملف؟")) return
+  try {
+    let { error } = await supabase.from("pdfs2").delete().eq("id", id)
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  } catch (error) {
+    console.error("Delete PDF2 error:", error)
+    alert("❌ خطأ: " + error.message)
   }
 }
 
@@ -757,6 +958,7 @@ window.loadStudentData = async function() {
     if (!currentUser) return
 
     window.studentTeacherId = currentUser.teacher_id
+    let studentStage = currentUser.stage  // المرحلة الدراسية للطالب
 
     const [
       { data: videos },
@@ -764,10 +966,10 @@ window.loadStudentData = async function() {
       { data: pdfs2 },
       { data: notes }
     ] = await Promise.all([
-      supabase.from("videos").select("*").eq("teacher_id", currentUser.teacher_id),
-      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.teacher_id),
-      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.teacher_id),
-      supabase.from("notes").select("*").eq("teacher_id", currentUser.teacher_id)
+      supabase.from("videos").select("*").eq("teacher_id", currentUser.teacher_id).eq("stage", studentStage),
+      supabase.from("pdfs").select("*").eq("teacher_id", currentUser.teacher_id).eq("stage", studentStage),
+      supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.teacher_id).eq("stage", studentStage),
+      supabase.from("notes").select("*").eq("teacher_id", currentUser.teacher_id).eq("stage", studentStage)
     ])
 
     // Videos
@@ -1147,6 +1349,7 @@ window.addEventListener("load", function() {
     window.loadStats()
     window.loadTeachers()
     window.loadStages()
+    window.loadLoginLogs()
   }
 
   // صفحة الطالب

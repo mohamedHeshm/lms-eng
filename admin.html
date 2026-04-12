@@ -475,6 +475,7 @@
   <div class="menu">
     <button class="menu-btn" onclick="openTab('addUserTab')">➕ إضافة مستخدم جديد</button>
     <button class="menu-btn" onclick="openTab('usersTab')">👥 إدارة المستخدمين</button>
+    <button class="menu-btn" onclick="openTab('loginLogsTab')">📋 سجل الدخول</button>
   </div>
 
   <!-- ADD USER TAB -->
@@ -520,6 +521,21 @@
       <h3>👥 إدارة المستخدمين</h3>
       <input type="text" id="search" placeholder="🔍 ابحث عن مستخدم...">
       <div id="users"></div>
+    </div>
+  </div>
+
+  <!-- LOGIN LOGS TAB -->
+  <div id="loginLogsTab" class="tab-content">
+    <div class="card">
+      <h3>📋 سجل الدخول</h3>
+      <div style="margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button onclick="filterLogs('all')" style="width:auto; padding:10px 20px; background:#667eea;">الكل</button>
+        <button onclick="filterLogs('student')" style="width:auto; padding:10px 20px; background:#25d366;">الطلاب</button>
+        <button onclick="filterLogs('teacher')" style="width:auto; padding:10px 20px; background:#ffc107;">المدرسين</button>
+      </div>
+      <div id="loginLogsContainer">
+        <p style="text-align:center; color:#999;">جاري تحميل السجلات...</p>
+      </div>
     </div>
   </div>
 
