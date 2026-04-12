@@ -2,127 +2,645 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    /* ==================== LAYOUT ==================== */
+    .layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ==================== SIDEBAR ==================== */
+    .sidebar {
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 5px 0 20px rgba(0, 0, 0, 0.2);
+      z-index: 50;
+    }
+
+    .sidebar h2 {
+      font-size: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 20px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 25px;
+    }
+
+    .sidebar-title {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .stage-btn {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 500;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: left 0.4s;
+    }
+
+    .stage-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateX(5px);
+    }
+
+    .stage-btn:hover::before {
+      left: 100%;
+    }
+
+    .stage-btn.active {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-color: white;
+      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    /* ==================== MAIN CONTENT ==================== */
+    .main-content {
+      margin-right: 250px;
+      padding: 40px 20px;
+    }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 50px 40px;
+      text-align: center;
+      border-radius: 20px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: moveGrid 20s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 2;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ==================== MENU ==================== */
+    .menu {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .menu-btn {
+      padding: 12px 24px;
+      background: white;
+      border: 3px solid #667eea;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      font-family: 'Cairo', sans-serif;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .menu-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: #667eea;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+      z-index: -1;
+    }
+
+    .menu-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .menu-btn:hover {
+      color: white;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    /* ==================== CARD ==================== */
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      border: 2px solid rgba(102, 126, 234, 0.1);
+      transition: all 0.4s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    /* ==================== INPUT & BUTTON ==================== */
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      box-sizing: border-box;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.4s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .logout {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    .logout:hover {
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    /* ==================== TAB CONTENT ==================== */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==================== PROFILE PREVIEW ==================== */
+    .profile-preview {
+      text-align: center;
+      padding: 20px;
+      background: #f5f7ff;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+
+    .profile-preview img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #667eea;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+      margin-bottom: 15px;
+    }
+
+    .profile-preview h4 {
+      color: #667eea;
+      margin: 10px 0;
+    }
+
+    /* ==================== LIST ==================== */
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 12px;
+      margin: 8px 0;
+      background: #f5f7ff;
+      border-radius: 10px;
+      border-right: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    li:hover {
+      background: #eef2ff;
+      transform: translateX(5px);
+    }
+
+    li a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    li a:hover {
+      color: #764ba2;
+    }
+
+    /* ==================== STATUS ==================== */
+    #status, #status2, #profileStatus {
+      margin: 15px 0;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ==================== STUDENT CARD ==================== */
+    .student-card {
+      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 15px;
+      border: 2px solid #e0e8ff;
+      transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+    }
+
+    /* ==================== SCROLL BUTTONS ==================== */
+    #scrollTopBtn, #scrollBottomBtn {
+      position: fixed;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      z-index: 40;
+    }
+
+    #scrollTopBtn {
+      bottom: 120px;
+    }
+
+    #scrollBottomBtn {
+      bottom: 60px;
+    }
+
+    #scrollTopBtn:hover, #scrollBottomBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: -250px;
+        transition: left 0.3s ease;
+        width: 250px;
+        z-index: 100;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-right: 0;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      .menu {
+        flex-direction: column;
+      }
+
+      .menu-btn {
+        width: 100%;
+      }
+    }
+
+    .solutions-button {
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+      box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .solutions-button:hover {
+      box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    }
+  </style>
 </head>
-<body class="dashboard">
-<div class="container">
+<body>
 
-  <h2>👨‍🏫 لوحة المدرس</h2>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <h2>📚 المراحل</h2>
 
-  <!-- زرار الحلول -->
-  <div style="margin-bottom:15px;">
-    <button onclick="openTab('solutions')" style="background:#ff6b35;font-size:16px;padding:12px; width:100%; border:none; border-radius:8px; color:white; cursor:pointer;">
-      📥 حلول الطلاب
-    </button>
-  </div>
-
-  <div class="tabs">
-    <button onclick="openTab('profile')">👤 البروفايل</button>
-    <button onclick="openTab('social')">🔗 التواصل</button>
-    <button onclick="openTab('video')">🎥 فيديو</button>
-    <button onclick="openTab('pdf')">📁الواجب </button>
-    <button onclick="openTab('pdf2')">📁 مذكرات</button>
-    <button onclick="openTab('note')">📝تنبيهات</button>
-  </div>
-
-  <!-- PROFILE -->
-  <div id="profile" class="tab-content">
-    <div class="card">
-      <h3>👤 صفحتي</h3>
-      <div id="profilePreview" class="profile-preview">
-        <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile">
-        <h4 id="profileName">اسم المدرس</h4>
-        <p id="profileBio">نبذة بسيطة...</p>
+    <div class="sidebar-section">
+      <div class="sidebar-title">المراحل الدراسية</div>
+      <div id="stageNav" style="display: flex; flex-direction: column; gap: 8px;">
+        <p style="text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 14px;">جاري التحميل...</p>
       </div>
-      <input type="text" id="bio" placeholder="عرف نفسك">
-      <input type="file" id="imgFile" accept="image/*">
-      <p id="profileStatus"></p>
-      <button onclick="saveProfile()">حفظ</button>
+    </div>
+
+    <div class="sidebar-section">
+      <button class="stage-btn" onclick="goHome()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
+        🏠 الرئيسية
+      </button>
+      <button class="stage-btn" onclick="goToChangePassword()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
+        🔐 تغيير كلمة المرور
+      </button>
     </div>
   </div>
 
-  <!-- SOCIAL -->
-  <div id="social" class="tab-content">
-    <div class="card">
-      <h3>🔗 روابط التواصل</h3>
-      <input type="text" id="facebook" placeholder="رابط فيسبوك">
-      <input type="text" id="whatsapp" placeholder="رابط واتساب">
-      <input type="text" id="youtube" placeholder="رابط يوتيوب">
-      <button onclick="saveSocial()">حفظ</button>
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-content">
+        <h1>👨‍🏫 لوحة المدرس</h1>
+        <p>إدارة المحتوى الدراسي والطلاب</p>
+      </div>
     </div>
-  </div>
 
-  <!-- VIDEO -->
-  <div id="video" class="tab-content">
-    <div class="card">
-      <h3>🎥 نشر فيديو</h3>
-      <input type="text" id="videoInput" placeholder="رابط الفيديو">
-      <button onclick="addVideo()">نشر</button>
-    </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الفيديوهات المنشورة</h3>
-      <div id="videoListTeacher"></div>
-    </div>
-  </div>
+    <!-- SOLUTIONS BUTTON -->
+    <button class="solutions-button" onclick="openTab('solutions')">
+      📥 عرض حلول الطلاب
+    </button>
 
-  <!-- PDF الأول -->
-  <div id="pdf" class="tab-content">
-    <div class="card">
-      <h3>📁 رفع شيتات</h3>
-      <input type="file" id="pdfFile" accept="application/pdf">
-      <button onclick="uploadPDF()">رفع</button>
-      <p id="status"></p>
+    <!-- MENU -->
+    <div class="menu">
+      <button class="menu-btn" onclick="openTab('profile')">👤 البروفايل</button>
+      <button class="menu-btn" onclick="openTab('social')">🔗 التواصل</button>
+      <button class="menu-btn" onclick="openTab('video')">🎥 فيديو</button>
+      <button class="menu-btn" onclick="openTab('pdf')">📁 الواجب</button>
+      <button class="menu-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
+      <button class="menu-btn" onclick="openTab('note')">📝 ملاحظات</button>
     </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملفات المرفوعة</h3>
-      <div id="pdfListTeacher"></div>
-    </div>
-  </div>
 
-  <!-- PDF الثاني -->
-  <div id="pdf2" class="tab-content">
-    <div class="card">
-      <h3>📁 رفع مذكرات</h3>
-      <input type="file" id="pdf2File" accept="application/pdf">
-      <button onclick="uploadPDF2()">رفع</button>
-      <p id="status2"></p>
+    <!-- PROFILE TAB -->
+    <div id="profile" class="tab-content active">
+      <div class="card">
+        <h3>👤 صفحتي</h3>
+        <div id="profilePreview" class="profile-preview">
+          <img src="https://via.placeholder.com/150" alt="Profile">
+          <h4>اسم المدرس</h4>
+          <p>نبذة بسيطة...</p>
+        </div>
+        <textarea id="bio" placeholder="📝 عرف نفسك بكلمات معبرة..."></textarea>
+        <input type="file" id="imgFile" accept="image/*" placeholder="صورتك الشخصية">
+        <p id="profileStatus"></p>
+        <button onclick="saveProfile()">💾 حفظ البروفايل</button>
+      </div>
     </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملفات المرفوعة</h3>
-      <div id="pdfListTeacher2"></div>
-    </div>
-  </div>
 
-  <!-- NOTE -->
-  <div id="note" class="tab-content">
-    <div class="card">
-      <h3>📝 نشر ملاحظة</h3>
-      <input type="text" id="noteInput" placeholder="اكتب ملاحظة">
-      <button onclick="addNote()">نشر</button>
+    <!-- SOCIAL TAB -->
+    <div id="social" class="tab-content">
+      <div class="card">
+        <h3>🔗 روابط التواصل</h3>
+        <input type="text" id="facebook" placeholder="📘 رابط فيسبوك">
+        <input type="text" id="whatsapp" placeholder="💬 رابط واتساب">
+        <input type="text" id="youtube" placeholder="▶️ رابط يوتيوب">
+        <button onclick="saveSocial()">💾 حفظ الروابط</button>
+      </div>
     </div>
-    <div class="card" style="margin-top:15px;">
-      <h3>📋 الملاحظات المنشورة</h3>
-      <div id="noteListTeacher"></div>
-    </div>
-  </div>
 
-  <!-- SOLUTIONS -->
-  <div id="solutions" class="tab-content">
-    <div class="card">
-      <h3>📥 حلول الطلاب</h3>
-      <div id="solutionsList"></div>
+    <!-- VIDEO TAB -->
+    <div id="video" class="tab-content">
+      <div class="card">
+        <h3>🎥 نشر فيديو</h3>
+        <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
+        <button onclick="addVideo()">🚀 نشر الفيديو</button>
+      </div>
+      <div class="card" style="margin-top:15px;">
+        <h3>📋 الفيديوهات المنشورة</h3>
+        <ul id="videoListTeacher">
+          <li>جاري التحميل...</li>
+        </ul>
+      </div>
     </div>
-  </div>
 
-  <button class="logout" onclick="logout()">تسجيل خروج</button>
+    <!-- PDF TAB -->
+    <div id="pdf" class="tab-content">
+      <div class="card">
+        <h3>📁 رفع شيتات (الواجبات)</h3>
+        <input type="file" id="pdfFile" accept="application/pdf">
+        <button onclick="uploadPDF()">📤 رفع الملف</button>
+        <p id="status"></p>
+      </div>
+      <div class="card" style="margin-top:15px;">
+        <h3>📋 الملفات المرفوعة</h3>
+        <ul id="pdfListTeacher">
+          <li>جاري التحميل...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PDF2 TAB -->
+    <div id="pdf2" class="tab-content">
+      <div class="card">
+        <h3>📁 رفع مذكرات</h3>
+        <input type="file" id="pdf2File" accept="application/pdf">
+        <button onclick="uploadPDF2()">📤 رفع الملف</button>
+        <p id="status2"></p>
+      </div>
+      <div class="card" style="margin-top:15px;">
+        <h3>📋 الملفات المرفوعة</h3>
+        <ul id="pdfListTeacher2">
+          <li>جاري التحميل...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- NOTE TAB -->
+    <div id="note" class="tab-content">
+      <div class="card">
+        <h3>📝 نشر ملاحظة</h3>
+        <textarea id="noteInput" placeholder="اكتب ملاحظة مهمة للطلاب..."></textarea>
+        <button onclick="addNote()">🚀 نشر الملاحظة</button>
+      </div>
+      <div class="card" style="margin-top:15px;">
+        <h3>📋 الملاحظات المنشورة</h3>
+        <ul id="noteListTeacher">
+          <li>جاري التحميل...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SOLUTIONS TAB -->
+    <div id="solutions" class="tab-content">
+      <div class="card">
+        <h3>📥 حلول الطلاب</h3>
+        <div id="solutionsList">
+          <p>جاري تحميل الحلول...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGOUT BUTTON -->
+    <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
+  </div>
 </div>
 
-<script type="module" src="js/app.js"></script>
+<!-- SCROLL BUTTONS -->
+<button id="scrollTopBtn" onclick="scrollToTop()">⬆️</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇️</button>
 
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<script type="module" src="js/app.js"></script>
 
 </body>
 </html>
