@@ -110,11 +110,14 @@
     }
 
     /* ==================== MAIN CONTENT ==================== */
-    .main-content {
-      margin-right: 250px;
-      padding: 40px 20px;
-    }
-
+   .main-content {
+  margin-left: 250px;
+  margin-right: 0;
+  padding: 40px 20px;
+}
+.stage-btn.active {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
     /* ==================== HEADER ==================== */
     .header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -498,6 +501,17 @@
     </div>
 
     <div class="sidebar-section">
+      <div class="sidebar-section">
+        <div class="sidebar-title">القائمة</div>
+
+        <button class="stage-btn" onclick="openTab('profile')">👤 البروفايل</button>
+        <button class="stage-btn" onclick="openTab('social')">🔗 التواصل</button>
+        <button class="stage-btn" onclick="openTab('video')">🎥 فيديو</button>
+        <button class="stage-btn" onclick="openTab('pdf')">📁 الواجب</button>
+        <button class="stage-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
+        <button class="stage-btn" onclick="openTab('note')">📝 ملاحظات</button>
+        <button class="stage-btn" onclick="openTab('solutions')">📥 الحلول</button>
+      </div>
       <button class="stage-btn" onclick="goHome()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
         🏠 الرئيسية
       </button>
@@ -521,16 +535,6 @@
     <button class="solutions-button" onclick="openTab('solutions')">
       📥 عرض حلول الطلاب
     </button>
-
-    <!-- MENU -->
-    <div class="menu">
-      <button class="menu-btn" onclick="openTab('profile')">👤 البروفايل</button>
-      <button class="menu-btn" onclick="openTab('social')">🔗 التواصل</button>
-      <button class="menu-btn" onclick="openTab('video')">🎥 فيديو</button>
-      <button class="menu-btn" onclick="openTab('pdf')">📁 الواجب</button>
-      <button class="menu-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
-      <button class="menu-btn" onclick="openTab('note')">📝 ملاحظات</button>
-    </div>
 
     <!-- PROFILE TAB -->
     <div id="profile" class="tab-content active">
