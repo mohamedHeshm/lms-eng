@@ -24,7 +24,7 @@
 
     /* ==================== LAYOUT ==================== */
     .layout {
-      display: grid;
+      display: block;
       grid-template-columns: 250px 1fr;
       min-height: 100vh;
     }
@@ -110,13 +110,13 @@
     }
 
     /* ==================== MAIN CONTENT ==================== */
-   .main-content {
-  margin-left: 250px;
-  margin-right: 0;
+ .main-content {
+  margin-left: 250px; /* نفس عرض السايدبار */
   padding: 40px 20px;
-}
-.stage-btn.active {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* يخلي كل حاجة في النص */
 }
     /* ==================== HEADER ==================== */
     .header {
@@ -224,9 +224,8 @@
     /* ==================== CARD ==================== */
     .card {
   background: rgba(255, 255, 255, 0.95); /* أبيض شبه شفاف */
-  padding: 30px;
-  border-radius: 20px;
-  margin-bottom: 25px;
+  width: 100%;
+  max-width: 800px; /* أهم حاجة */
 
   /* أهم حاجة */
   max-width: 900px;
