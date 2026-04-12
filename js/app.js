@@ -1165,19 +1165,7 @@ window.addEventListener("load", function() {
     window.loadTeacherStages()
   }
 })
-function openTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.classList.remove('active');
-  });
-
-  document.getElementById(tabId).classList.add('active');
-
-  document.querySelectorAll('.stage-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  event.target.classList.add('active');
-}
+// openTab is already defined above via window.openTab
 // تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
   if (document.getElementById("totalUsers")) {
