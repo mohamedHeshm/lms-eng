@@ -223,15 +223,24 @@
 
     /* ==================== CARD ==================== */
     .card {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      margin-bottom: 25px;
-      border: 2px solid rgba(102, 126, 234, 0.1);
-      transition: all 0.4s ease;
-    }
+  background: rgba(255, 255, 255, 0.95); /* أبيض شبه شفاف */
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 25px;
 
+  /* أهم حاجة */
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+
+  /* شكل مربع واضح */
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+
+  backdrop-filter: blur(10px); /* تأثير زجاجي جامد 🔥 */
+
+  transition: all 0.3s ease;
+}
     .card:hover {
       box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
       border-color: rgba(102, 126, 234, 0.3);
