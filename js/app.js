@@ -1625,58 +1625,10 @@ window.deleteContent = async function(id) {
 
 */
 
-// ================== جدول Supabase المطلوب ==================
-/*
 
--- شغّل هذا الـ SQL في Supabase Console
-
-CREATE TABLE teacher_content (
-  id bigint primary key generated always as identity,
-  teacher_id uuid not null,
-  stage text not null,
-  type text not null,
-  title text not null,
-  content text,
-  url text,
-  created_at timestamp default now()
-);
-
--- فعّل Row Level Security
-ALTER TABLE teacher_content ENABLE ROW LEVEL SECURITY;
-
--- أضف السياسات
-CREATE POLICY "Anyone can read"
-  ON teacher_content
-  FOR SELECT
-  USING (true);
-
-CREATE POLICY "Teachers can insert"
-  ON teacher_content
-  FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY "Teachers can delete"
-  ON teacher_content
-  FOR DELETE
-  USING (true);
-
-*/
-
-// ================== اختبار الوظائف ==================
-
-/**
- * اختبر الوظائف في Console
- * 1. افتح Developer Tools (F12)
- * 2. اكتب: window.addTeacherContent()
- * 3. يجب أن يجرّب إضافة محتوى جديد
- */
 
 console.log("✅ وظائف إدارة محتوى المدرس تم تحميلها بنجاح")
 
-// ================== ملاحظات مهمة ==================
-
-/*
-// openTab is already defined above via window.openTab
 // تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
   if (document.getElementById("totalUsers")) {
