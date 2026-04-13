@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al-Ma'moun - نظام إدارة التعليم</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-
+  <title>Al-Ma'moun LMS - المنصة التعليمية الذكية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,523 +12,451 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --primary: #667eea;
-      --secondary: #764ba2;
-      --accent: #f093fb;
-      --dark: #1a1a2e;
-      --light: #f5f7fa;
-      --text: #333;
+    html, body {
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: 'Cairo', sans-serif;
-      background:
-        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-        url("images/s1.jpg") no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a0f3f 50%, #2d1b4e 100%);
       min-height: 100vh;
-      padding: 20px;
-      color: white;
-      overflow-x: hidden;
+      color: #fff;
+      position: relative;
     }
 
-    /* ==================== SCROLL BAR ==================== */
-    ::-webkit-scrollbar {
-      width: 12px;
+    /* ==================== ANIMATED BACKGROUND ==================== */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
     }
 
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
+    .blob {
+      position: absolute;
+      opacity: 0.6;
+      filter: blur(40px);
+      mix-blend-mode: screen;
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 6px;
+    .blob-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      top: -100px;
+      left: -100px;
+      animation: blob-animation 8s ease-in-out infinite;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.6);
+    .blob-2 {
+      width: 350px;
+      height: 350px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      bottom: -100px;
+      right: -100px;
+      animation: blob-animation 10s ease-in-out infinite reverse;
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
+    .blob-3 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      top: 50%;
+      right: 10%;
+      animation: blob-animation 12s ease-in-out infinite;
+    }
+
+    @keyframes blob-animation {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* ==================== GRID BACKGROUND ==================== */
+    .grid-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: grid-scroll 20s linear infinite;
+    }
+
+    @keyframes grid-scroll {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
     }
 
     /* ==================== HEADER ==================== */
-    .header {
-      text-align: center;
+    header {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+      background: rgba(15, 15, 30, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      right: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ==================== LOGIN BUTTON ==================== */
+    .login-btn {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50px;
       color: white;
-      margin-bottom: 80px;
-      animation: slideDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: slideInRight 0.8s ease-out 0.3s both;
+    }
+
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+      z-index: 1;
+    }
+
+    .login-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .login-btn span {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==================== HERO SECTION ==================== */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 5;
+      padding: 60px 40px;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      text-align: center;
+      perspective: 1000px;
+    }
+
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #667eea 50%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: slideInUp 0.8s ease-out;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 40px;
+      animation: slideInUp 0.8s ease-out 0.2s both;
+      font-weight: 300;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: slideInUp 0.8s ease-out 0.4s both;
+    }
+
+    .btn {
+      padding: 16px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+      z-index: 0;
+    }
+
+    .btn:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn span {
       position: relative;
       z-index: 1;
     }
 
-    .header-content {
+    .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    /* ==================== FEATURES SECTION ==================== */
+    .features {
       position: relative;
+      z-index: 5;
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .logo {
-      font-size: 4.5rem;
-      margin-bottom: 20px;
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    .header h1 {
-      font-size: 3.8rem;
-      font-weight: 900;
-      margin-bottom: 15px;
-      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      letter-spacing: -1px;
-      background: linear-gradient(135deg, #fff, #f0f0f0);
+    .section-title {
+      font-size: 48px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .header-subtitle {
-      font-size: 1.4rem;
-      opacity: 0.95;
-      font-weight: 300;
-      margin-bottom: 30px;
-      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    .header-divider {
-      width: 150px;
-      height: 4px;
-      background: linear-gradient(90deg, transparent, white, transparent);
-      margin: 0 auto 40px;
-      animation: expandWidth 1s ease-out 0.3s both;
-    }
-
-    .stats-summary {
-      display: flex;
-      justify-content: center;
-      gap: 60px;
-      margin-top: 40px;
-      flex-wrap: wrap;
-    }
-
-    .summary-item {
-      text-align: center;
-      animation: fadeInUp 0.8s ease-out 0.4s both;
-    }
-
-    .summary-number {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      margin-bottom: 8px;
-    }
-
-    .summary-label {
-      font-size: 1rem;
-      opacity: 0.9;
-      font-weight: 500;
-    }
-
-    /* ==================== TABS ==================== */
-    .tabs-container {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 50px;
-      animation: fadeInUp 0.8s ease-out 0.5s both;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      padding: 12px 28px;
-      border: 2px solid white;
-      background: transparent;
-      color: white;
-      border-radius: 30px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Cairo', sans-serif;
-    }
-
-    .tab-btn:hover,
-    .tab-btn.active {
-      background: white;
-      color: var(--secondary);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ==================== TEACHERS GRID ==================== */
-    .teachers-grid {
+    .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 40px;
-      margin-bottom: 80px;
-      animation: fadeInUp 0.8s ease-out 0.6s both;
     }
 
-    .teacher-card {
-      position: relative;
-      background: white;
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px;
       border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .teacher-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 0;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .teacher-card * {
       position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      group: true;
+      animation: fadeIn 0.8s ease-out both;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.2s; }
+    .feature-card:nth-child(2) { animation-delay: 0.4s; }
+    .feature-card:nth-child(3) { animation-delay: 0.6s; }
+    .feature-card:nth-child(4) { animation-delay: 0.8s; }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s;
       z-index: 1;
     }
 
-    .teacher-card:hover {
-      transform: translateY(-20px);
-      box-shadow: 0 40px 80px rgba(102, 126, 234, 0.3);
+    .feature-card:hover::before {
+      left: 100%;
     }
 
-    .teacher-card:hover::before {
-      opacity: 1;
+    .feature-card:hover {
+      transform: translateY(-20px) scale(1.05);
+      border-color: rgba(102, 126, 234, 0.5);
+      background: rgba(102, 126, 234, 0.1);
     }
 
-    /* CARD HEADER */
-    .card-header {
-      position: relative;
-      height: 200px;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-    }
-
-    .card-header::after {
-      content: '';
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-      bottom: -50px;
-      right: -50px;
-      border-radius: 50%;
-    }
-
-    .teacher-image {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      object-fit: cover;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translate(-50%, 0) scale(1);
-      border: 6px solid white;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-      z-index: 2;
-      transition: all 0.4s ease;
-    }
-
-    .teacher-card:hover .teacher-image {
-      transform: translateX(-50%) scale(1.1);
-    }
-
-    /* CARD BODY */
-    .card-body {
-      padding: 110px 30px 30px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .teacher-name {
-      font-size: 1.8rem;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      transition: all 0.4s ease;
-      animation: fadeUp 0.8s ease;
-    }
-
-    .teacher-card:hover .teacher-name {
-      transform: scale(1.08);
-      letter-spacing: 1px;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .teacher-badge {
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
       display: inline-block;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin: 0 auto 15px;
-      text-align: center;
+      animation: float 3s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
     }
 
-    .teacher-bio {
-      color: #666;
-      font-size: 0.95rem;
+    .feature-card:nth-child(1) .feature-icon { animation-delay: 0s; }
+    .feature-card:nth-child(2) .feature-icon { animation-delay: 0.5s; }
+    .feature-card:nth-child(3) .feature-icon { animation-delay: 1s; }
+    .feature-card:nth-child(4) .feature-icon { animation-delay: 1.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .feature-card h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .feature-card p {
+      color: rgba(255, 255, 255, 0.7);
       line-height: 1.6;
-      text-align: center;
-      margin-bottom: 20px;
-      flex-grow: 1;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      position: relative;
+      z-index: 2;
     }
 
-    /* STATS */
-    .card-stats {
+    /* ==================== STATS SECTION ==================== */
+    .stats {
+      position: relative;
+      z-index: 5;
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-      padding: 15px 0;
-      border-top: 1px solid #f0f0f0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .stat {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
       text-align: center;
     }
+
+    .stat-item {
+      animation: fadeIn 0.8s ease-out both;
+    }
+
+    .stat-item:nth-child(1) { animation-delay: 0.2s; }
+    .stat-item:nth-child(2) { animation-delay: 0.4s; }
+    .stat-item:nth-child(3) { animation-delay: 0.6s; }
+    .stat-item:nth-child(4) { animation-delay: 0.8s; }
 
     .stat-number {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: var(--primary);
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      color: #999;
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
-    /* SOCIAL LINKS */
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .social-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      cursor: pointer;
-      background: white;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      position: relative;
-      border: 2px solid transparent;
-      text-decoration: none;
-    }
-
-    .social-icon img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      transition: all 0.3s ease;
-    }
-
-    .social-icon.facebook {
-      border-color: #1877f2;
-    }
-
-    .social-icon.whatsapp {
-      border-color: #25d366;
-    }
-
-    .social-icon.youtube {
-      border-color: #ff0000;
-    }
-
-    .social-icon:hover {
-      transform: translateY(-12px) scale(1.25) rotate(10deg);
-      box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5);
-    }
-
-    .social-icon.facebook:hover {
-      background: #1877f2;
-      box-shadow: 0 20px 50px rgba(24, 119, 242, 0.5);
-    }
-
-    .social-icon.facebook:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon.whatsapp:hover {
-      background: #25d366;
-      box-shadow: 0 20px 50px rgba(37, 211, 102, 0.5);
-    }
-
-    .social-icon.whatsapp:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon.youtube:hover {
-      background: #ff0000;
-      box-shadow: 0 20px 50px rgba(255, 0, 0, 0.5);
-    }
-
-    .social-icon.youtube:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    .social-icon::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .social-icon:hover::before {
-      opacity: 1;
-    }
-
-    /* BUTTONS */
-    .card-buttons {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      font-size: 0.95rem;
+      font-size: 56px;
       font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Cairo', sans-serif;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* ==================== LOADING ==================== */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: white;
-      grid-column: 1 / -1;
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    .loading-text {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-
-    /* ==================== EMPTY STATE ==================== */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: white;
-      grid-column: 1 / -1;
-    }
-
-    .empty-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-    }
-
-    .empty-text {
-      font-size: 1.3rem;
-      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 10px;
+      animation: pulse 2s ease-in-out infinite;
     }
 
-    .empty-subtext {
-      opacity: 0.85;
-      font-size: 1rem;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .stat-text {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
     }
 
     /* ==================== FOOTER ==================== */
-    .footer {
+    footer {
+      position: relative;
+      z-index: 5;
+      padding: 40px;
       text-align: center;
-      padding: 40px 20px;
-      color: white;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 60px;
-    }
-
-    .footer p {
-      margin: 5px 0;
-      font-weight: 300;
+      color: rgba(255, 255, 255, 0.6);
     }
 
     /* ==================== ANIMATIONS ==================== */
-    @keyframes slideDown {
+    @keyframes fadeInDown {
       from {
         opacity: 0;
-        transform: translateY(-40px);
+        transform: translateY(-30px);
       }
       to {
         opacity: 1;
@@ -537,7 +464,18 @@
       }
     }
 
-    @keyframes fadeInUp {
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInUp {
       from {
         opacity: 0;
         transform: translateY(30px);
@@ -551,456 +489,320 @@
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: scale(0.9);
       }
       to {
         opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes bounce {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-20px);
-      }
-    }
-
-    @keyframes expandWidth {
-      from {
-        width: 0;
-      }
-      to {
-        width: 150px;
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
       }
     }
 
     /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 1200px) {
-      .teachers-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 30px;
-      }
-    }
-
     @media (max-width: 768px) {
-      .header h1 {
-        font-size: 2.5rem;
-      }
-
-      .header-subtitle {
-        font-size: 1.1rem;
-      }
-
-      .logo {
-        font-size: 3rem;
-      }
-
-      .stats-summary {
-        gap: 30px;
-      }
-
-      .teachers-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card-stats {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-
-      .tab-btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .header h1 {
-        font-size: 1.8rem;
-      }
-
-      .header-subtitle {
-        font-size: 1rem;
-      }
-
-      .summary-number {
-        font-size: 1.8rem;
-      }
-
-      .card-body {
-        padding: 100px 20px 20px;
-      }
-
-      .teacher-name {
-        font-size: 1.3rem;
-      }
-
-      .card-buttons {
+      header {
+        padding: 20px;
         flex-direction: column;
+        gap: 20px;
+      }
+
+      .nav-links {
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .hero h1 {
+        font-size: 48px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
       }
 
       .btn {
-        padding: 10px;
-        font-size: 0.9rem;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .section-title {
+        font-size: 36px;
+      }
+
+      .blob {
+        width: 250px !important;
+        height: 250px !important;
       }
     }
 
-    /* ==================== TRANSITIONS ==================== */
-    .fade-exit {
-      animation: fadeOut 0.4s ease-out forwards;
+    /* ==================== MODAL ==================== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
     }
 
-    @keyframes fadeOut {
-      from {
-        opacity: 1;
-        transform: scale(1);
-      }
-      to {
-        opacity: 0;
-        transform: scale(0.9);
-      }
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a0f3f 0%, #2d1b4e 100%);
+      padding: 50px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      margin: 15px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .modal-status {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <!-- ==================== HEADER ==================== -->
-  <div class="header">
-    <div class="header-content">
-      <div class="logo">🎓</div>
-      <h1>Al-Ma'moun</h1>
-      <p class="header-subtitle">نظام إدارة التعليم الإلكتروني المتقدم</p>
-      <div class="header-divider"></div>
 
-      <div class="stats-summary">
-        <div class="summary-item">
-          <div class="summary-number" id="totalUsers">0</div>
-          <div class="summary-label">مستخدم</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-number" id="totalTeachers">0</div>
-          <div class="summary-label">معلم متميز</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-number" id="totalStudents">0</div>
-          <div class="summary-label">طالب نشط</div>
-        </div>
-      </div>
+<!-- ANIMATED BACKGROUND -->
+<div class="animated-bg">
+  <div class="grid-bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">🎓 Al-Ma'moun</div>
+  <nav class="nav-links">
+    <a href="#features">المميزات</a>
+    <a href="#stats">الإحصائيات</a>
+    <a href="#about">عن المنصة</a>
+    <button class="login-btn" onclick="openLoginModal()">
+      <span>🔐 دخول</span>
+    </button>
+  </nav>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>منصة التعليم الذكية</h1>
+    <p>تعلم أذكى، علم أفضل، نتائج أعظم</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary" onclick="openLoginModal()">
+        <span>🚀 ابدأ الآن</span>
+      </button>
+      <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+        <span>📚 تعرف أكثر</span>
+      </button>
     </div>
   </div>
+</section>
 
-  <!-- ==================== TABS ==================== -->
-  <div class="tabs-container">
-    <button class="tab-btn active" onclick="window.filterTeachers(this, 'all')">👥 جميع المعلمين</button>
-    <button class="tab-btn" onclick="window.filterTeachers(this, 'top')">⭐ الأفضل تقييماً</button>
-    <button class="tab-btn" onclick="window.filterTeachers(this, 'new')">🆕 الجدد</button>
-  </div>
-
-  <!-- ==================== TEACHERS CONTAINER ==================== -->
-  <div id="teachersContainer" class="teachers-grid">
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">⏳ جاري تحميل المعلمين...</div>
+<!-- FEATURES SECTION -->
+<section class="features" id="features">
+  <h2 class="section-title">🌟 المميزات الرئيسية</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>إدارة متعددة الأدوار</h3>
+      <p>نظام متقدم للأدمن والمدرسين والطلاب مع صلاحيات محددة بدقة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <h3>محتوى تعليمي غني</h3>
+      <p>ملفات PDF، فيديوهات، ملاحظات ومراحل دراسية منظمة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>تتبع التقدم</h3>
+      <p>مراقبة فعالة لتقدم الطلاب مع تقارير مفصلة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <h3>التفاعل والتواصل</h3>
+      <p>تعليقات وتقييمات مباشرة بين المدرسين والطلاب</p>
     </div>
   </div>
+</section>
 
-  <!-- ==================== FOOTER ==================== -->
-  <div class="footer">
-    <p>💡 منصة تعليمية موثوقة وآمنة</p>
-    <p>جميع الحقوق محفوظة © 2026 | طورها مهندس محمد هشام 👨🏻‍💻</p>
+<!-- STATS SECTION -->
+<section class="stats" id="stats">
+  <h2 class="section-title">📊 إحصائيات المنصة</h2>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number">500+</div>
+      <div class="stat-text">طالب نشط</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50+</div>
+      <div class="stat-text">مدرس متخصص</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1000+</div>
+      <div class="stat-text">ملف تعليمي</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">99%</div>
+      <div class="stat-text">رضا المستخدمين</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="about">
+  <p>© 2024 Al-Ma'moun Educational Platform | طورتها بـ ❤️ لتحسين التعليم</p>
+  <p style="margin-top: 15px; font-size: 14px;">تصميم وتطوير: محمد حشام | جميع الحقوق محفوظة</p>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeLoginModal()">✕</button>
+    <h2>تسجيل الدخول</h2>
+    <input type="email" class="modal-input" id="modalEmail" placeholder="📧 البريد الإلكتروني">
+    <input type="password" class="modal-input" id="modalPassword" placeholder="🔒 كلمة المرور">
+    <button class="modal-btn" onclick="handleLogin()">دخول</button>
+    <div class="modal-status" id="modalStatus"></div>
   </div>
 </div>
 
-<!-- ==================== SUPABASE ==================== -->
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  // ========== LOGIN MODAL FUNCTIONS ==========
+  window.openLoginModal = function() {
+    document.getElementById('loginModal').classList.add('active');
+  }
 
-  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
-  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  window.closeLoginModal = function() {
+    document.getElementById('loginModal').classList.remove('active');
+  }
 
-  let allTeachers = []
-  let currentFilter = 'all'
+  window.handleLogin = async function() {
+    const email = document.getElementById('modalEmail').value.trim();
+    const password = document.getElementById('modalPassword').value.trim();
+    const status = document.getElementById('modalStatus');
 
-  // تحميل جميع البيانات
-  async function loadData() {
+    if (!email || !password) {
+      status.innerHTML = '❌ يجب ملء جميع الحقول';
+      status.style.color = '#ff4d4d';
+      return;
+    }
+
+    status.innerHTML = '⏳ جاري المعالجة...';
+    status.style.color = '#4facfe';
+
+    // محاولة تسجيل الدخول عبر app.js
     try {
-      // تحميل الإحصائيات
-      let { data: users, error: usersError } = await supabase
-        .from("users")
-        .select("id, role", { count: 'exact' })
-
-      if (usersError) throw usersError
-
-      if (users && users.length > 0) {
-        let teachers = users.filter(u => u.role === "teacher").length
-        let students = users.filter(u => u.role === "student").length
-
-        animateNumber("totalUsers", users.length)
-        animateNumber("totalTeachers", teachers)
-        animateNumber("totalStudents", students)
-      }
-
-      // تحميل المعلمين
-      await loadTeachers()
-
-    } catch (error) {
-      console.error("خطأ في تحميل البيانات:", error)
-    }
-  }
-
-  // تحميل المعلمين
-  async function loadTeachers() {
-    try {
-      let { data: teachers, error: teachersError } = await supabase
-        .from("users")
-        .select("id, name, created_at")
-        .eq("role", "teacher")
-
-      if (teachersError) throw teachersError
-
-      if (!teachers || teachers.length === 0) {
-        showEmpty()
-        return
-      }
-
-      allTeachers = []
-
-      // تحميل بيانات جميع المعلمين بالتوازي
-      const teacherPromises = teachers.map(async (teacher) => {
-        try {
-          const [
-            { data: profile },
-            { data: social },
-            { data: comments }
-          ] = await Promise.all([
-            supabase.from("teacher_profile").select("*").eq("teacher_id", teacher.id).single(),
-            supabase.from("social_links").select("*").eq("teacher_id", teacher.id).single(),
-            supabase.from("teacher_comments").select("rating").eq("teacher_id", teacher.id)
-          ])
-
-          // حساب التقييم
-          let rating = 4.8
-          if (comments && comments.length > 0) {
-            rating = parseFloat((comments.reduce((sum, c) => sum + (c.rating || 0), 0) / comments.length).toFixed(1))
-          }
-
-          // عد الطلاب المسجلين مع هذا المعلم
-          const { data: studentCourses } = await supabase
-            .from("teacher_comments")
-            .select("id")
-            .eq("teacher_id", teacher.id)
-
-          return {
-            id: teacher.id,
-            name: teacher.name,
-            created_at: teacher.created_at,
-            profile: profile || {},
-            social: social || {},
-            students: studentCourses?.length || 0,
-            rating: rating
-          }
-        } catch (err) {
-          console.warn(`خطأ في تحميل بيانات المعلم ${teacher.id}:`, err)
-          return {
-            id: teacher.id,
-            name: teacher.name,
-            created_at: teacher.created_at,
-            profile: {},
-            social: {},
-            students: 0,
-            rating: 4.8
-          }
-        }
-      })
-
-      allTeachers = await Promise.all(teacherPromises)
-      displayTeachers('all')
-
-    } catch (error) {
-      console.error("خطأ في تحميل المعلمين:", error)
-      showEmpty()
-    }
-  }
-
-  // عرض المعلمين
-  async function displayTeachers(filter) {
-    currentFilter = filter
-    let container = document.getElementById("teachersContainer")
-
-    if (allTeachers.length === 0) {
-      showEmpty()
-      return
-    }
-
-    let filtered = allTeachers
-
-    if (filter === 'top') {
-      // ترتيب حسب التقييم
-      filtered = [...allTeachers].sort((a, b) => b.rating - a.rating)
-    } else if (filter === 'new') {
-      // أحدث المعلمين
-      filtered = [...allTeachers].sort((a, b) =>
-        new Date(b.created_at) - new Date(a.created_at)
-      ).slice(0, 6)
-    }
-
-    container.innerHTML = ""
-
-    filtered.forEach((teacher, index) => {
-      let card = createTeacherCard(teacher, index)
-      container.appendChild(card)
-    })
-
-    if (filtered.length === 0) {
-      showEmpty()
-    }
-  }
-
-  // إنشاء بطاقة المعلم
-  function createTeacherCard(teacher, index) {
-    let card = document.createElement('div')
-    card.className = 'teacher-card'
-
-    let socialLinks = ""
-    if (teacher.social?.facebook) {
-      socialLinks += `
-        <a href="${escapeHtml(teacher.social.facebook)}" target="_blank" rel="noopener noreferrer" class="social-icon facebook" title="فيسبوك">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231877f2'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E" alt="Facebook">
-        </a>
-      `
-    }
-    if (teacher.social?.whatsapp) {
-      socialLinks += `
-        <a href="${escapeHtml(teacher.social.whatsapp)}" target="_blank" rel="noopener noreferrer" class="social-icon whatsapp" title="واتساب">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325d366'%3E%3Cpath d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z'/%3E%3C/svg%3E" alt="WhatsApp">
-        </a>
-      `
-    }
-    if (teacher.social?.youtube) {
-      socialLinks += `
-        <a href="${escapeHtml(teacher.social.youtube)}" target="_blank" rel="noopener noreferrer" class="social-icon youtube" title="يوتيوب">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff0000'%3E%3Cpath d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/%3E%3C/svg%3E" alt="YouTube">
-        </a>
-      `
-    }
-
-    let imageUrl = teacher.profile?.image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
-    let bio = teacher.profile?.bio || "معلم متخصص في التعليم الإلكتروني"
-
-    card.innerHTML = `
-      <div class="card-header">
-        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(teacher.name)}" class="teacher-image" loading="lazy">
-      </div>
-      <div class="card-body">
-        <h3 class="teacher-name">${escapeHtml(teacher.name)}</h3>
-        <div class="teacher-badge">🌟 معلم متميز</div>
-        <p class="teacher-bio">${escapeHtml(bio)}</p>
-
-        <div class="card-stats">
-          <div class="stat">
-            <div class="stat-number">${teacher.students}</div>
-            <div class="stat-label">تعليقات الطلاب </div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">${teacher.rating}</div>
-            <div class="stat-label">تقييم</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">12</div>
-            <div class="stat-label">دورة</div>
-          </div>
-        </div>
-
-        <div class="social-links">
-          ${socialLinks || '<p style="color:#ccc; font-size:0.9rem; text-align:center;">لم يتم إضافة روابط تواصل</p>'}
-        </div>
-
-        <div class="card-buttons">
-          <button class="btn btn-primary" onclick="window.goToProfile('${escapeHtml(teacher.id)}')">👤 عرض البروفايل</button>
-          <button class="btn btn-secondary" onclick="window.goToLogin()">🔐 دخول</button>
-        </div>
-      </div>
-    `
-
-    return card
-  }
-
-  // دالة XSS Protection
-  function escapeHtml(unsafe) {
-    if (!unsafe) return ''
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;")
-  }
-
-  // عرض الحالة الفارغة
-  function showEmpty() {
-    let container = document.getElementById("teachersContainer")
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📚</div>
-        <div class="empty-text">لا توجد معلمين حالياً</div>
-        <div class="empty-subtext">سيتم إضافة معلمين قريباً...</div>
-      </div>
-    `
-  }
-
-  // animate أرقام
-  function animateNumber(id, final) {
-    let el = document.getElementById(id)
-    if (!el) return
-
-    let current = 0
-    let increment = Math.ceil(final / 50)
-    let interval = setInterval(() => {
-      current += increment
-      if (current >= final) {
-        el.innerText = final
-        clearInterval(interval)
+      // نتوقع أن يكون هناك دالة login في app.js
+      // سنعيد توجيه المستخدم إلى صفحة الدخول الأصلية
+      if (window.login) {
+        localStorage.setItem('tempEmail', email);
+        localStorage.setItem('tempPassword', password);
+        window.location.href = 'index.html';
       } else {
-        el.innerText = current
+        status.innerHTML = '❌ خطأ في الاتصال';
+        status.style.color = '#ff4d4d';
       }
-    }, 20)
+    } catch (error) {
+      status.innerHTML = '❌ حصل خطأ: ' + error.message;
+      status.style.color = '#ff4d4d';
+    }
   }
 
-  // Navigation
-  window.goToProfile = function(teacherId) {
-    window.location.href = `teacher-profile.html?id=${teacherId}`
-  }
+  // إغلاق الـ modal عند الضغط خارجه
+  document.getElementById('loginModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      window.closeLoginModal();
+    }
+  });
 
-  window.goToLogin = function() {
-    window.location.href = "index.html"
-  }
-
-  // فلترة المعلمين - مصحح
-  window.filterTeachers = function(button, filter) {
-    let buttons = document.querySelectorAll('.tab-btn')
-    buttons.forEach(btn => btn.classList.remove('active'))
-    button.classList.add('active')
-    displayTeachers(filter)
-  }
-
-  // تحميل البيانات عند فتح الصفحة
-  window.addEventListener("load", loadData)
-
-  // تحديث البيانات كل 30 ثانية
-  setInterval(loadData, 30000)
+  // الدخول بـ Enter
+  document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('active')) {
+      window.handleLogin();
+    }
+  });
 </script>
+
 </body>
 </html>
