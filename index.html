@@ -2,85 +2,806 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>LMS Login</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Ma'moun LMS - المنصة التعليمية الذكية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a0f3f 50%, #2d1b4e 100%);
+      min-height: 100vh;
+      color: #fff;
+      position: relative;
+    }
+
+    /* ==================== ANIMATED BACKGROUND ==================== */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      opacity: 0.6;
+      filter: blur(40px);
+      mix-blend-mode: screen;
+    }
+
+    .blob-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      top: -100px;
+      left: -100px;
+      animation: blob-animation 8s ease-in-out infinite;
+    }
+
+    .blob-2 {
+      width: 350px;
+      height: 350px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      bottom: -100px;
+      right: -100px;
+      animation: blob-animation 10s ease-in-out infinite reverse;
+    }
+
+    .blob-3 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      top: 50%;
+      right: 10%;
+      animation: blob-animation 12s ease-in-out infinite;
+    }
+
+    @keyframes blob-animation {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* ==================== GRID BACKGROUND ==================== */
+    .grid-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: grid-scroll 20s linear infinite;
+    }
+
+    @keyframes grid-scroll {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* ==================== HEADER ==================== */
+    header {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+      background: rgba(15, 15, 30, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      right: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ==================== LOGIN BUTTON ==================== */
+    .login-btn {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: slideInRight 0.8s ease-out 0.3s both;
+    }
+
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+      z-index: 1;
+    }
+
+    .login-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .login-btn span {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==================== HERO SECTION ==================== */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 5;
+      padding: 60px 40px;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      text-align: center;
+      perspective: 1000px;
+    }
+
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #667eea 50%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: slideInUp 0.8s ease-out;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 40px;
+      animation: slideInUp 0.8s ease-out 0.2s both;
+      font-weight: 300;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: slideInUp 0.8s ease-out 0.4s both;
+    }
+
+    .btn {
+      padding: 16px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+      z-index: 0;
+    }
+
+    .btn:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    /* ==================== FEATURES SECTION ==================== */
+    .features {
+      position: relative;
+      z-index: 5;
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 48px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      group: true;
+      animation: fadeIn 0.8s ease-out both;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.2s; }
+    .feature-card:nth-child(2) { animation-delay: 0.4s; }
+    .feature-card:nth-child(3) { animation-delay: 0.6s; }
+    .feature-card:nth-child(4) { animation-delay: 0.8s; }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s;
+      z-index: 1;
+    }
+
+    .feature-card:hover::before {
+      left: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-20px) scale(1.05);
+      border-color: rgba(102, 126, 234, 0.5);
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .feature-card:nth-child(1) .feature-icon { animation-delay: 0s; }
+    .feature-card:nth-child(2) .feature-icon { animation-delay: 0.5s; }
+    .feature-card:nth-child(3) .feature-icon { animation-delay: 1s; }
+    .feature-card:nth-child(4) .feature-icon { animation-delay: 1.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .feature-card h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .feature-card p {
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==================== STATS SECTION ==================== */
+    .stats {
+      position: relative;
+      z-index: 5;
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat-item {
+      animation: fadeIn 0.8s ease-out both;
+    }
+
+    .stat-item:nth-child(1) { animation-delay: 0.2s; }
+    .stat-item:nth-child(2) { animation-delay: 0.4s; }
+    .stat-item:nth-child(3) { animation-delay: 0.6s; }
+    .stat-item:nth-child(4) { animation-delay: 0.8s; }
+
+    .stat-number {
+      font-size: 56px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .stat-text {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+    }
+
+    /* ==================== FOOTER ==================== */
+    footer {
+      position: relative;
+      z-index: 5;
+      padding: 40px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      header {
+        padding: 20px;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .nav-links {
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .hero h1 {
+        font-size: 48px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .section-title {
+        font-size: 36px;
+      }
+
+      .blob {
+        width: 250px !important;
+        height: 250px !important;
+      }
+    }
+
+    /* ==================== MODAL ==================== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a0f3f 0%, #2d1b4e 100%);
+      padding: 50px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      margin: 15px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .modal-status {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
+<body>
 
-<body class="login-body">
-
-<div class="login-container">
-
-  <div class="login-box-pro">
-
-    <h2>🎓 Al-Ma'moun 🎓</h2>
-    <p>تسجيل الدخول</p>
-
-    <!-- Email -->
-    <div class="input-group">
-      <input type="email" id="email" required>
-      <label>📧 الايميل</label>
-    </div>
-
-    <!-- Password -->
-    <div class="input-group">
-      <input type="password" id="password" required>
-      <label>🔒 الباسورد</label>
-    </div>
-
-    <!-- زر الدخول -->
-    <button onclick="handleLogin()" id="loginBtn">دخول</button>
-
-    <!-- حالة تسجيل الدخول -->
-    <p id="loginStatus" style="text-align:center; margin-top:10px; color:#ff4d4d;"></p>
-
-    <div class="footer-text">
-      Developer by Eng Mohamed Hesham 👨🏻‍💻
-    </div>
-
-    <!-- زر الرجوع -->
-    <a href="dashboard-home.html">
-      <button style="margin-top:15px; background:#6c757d; width:100%; padding:10px; border:none; border-radius:8px; color:white; cursor:pointer; font-family:'Cairo', sans-serif;">
-        🏠 الرجوع للرئيسية
-      </button>
-    </a>
-  </div>
-
+<!-- ANIMATED BACKGROUND -->
+<div class="animated-bg">
+  <div class="grid-bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
 </div>
 
-<!-- Scroll -->
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<!-- HEADER -->
+<header>
+  <div class="logo">🎓 Al-Ma'moun</div>
+  <nav class="nav-links">
+    <a href="#features">المميزات</a>
+    <a href="#stats">الإحصائيات</a>
+    <a href="#about">عن المنصة</a>
+    <button class="login-btn" onclick="openLoginModal()">
+      <span>🔐 دخول</span>
+    </button>
+  </nav>
+</header>
 
-<script type="module" src="js/app.js"></script>
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>منصة التعليم الذكية</h1>
+    <p>تعلم أذكى، علم أفضل، نتائج أعظم</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary" onclick="openLoginModal()">
+        <span>🚀 ابدأ الآن</span>
+      </button>
+      <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+        <span>📚 تعرف أكثر</span>
+      </button>
+    </div>
+  </div>
+</section>
 
-<script>
-  // 🔥 تحسين تجربة تسجيل الدخول
-  async function handleLogin() {
-    let btn = document.getElementById("loginBtn")
-    let status = document.getElementById("loginStatus")
+<!-- FEATURES SECTION -->
+<section class="features" id="features">
+  <h2 class="section-title">🌟 المميزات الرئيسية</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>إدارة متعددة الأدوار</h3>
+      <p>نظام متقدم للأدمن والمدرسين والطلاب مع صلاحيات محددة بدقة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <h3>محتوى تعليمي غني</h3>
+      <p>ملفات PDF، فيديوهات، ملاحظات ومراحل دراسية منظمة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>تتبع التقدم</h3>
+      <p>مراقبة فعالة لتقدم الطلاب مع تقارير مفصلة</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <h3>التفاعل والتواصل</h3>
+      <p>تعليقات وتقييمات مباشرة بين المدرسين والطلاب</p>
+    </div>
+  </div>
+</section>
 
-    btn.disabled = true
-    btn.innerText = "⏳ جاري..."
-    status.innerText = ""
+<!-- STATS SECTION -->
+<section class="stats" id="stats">
+  <h2 class="section-title">📊 إحصائيات المنصة</h2>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number">500+</div>
+      <div class="stat-text">طالب نشط</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50+</div>
+      <div class="stat-text">مدرس متخصص</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1000+</div>
+      <div class="stat-text">ملف تعليمي</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">99%</div>
+      <div class="stat-text">رضا المستخدمين</div>
+    </div>
+  </div>
+</section>
 
-    try {
-      await window.login()
-    } catch (e) {
-      status.innerText = "❌ حصل خطأ: " + e.message
-    }
+<!-- FOOTER -->
+<footer id="about">
+  <p>© 2024 Al-Ma'moun Educational Platform | طورتها بـ ❤️ لتحسين التعليم</p>
+  <p style="margin-top: 15px; font-size: 14px;">تصميم وتطوير: محمد حشام | جميع الحقوق محفوظة</p>
+</footer>
 
-    btn.disabled = false
-    btn.innerText = "دخول"
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeLoginModal()">✕</button>
+    <h2>تسجيل الدخول</h2>
+    <input type="email" class="modal-input" id="modalEmail" placeholder="📧 البريد الإلكتروني">
+    <input type="password" class="modal-input" id="modalPassword" placeholder="🔒 كلمة المرور">
+    <button class="modal-btn" onclick="handleLogin()">دخول</button>
+    <div class="modal-status" id="modalStatus"></div>
+  </div>
+</div>
+
+<script type="module">
+  // ========== LOGIN MODAL FUNCTIONS ==========
+  window.openLoginModal = function() {
+    document.getElementById('loginModal').classList.add('active');
   }
 
-  // 🔥 Enter للدخول
-  document.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-      handleLogin()
-    }
-  })
+  window.closeLoginModal = function() {
+    document.getElementById('loginModal').classList.remove('active');
+  }
 
+  window.handleLogin = async function() {
+    const email = document.getElementById('modalEmail').value.trim();
+    const password = document.getElementById('modalPassword').value.trim();
+    const status = document.getElementById('modalStatus');
+
+    if (!email || !password) {
+      status.innerHTML = '❌ يجب ملء جميع الحقول';
+      status.style.color = '#ff4d4d';
+      return;
+    }
+
+    status.innerHTML = '⏳ جاري المعالجة...';
+    status.style.color = '#4facfe';
+
+    // محاولة تسجيل الدخول عبر app.js
+    try {
+      // نتوقع أن يكون هناك دالة login في app.js
+      // سنعيد توجيه المستخدم إلى صفحة الدخول الأصلية
+      if (window.login) {
+        localStorage.setItem('tempEmail', email);
+        localStorage.setItem('tempPassword', password);
+        window.location.href = 'index.html';
+      } else {
+        status.innerHTML = '❌ خطأ في الاتصال';
+        status.style.color = '#ff4d4d';
+      }
+    } catch (error) {
+      status.innerHTML = '❌ حصل خطأ: ' + error.message;
+      status.style.color = '#ff4d4d';
+    }
+  }
+
+  // إغلاق الـ modal عند الضغط خارجه
+  document.getElementById('loginModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      window.closeLoginModal();
+    }
+  });
+
+  // الدخول بـ Enter
+  document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('active')) {
+      window.handleLogin();
+    }
+  });
 </script>
 
 </body>

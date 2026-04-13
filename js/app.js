@@ -1368,6 +1368,314 @@ window.addEventListener("load", function() {
     window.loadTeacherStages()
   }
 })
+
+window.addTeacherContent = async function() {
+  try {
+    let stage = document.getElementById("contentStageSelect")?.value.trim()
+    let type = document.getElementById("contentTypeSelect")?.value
+    let title = document.getElementById("contentTitle")?.value.trim()
+    let content = document.getElementById("contentText")?.value.trim()
+    let status = document.getElementById("contentStatus")
+
+    // التحقق من الحقول
+    if (!stage || !type || !title || !content) {
+      if (status) {
+        status.innerText = "❗ اكتب كل البيانات"
+        status.style.color = "#ff4d4d"
+      }
+      return
+    }
+
+    // التحقق من أن المستخدم مدرس
+    let currentUser = getCurrentUser()
+    if (!currentUser || currentUser.role !== "teacher") {
+      if (status) {
+        status.innerText = "❌ أنت لست مدرس"
+        status.style.color = "#ff4d4d"
+      }
+      return
+    }
+
+    if (status) {
+      status.innerText = "⏳ جاري الإضافة..."
+      status.style.color = "#4facfe"
+    }
+
+    // إدراج البيانات في قاعدة البيانات
+    let { error } = await supabase.from("teacher_content").insert([
+      {
+        teacher_id: currentUser.id,
+        stage: stage,
+        type: type,
+        title: title,
+        content: content,
+        url: type !== "note" ? content : null,
+        created_at: new Date().toISOString()
+      }
+    ])
+
+    if (error) {
+      if (status) {
+        status.innerText = "❌ خطأ: " + error.message
+        status.style.color = "#ff4d4d"
+      }
+      console.error("Insert error:", error)
+      return
+    }
+
+    // نجاح العملية
+    if (status) {
+      status.innerText = "✅ تمت الإضافة بنجاح"
+      status.style.color = "#25d366"
+    }
+
+    // مسح الحقول
+    document.getElementById("contentTitle").value = ""
+    document.getElementById("contentText").value = ""
+    document.getElementById("contentTypeSelect").value = ""
+
+    // إعادة تحميل المحتوى
+    if (window.loadContentByStage) {
+      setTimeout(() => {
+        window.loadContentByStage(stage)
+      }, 500)
+    }
+
+  } catch (error) {
+    console.error("Add teacher content error:", error)
+    let status = document.getElementById("contentStatus")
+    if (status) {
+      status.innerText = "❌ خطأ: " + error.message
+      status.style.color = "#ff4d4d"
+    }
+  }
+}
+
+/**
+ * تحميل المحتوى حسب المرحلة الدراسية
+ * @param {string} stage - المرحلة الدراسية المراد تحميل محتواها
+ */
+window.loadContentByStage = async function(stage) {
+  try {
+    let currentUser = getCurrentUser()
+    if (!currentUser) return
+
+    // جلب المحتوى من قاعدة البيانات
+    let { data: contents, error } = await supabase
+      .from("teacher_content")
+      .select("*")
+      .eq("teacher_id", currentUser.id)
+      .eq("stage", stage)
+      .order("created_at", { ascending: false })
+
+    let contentList = document.getElementById("contentList")
+    if (!contentList) return
+
+    contentList.innerHTML = ""
+
+    if (error || !contents || contents.length === 0) {
+      contentList.innerHTML = `
+        <div style="text-align:center; color:#999; padding:40px;">
+          <p style="font-size:18px;">📭 لا يوجد محتوى في هذه المرحلة</p>
+        </div>
+      `
+      return
+    }
+
+    // عرض المحتوى
+    contents.forEach(content => {
+      let icon = {
+        "pdf": "📄",
+        "video": "🎥",
+        "note": "📝"
+      }[content.type] || "📋"
+
+      let typeText = {
+        "pdf": "ملف",
+        "video": "فيديو",
+        "note": "ملاحظة"
+      }[content.type] || "محتوى"
+
+      let dateStr = new Date(content.created_at).toLocaleDateString("ar-EG")
+
+      contentList.innerHTML += `
+        <div style="
+          background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+          padding: 20px;
+          margin: 15px 0;
+          border-radius: 15px;
+          border-left: 5px solid #667eea;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        ">
+          <h4 style="color: #667eea; margin-bottom: 8px; font-size: 18px;">
+            ${icon} ${escapeHtml(content.title || "بدون عنوان")}
+          </h4>
+          <p style="color: #666; margin: 5px 0; font-size: 14px;">نوع: ${typeText}</p>
+          <p style="color: #666; margin: 5px 0; font-size: 14px;">التاريخ: ${dateStr}</p>
+
+          ${content.url ? `
+            <a href="${escapeHtml(content.url)}" target="_blank" style="
+              color: #667eea;
+              text-decoration: none;
+              font-weight: 600;
+              display: inline-block;
+              margin-top: 10px;
+            ">🔗 الرابط</a>
+          ` : ''}
+
+          ${content.content && content.type === "note" ? `
+            <p style="
+              margin-top: 10px;
+              color: #333;
+              font-size: 15px;
+              line-height: 1.6;
+            ">${escapeHtml(content.content)}</p>
+          ` : ''}
+
+          <button onclick="window.deleteContent('${content.id}')" style="
+            width: auto;
+            padding: 8px 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            🗑 حذف
+          </button>
+        </div>
+      `
+    })
+
+  } catch (error) {
+    console.error("Load content error:", error)
+    let contentList = document.getElementById("contentList")
+    if (contentList) {
+      contentList.innerHTML = `<p style="color: red;">❌ حدث خطأ في تحميل المحتوى</p>`
+    }
+  }
+}
+
+/**
+ * حذف محتوى
+ * @param {string} id - معرّف المحتوى المراد حذفه
+ */
+window.deleteContent = async function(id) {
+  if (!confirm("هل تأكد من حذف هذا المحتوى؟")) return
+
+  try {
+    let { error } = await supabase.from("teacher_content").delete().eq("id", id)
+
+    if (error) {
+      alert("❌ خطأ في الحذف: " + error.message)
+      return
+    }
+
+    alert("✅ تم الحذف بنجاح")
+
+    // إعادة تحميل المحتوى
+    let stage = document.getElementById("contentStageSelect")?.value
+    if (stage && window.loadContentByStage) {
+      window.loadContentByStage(stage)
+    }
+
+  } catch (error) {
+    console.error("Delete error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+// ================== مثال استخدام الوظائف ==================
+/*
+
+// مثال 1: إضافة محتوى جديد
+// HTML:
+<select id="contentStageSelect">
+  <option value="الأول">الأول</option>
+  <option value="الثاني">الثاني</option>
+</select>
+
+<select id="contentTypeSelect">
+  <option value="pdf">PDF</option>
+  <option value="video">Video</option>
+  <option value="note">Note</option>
+</select>
+
+<input type="text" id="contentTitle" placeholder="عنوان المحتوى">
+<textarea id="contentText" placeholder="المحتوى أو الرابط"></textarea>
+<div id="contentStatus"></div>
+
+<button onclick="addTeacherContent()">إضافة</button>
+
+// مثال 2: عرض المحتوى
+<div id="contentList"></div>
+
+<script>
+  // عند اختيار مرحلة
+  document.getElementById("contentStageSelect").addEventListener("change", function() {
+    window.loadContentByStage(this.value)
+  })
+</script>
+
+*/
+
+// ================== جدول Supabase المطلوب ==================
+/*
+
+-- شغّل هذا الـ SQL في Supabase Console
+
+CREATE TABLE teacher_content (
+  id bigint primary key generated always as identity,
+  teacher_id uuid not null,
+  stage text not null,
+  type text not null,
+  title text not null,
+  content text,
+  url text,
+  created_at timestamp default now()
+);
+
+-- فعّل Row Level Security
+ALTER TABLE teacher_content ENABLE ROW LEVEL SECURITY;
+
+-- أضف السياسات
+CREATE POLICY "Anyone can read"
+  ON teacher_content
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Teachers can insert"
+  ON teacher_content
+  FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Teachers can delete"
+  ON teacher_content
+  FOR DELETE
+  USING (true);
+
+*/
+
+// ================== اختبار الوظائف ==================
+
+/**
+ * اختبر الوظائف في Console
+ * 1. افتح Developer Tools (F12)
+ * 2. اكتب: window.addTeacherContent()
+ * 3. يجب أن يجرّب إضافة محتوى جديد
+ */
+
+console.log("✅ وظائف إدارة محتوى المدرس تم تحميلها بنجاح")
+
+// ================== ملاحظات مهمة ==================
+
+/*
 // openTab is already defined above via window.openTab
 // تحديث الإحصائيات كل 30 ثانية
 setInterval(() => {
