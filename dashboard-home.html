@@ -535,109 +535,6 @@
         height: 250px !important;
       }
     }
-
-    /* ==================== MODAL ==================== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-    }
-
-    .modal.active {
-      display: flex;
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .modal-content {
-      background: linear-gradient(135deg, #1a0f3f 0%, #2d1b4e 100%);
-      padding: 50px;
-      border-radius: 20px;
-      max-width: 500px;
-      width: 90%;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      animation: slideInUp 0.3s ease-out;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover {
-      transform: rotate(90deg);
-    }
-
-    .modal h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .modal-input {
-      width: 100%;
-      padding: 14px;
-      margin: 15px 0;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      color: white;
-      font-family: 'Cairo', sans-serif;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .modal-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .modal-input:focus {
-      outline: none;
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.1);
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-    }
-
-    .modal-btn {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      margin-top: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .modal-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
-    }
-
-    .modal-status {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -657,7 +554,7 @@
     <a href="#features">المميزات</a>
     <a href="#stats">الإحصائيات</a>
     <a href="#about">عن المنصة</a>
-    <button class="login-btn" onclick="openLoginModal()">
+    <button class="login-btn" onclick="window.location.href='index.html'">
       <span>🔐 دخول</span>
     </button>
   </nav>
@@ -669,7 +566,7 @@
     <h1>منصة التعليم الذكية</h1>
     <p>تعلم أذكى، علم أفضل، نتائج أعظم</p>
     <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="openLoginModal()">
+      <button class="btn btn-primary" onclick="window.location.href='index.html'">
         <span>🚀 ابدأ الآن</span>
       </button>
       <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
@@ -731,77 +628,13 @@
 
 <!-- FOOTER -->
 <footer id="about">
-  <p>© 2024 Al-Ma'moun Educational Platform | طورتها بـ ❤️ لتحسين التعليم</p>
-  <p style="margin-top: 15px; font-size: 14px;">تصميم وتطوير: محمد حشام | جميع الحقوق محفوظة</p>
+  <p>© 2026 Al-Ma'moun Educational Platform | طورتها بـ ❤️ لتحسين التعليم</p>
+  <p style="margin-top: 15px; font-size: 14px;">تصميم وتطوير: محمد هشام | جميع الحقوق محفوظة</p>
 </footer>
 
-<!-- LOGIN MODAL -->
-<div class="modal" id="loginModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeLoginModal()">✕</button>
-    <h2>تسجيل الدخول</h2>
-    <input type="email" class="modal-input" id="modalEmail" placeholder="📧 البريد الإلكتروني">
-    <input type="password" class="modal-input" id="modalPassword" placeholder="🔒 كلمة المرور">
-    <button class="modal-btn" onclick="handleLogin()">دخول</button>
-    <div class="modal-status" id="modalStatus"></div>
-  </div>
-</div>
-
-<script type="module">
-  // ========== LOGIN MODAL FUNCTIONS ==========
-  window.openLoginModal = function() {
-    document.getElementById('loginModal').classList.add('active');
-  }
-
-  window.closeLoginModal = function() {
-    document.getElementById('loginModal').classList.remove('active');
-  }
-
-  window.handleLogin = async function() {
-    const email = document.getElementById('modalEmail').value.trim();
-    const password = document.getElementById('modalPassword').value.trim();
-    const status = document.getElementById('modalStatus');
-
-    if (!email || !password) {
-      status.innerHTML = '❌ يجب ملء جميع الحقول';
-      status.style.color = '#ff4d4d';
-      return;
-    }
-
-    status.innerHTML = '⏳ جاري المعالجة...';
-    status.style.color = '#4facfe';
-
-    // محاولة تسجيل الدخول عبر app.js
-    try {
-      // نتوقع أن يكون هناك دالة login في app.js
-      // سنعيد توجيه المستخدم إلى صفحة الدخول الأصلية
-      if (window.login) {
-        localStorage.setItem('tempEmail', email);
-        localStorage.setItem('tempPassword', password);
-        window.location.href = 'index.html';
-      } else {
-        status.innerHTML = '❌ خطأ في الاتصال';
-        status.style.color = '#ff4d4d';
-      }
-    } catch (error) {
-      status.innerHTML = '❌ حصل خطأ: ' + error.message;
-      status.style.color = '#ff4d4d';
-    }
-  }
-
-  // إغلاق الـ modal عند الضغط خارجه
-  document.getElementById('loginModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      window.closeLoginModal();
-    }
-  });
-
-  // الدخول بـ Enter
-  document.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('active')) {
-      window.handleLogin();
-    }
-  });
+<script>
+  // تنبيه بسيط عند التحميل
+  console.log("✅ Home page loaded successfully - All buttons redirect to index.html")
 </script>
 
 </body>
