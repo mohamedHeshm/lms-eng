@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Dashboard - Modern</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -27,8 +24,8 @@
 
     /* ==================== LAYOUT ==================== */
     .layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
+      display: block;
+      grid-template-columns: 250px 1fr;
       min-height: 100vh;
     }
 
@@ -40,54 +37,49 @@
       position: fixed;
       left: 0;
       top: 0;
-      width: 280px;
+      width: 250px;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: 10px 0 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 5px 0 20px rgba(0, 0, 0, 0.2);
       z-index: 50;
-      backdrop-filter: blur(10px);
     }
 
     .sidebar h2 {
-      font-size: 26px;
+      font-size: 24px;
       margin-bottom: 30px;
       text-align: center;
-      border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
       padding-bottom: 20px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .sidebar-section {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .sidebar-title {
-      font-size: 13px;
+      font-size: 14px;
       color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 700;
+      letter-spacing: 1px;
+      font-weight: 600;
     }
 
     .stage-btn {
       width: 100%;
-      padding: 13px 16px;
-      margin-bottom: 10px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
       background: rgba(255, 255, 255, 0.1);
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 14px;
       font-family: 'Cairo', sans-serif;
-      font-weight: 600;
+      font-weight: 500;
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .stage-btn::before {
@@ -97,15 +89,14 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
+      background: rgba(255, 255, 255, 0.2);
+      transition: left 0.4s;
     }
 
     .stage-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.6);
       transform: translateX(5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
 
     .stage-btn:hover::before {
@@ -115,44 +106,29 @@
     .stage-btn.active {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       border-color: white;
-      box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
-      transform: translateX(5px) scale(1.02);
+      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
     }
 
     /* ==================== MAIN CONTENT ==================== */
-    .main-content {
-      margin-left: 280px;
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+ .main-content {
+  margin-left: 250px; /* نفس عرض السايدبار */
+  padding: 40px 20px;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* يخلي كل حاجة في النص */
+}
     /* ==================== HEADER ==================== */
     .header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 60px 50px;
+      padding: 50px 40px;
       text-align: center;
-      border-radius: 25px;
-      margin-bottom: 50px;
+      border-radius: 20px;
+      margin-bottom: 40px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 1000px;
-      animation: slideDown 0.8s ease-out;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
 
     .header::before {
@@ -175,35 +151,38 @@
     .header-content {
       position: relative;
       z-index: 2;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .header h1 {
-      font-size: 48px;
-      margin-bottom: 12px;
-      font-weight: 800;
-      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
-      letter-spacing: 2px;
-    }
-
-    .header p {
-      font-size: 18px;
-      opacity: 0.95;
-      font-weight: 300;
+      font-size: 42px;
+      margin-bottom: 10px;
+      font-weight: 700;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     /* ==================== MENU ==================== */
     .menu {
       display: flex;
-      gap: 12px;
-      margin-bottom: 40px;
+      gap: 10px;
+      margin-bottom: 30px;
       flex-wrap: wrap;
       justify-content: center;
-      width: 100%;
-      max-width: 1000px;
     }
 
     .menu-btn {
-      padding: 12px 26px;
+      padding: 12px 24px;
       background: white;
       border: 3px solid #667eea;
       border-radius: 15px;
@@ -215,7 +194,7 @@
       position: relative;
       overflow: hidden;
       font-family: 'Cairo', sans-serif;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
     }
 
     .menu-btn::before {
@@ -239,16 +218,106 @@
 
     .menu-btn:hover {
       color: white;
-      box-shadow: 0 10px 35px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    /* ==================== CARD ==================== */
+    .card {
+  background: rgba(255, 255, 255, 0.95); /* أبيض شبه شفاف */
+  width: 100%;
+  max-width: 900px; /* عرض البطاقة */
+  margin-left: auto;
+  margin-right: auto;
+
+  /* شكل مربع واضح */
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+
+  backdrop-filter: blur(10px); /* تأثير زجاجي جامد 🔥 */
+
+  transition: all 0.3s ease;
+}
+    .card:hover {
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    /* ==================== INPUT & BUTTON ==================== */
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      box-sizing: border-box;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.4s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
       transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .logout {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    .logout:hover {
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
     }
 
     /* ==================== TAB CONTENT ==================== */
     .tab-content {
       display: none;
       animation: fadeIn 0.5s ease-out;
-      width: 100%;
-      max-width: 1000px;
     }
 
     .tab-content.active {
@@ -266,192 +335,127 @@
       }
     }
 
-    /* ==================== CARD ==================== */
-    .card {
-      background: rgba(255, 255, 255, 0.97);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      border: 2px solid rgba(102, 126, 234, 0.1);
-      transition: all 0.4s ease;
-      backdrop-filter: blur(10px);
-      width: 100%;
+    /* ==================== PROFILE PREVIEW ==================== */
+    .profile-preview {
+      text-align: center;
+      padding: 20px;
+      background: #f5f7ff;
+      border-radius: 15px;
+      margin-bottom: 20px;
     }
 
-    .card:hover {
-      box-shadow: 0 25px 70px rgba(102, 126, 234, 0.2);
-      border-color: rgba(102, 126, 234, 0.3);
-      transform: translateY(-3px);
+    .profile-preview img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #667eea;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+      margin-bottom: 15px;
     }
 
-    .card h3 {
+    .profile-preview h4 {
       color: #667eea;
-      margin-bottom: 25px;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      margin: 10px 0;
     }
 
-    /* ==================== INPUT & TEXTAREA ==================== */
-    input, select, textarea {
-      width: 100%;
-      padding: 14px 16px;
-      margin: 12px 0;
-      border-radius: 12px;
-      border: 2px solid #e0e0e0;
-      box-sizing: border-box;
-      font-size: 16px;
-      font-family: 'Cairo', sans-serif;
-      transition: all 0.3s ease;
-      background: white;
+    /* ==================== LIST ==================== */
+    ul {
+      list-style: none;
+      padding: 0;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
-      transform: translateY(-2px);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #999;
-    }
-
-    /* ==================== BUTTON ==================== */
-    button:not(.menu-btn):not(.stage-btn) {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      font-family: 'Cairo', sans-serif;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-      position: relative;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    button:not(.menu-btn):not(.stage-btn)::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
-    }
-
-    button:not(.menu-btn):not(.stage-btn):hover::before {
-      left: 100%;
-    }
-
-    button:not(.menu-btn):not(.stage-btn):hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-    }
-
-    button:not(.menu-btn):not(.stage-btn):active {
-      transform: translateY(-1px);
-    }
-
-    .logout {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
-      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important;
-      margin-top: 40px !important;
-      width: 100%;
-      max-width: 1000px;
-    }
-
-    .logout:hover {
-      box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5) !important;
-    }
-
-    /* ==================== CONTENT BOX ==================== */
-    .content-box {
-      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
-      padding: 24px;
-      margin: 18px 0;
-      border-radius: 16px;
-      border-left: 5px solid #667eea;
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1);
-    }
-
-    .content-box:hover {
-      transform: translateX(-5px);
-      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
-    }
-
-    .content-box h4 {
-      color: #667eea;
-      margin-bottom: 10px;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .content-box p {
-      color: #666;
+    li {
+      padding: 12px;
       margin: 8px 0;
-      font-size: 15px;
-      line-height: 1.6;
+      background: #f5f7ff;
+      border-radius: 10px;
+      border-right: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    li:hover {
+      background: #eef2ff;
+      transform: translateX(5px);
+    }
+
+    li a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    li a:hover {
+      color: #764ba2;
+    }
+
+    /* ==================== STATUS ==================== */
+    #status, #status2, #profileStatus {
+      margin: 15px 0;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ==================== STUDENT CARD ==================== */
+    .student-card {
+      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 15px;
+      border: 2px solid #e0e8ff;
+      transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
     }
 
     /* ==================== SCROLL BUTTONS ==================== */
     #scrollTopBtn, #scrollBottomBtn {
       position: fixed;
-      right: 30px;
-      width: 55px;
-      height: 55px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
       cursor: pointer;
-      font-size: 26px;
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      font-size: 24px;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
       transition: all 0.3s ease;
-      z-index: 100;
+      z-index: 40;
     }
 
     #scrollTopBtn {
-      bottom: 130px;
+      bottom: 120px;
     }
 
     #scrollBottomBtn {
-      bottom: 70px;
+      bottom: 60px;
     }
 
     #scrollTopBtn:hover, #scrollBottomBtn:hover {
-      transform: scale(1.12);
-      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
+      transform: scale(1.1);
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
     }
 
     /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 1024px) {
+    @media (max-width: 768px) {
       .layout {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
         position: fixed;
-        left: -280px;
+        left: -250px;
         transition: left 0.3s ease;
-        width: 280px;
-        z-index: 200;
+        width: 250px;
+        z-index: 100;
       }
 
       .sidebar.open {
@@ -462,12 +466,8 @@
         margin-left: 0;
       }
 
-      .header {
-        padding: 40px 30px;
-      }
-
       .header h1 {
-        font-size: 36px;
+        font-size: 28px;
       }
 
       .menu {
@@ -477,42 +477,17 @@
       .menu-btn {
         width: 100%;
       }
-
-      #scrollTopBtn, #scrollBottomBtn {
-        right: 15px;
-        width: 50px;
-        height: 50px;
-        font-size: 22px;
-      }
     }
 
-    @media (max-width: 768px) {
-      .main-content {
-        padding: 20px 15px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      .header h1 {
-        font-size: 28px;
-      }
-
-      .header {
-        padding: 30px 20px;
-      }
+    .solutions-button {
+      background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+      box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+      width: 100%;
+      margin-bottom: 20px;
     }
 
-    /* ==================== ANIMATIONS ==================== */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .menu-btn:active {
-      animation: pulse 0.5s ease-out;
+    .solutions-button:hover {
+      box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
     }
   </style>
 </head>
@@ -525,25 +500,26 @@
 
     <div class="sidebar-section">
       <div class="sidebar-title">المراحل الدراسية</div>
-      <div id="stageNav" style="display: flex; flex-direction: column; gap: 10px;">
+      <div id="stageNav" style="display: flex; flex-direction: column; gap: 8px;">
         <p style="text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 14px;">جاري التحميل...</p>
       </div>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-title">القائمة الرئيسية</div>
+      <div class="sidebar-title">القائمة</div>
 
       <button class="stage-btn" onclick="openTab('profile')">👤 البروفايل</button>
       <button class="stage-btn" onclick="openTab('social')">🔗 التواصل</button>
       <button class="stage-btn" onclick="openTab('video')">🎥 فيديو</button>
-      <button class="stage-btn" onclick="openTab('pdf')">📁 الواجبات</button>
-      <button class="stage-btn" onclick="openTab('pdf2')">📚 مذكرات</button>
+      <button class="stage-btn" onclick="openTab('pdf')">📁 الواجب</button>
+      <button class="stage-btn" onclick="openTab('pdf2')">📁 مذكرات</button>
       <button class="stage-btn" onclick="openTab('note')">📝 ملاحظات</button>
+      <button class="stage-btn" onclick="openTab('solutions')">📥 الحلول</button>
       <button class="stage-btn" onclick="goHome()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
         🏠 الرئيسية
       </button>
       <button class="stage-btn" onclick="goToChangePassword()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
-        🔐 تغيير الباسورد
+        🔐 تغيير كلمة المرور
       </button>
     </div>
   </div>
@@ -558,17 +534,18 @@
       </div>
     </div>
 
+
     <!-- PROFILE TAB -->
     <div id="profile" class="tab-content active">
       <div class="card">
-        <h3>👤 صفحتي الشخصية</h3>
-        <div id="profilePreview" class="content-box">
+        <h3>👤 صفحتي</h3>
+        <div id="profilePreview" class="profile-preview">
           <h4>اسم المدرس</h4>
-          <p>نبذة بسيطة عن الملف الشخصي...</p>
+          <p>نبذة بسيطة...</p>
         </div>
-        <textarea id="bio" placeholder="📝 عرف نفسك بكلمات معبرة وملهمة..."></textarea>
+        <textarea id="bio" placeholder="📝 عرف نفسك بكلمات معبرة..."></textarea>
         <input type="file" id="imgFile" accept="image/*" placeholder="صورتك الشخصية">
-        <p id="profileStatus" style="margin-top: 10px; color: #667eea;"></p>
+        <p id="profileStatus"></p>
         <button onclick="saveProfile()">💾 حفظ البروفايل</button>
       </div>
     </div>
@@ -576,7 +553,7 @@
     <!-- SOCIAL TAB -->
     <div id="social" class="tab-content">
       <div class="card">
-        <h3>🔗 روابط التواصل الاجتماعي</h3>
+        <h3>🔗 روابط التواصل</h3>
         <input type="text" id="facebook" placeholder="📘 رابط فيسبوك">
         <input type="text" id="whatsapp" placeholder="💬 رابط واتساب">
         <input type="text" id="youtube" placeholder="▶️ رابط يوتيوب">
@@ -587,8 +564,8 @@
     <!-- VIDEO TAB -->
     <div id="video" class="tab-content">
       <div class="card">
-        <h3>🎥 نشر فيديو تعليمي</h3>
-        <select id="videoStageSelect" style="margin-bottom:15px;">
+        <h3>🎥 نشر فيديو</h3>
+        <select id="videoStageSelect" style="margin-bottom:10px;">
           <option value="">📚 اختر المرحلة الدراسية</option>
           <option value="الأولى الابتدائي">الأولى الابتدائي</option>
           <option value="الثانية الابتدائي">الثانية الابتدائي</option>
@@ -600,13 +577,13 @@
           <option value="الثانية الثانوي">الثانية الثانوي</option>
           <option value="الثالثة الثانوي">الثالثة الثانوي</option>
         </select>
-        <input type="text" id="videoInput" placeholder="رابط الفيديو من YouTube">
+        <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
         <button onclick="addVideo()">🚀 نشر الفيديو</button>
       </div>
-      <div class="card" style="margin-top:20px;">
+      <div class="card" style="margin-top:15px;">
         <h3>📋 الفيديوهات المنشورة</h3>
         <div id="videoListTeacher">
-          <p style="text-align: center; color: #999;">جاري التحميل...</p>
+          <p>جاري التحميل...</p>
         </div>
       </div>
     </div>
@@ -614,8 +591,8 @@
     <!-- PDF TAB -->
     <div id="pdf" class="tab-content">
       <div class="card">
-        <h3>📁 رفع الواجبات (Sheets)</h3>
-        <select id="pdfStageSelect" style="margin-bottom:15px;">
+        <h3>📁 رفع شيتات (الواجبات)</h3>
+        <select id="pdfStageSelect" style="margin-bottom:10px;">
           <option value="">📚 اختر المرحلة الدراسية</option>
           <option value="الأولى الابتدائي">الأولى الابتدائي</option>
           <option value="الثانية الابتدائي">الثانية الابتدائي</option>
@@ -629,12 +606,12 @@
         </select>
         <input type="file" id="pdfFile" accept="application/pdf">
         <button onclick="uploadPDF()">📤 رفع الملف</button>
-        <p id="status" style="margin-top: 10px; color: #667eea;"></p>
+        <p id="status"></p>
       </div>
-      <div class="card" style="margin-top:20px;">
+      <div class="card" style="margin-top:15px;">
         <h3>📋 الملفات المرفوعة</h3>
         <div id="pdfListTeacher">
-          <p style="text-align: center; color: #999;">جاري التحميل...</p>
+          <p>جاري التحميل...</p>
         </div>
       </div>
     </div>
@@ -642,8 +619,8 @@
     <!-- PDF2 TAB -->
     <div id="pdf2" class="tab-content">
       <div class="card">
-        <h3>📚 رفع المذكرات</h3>
-        <select id="pdf2StageSelect" style="margin-bottom:15px;">
+        <h3>📁 رفع مذكرات</h3>
+        <select id="pdf2StageSelect" style="margin-bottom:10px;">
           <option value="">📚 اختر المرحلة الدراسية</option>
           <option value="الأولى الابتدائي">الأولى الابتدائي</option>
           <option value="الثانية الابتدائي">الثانية الابتدائي</option>
@@ -657,12 +634,12 @@
         </select>
         <input type="file" id="pdf2File" accept="application/pdf">
         <button onclick="uploadPDF2()">📤 رفع الملف</button>
-        <p id="status2" style="margin-top: 10px; color: #667eea;"></p>
+        <p id="status2"></p>
       </div>
-      <div class="card" style="margin-top:20px;">
-        <h3>📋 المذكرات المرفوعة</h3>
+      <div class="card" style="margin-top:15px;">
+        <h3>📋 الملفات المرفوعة</h3>
         <div id="pdfListTeacher2">
-          <p style="text-align: center; color: #999;">جاري التحميل...</p>
+          <p>جاري التحميل...</p>
         </div>
       </div>
     </div>
@@ -670,8 +647,8 @@
     <!-- NOTE TAB -->
     <div id="note" class="tab-content">
       <div class="card">
-        <h3>📝 نشر ملاحظة مهمة</h3>
-        <select id="noteStageSelect" style="margin-bottom:15px;">
+        <h3>📝 نشر ملاحظة</h3>
+        <select id="noteStageSelect" style="margin-bottom:10px;">
           <option value="">📚 اختر المرحلة الدراسية</option>
           <option value="الأولى الابتدائي">الأولى الابتدائي</option>
           <option value="الثانية الابتدائي">الثانية الابتدائي</option>
@@ -686,10 +663,20 @@
         <textarea id="noteInput" placeholder="اكتب ملاحظة مهمة للطلاب..."></textarea>
         <button onclick="addNote()">🚀 نشر الملاحظة</button>
       </div>
-      <div class="card" style="margin-top:20px;">
+      <div class="card" style="margin-top:15px;">
         <h3>📋 الملاحظات المنشورة</h3>
         <div id="noteListTeacher">
-          <p style="text-align: center; color: #999;">جاري التحميل...</p>
+          <p>جاري التحميل...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLUTIONS TAB -->
+    <div id="solutions" class="tab-content">
+      <div class="card">
+        <h3>📥 حلول الطلاب</h3>
+        <div id="solutionsList">
+          <p>جاري تحميل الحلول...</p>
         </div>
       </div>
     </div>
@@ -704,32 +691,6 @@
 <button id="scrollBottomBtn" onclick="scrollToBottom()">⬇️</button>
 
 <script type="module" src="js/app.js"></script>
-
-<script>
-  // فتح وإغلاق Sidebar على الموبايل
-  function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar")
-    sidebar.classList.toggle("open")
-  }
-
-  // فتح التابز
-  function openTab(tabName) {
-    let tabs = document.querySelectorAll(".tab-content")
-    tabs.forEach(tab => tab.classList.remove("active"))
-
-    let selectedTab = document.getElementById(tabName)
-    if (selectedTab) selectedTab.classList.add("active")
-  }
-
-  // Scroll functions
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function scrollToBottom() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-  }
-</script>
 
 </body>
 </html>
