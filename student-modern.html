@@ -172,6 +172,27 @@
       font-weight: 800;
     }
 
+    /* Tab Content - مهم جداً! */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     /* Cards */
     .card {
       background: rgba(255, 255, 255, 0.97);
@@ -425,6 +446,15 @@
       font-size: 12px;
       margin-top: 8px;
     }
+
+    /* Stage info */
+    .stage-info {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -573,22 +603,44 @@
     overlay.classList.remove('active')
   }
 
-  // Tab Functions
+  // Tab Functions -最关键的部分！
   window.openTab = function(tabName, button) {
-    if (window.innerWidth <= 768) closeSidebar()
+    // إغلاق القائمة في الجوال
+    if (window.innerWidth <= 768) {
+      closeSidebar()
+    }
 
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'))
-    document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'))
+    // إخفاء جميع التبويبات
+    const allTabs = document.querySelectorAll('.tab-content')
+    allTabs.forEach(tab => {
+      tab.classList.remove('active')
+    })
 
+    // إزالة active من جميع الأزرار
+    const allButtons = document.querySelectorAll('.menu-btn')
+    allButtons.forEach(btn => {
+      btn.classList.remove('active')
+    })
+
+    // إظهار التبويب المختار
     const selectedTab = document.getElementById(tabName)
     if (selectedTab) {
       selectedTab.classList.add('active')
-      if (button) button.classList.add('active')
     }
+
+    // تفعيل الزر المضغوط
+    if (button) {
+      button.classList.add('active')
+    }
+
+    console.log('تم فتح التبويب:', tabName)
   }
 
   // Navigation
-  window.goToChangePassword = () => window.location.href = 'change-password.html'
+  window.goToChangePassword = () => {
+    window.location.href = 'change-password.html'
+  }
+
   window.goToTeacherProfile = () => {
     if (teacherId) {
       localStorage.setItem("selectedTeacherId", teacherId)
@@ -597,6 +649,7 @@
       alert("❌ لم يتم تعيين معلم لك")
     }
   }
+
   window.logout = () => {
     localStorage.removeItem("currentUser")
     window.location.href = "index.html"
@@ -621,17 +674,26 @@
       .eq("id", currentUser.id)
       .single()
 
-    if (userError || !userData) {
+    if (userError) {
+      console.error("Error fetching user:", userError)
       alert("❌ حدث خطأ في جلب بيانات الطالب")
       return
     }
 
-    teacherId = userData.teacher_id
-    studentStage = userData.stage || null
+    teacherId = userData?.teacher_id
+    studentStage = userData?.stage || null
 
     if (!teacherId) {
       alert("❌ لم يتم تعيين معلم لك بعد")
       return
+    }
+
+    // عرض المرحلة الدراسية في الهيدر
+    if (studentStage) {
+      const headerP = document.querySelector('.header p')
+      if (headerP) {
+        headerP.innerHTML = `📚 مرحلتك الدراسية: ${studentStage} | يتم عرض المحتوى الخاص بك فقط`
+      }
     }
 
     // جلب جميع البيانات (مصفاة حسب المرحلة)
@@ -640,67 +702,60 @@
 
   async function loadAllContent() {
     try {
-      // بناء شرط التصفية حسب المرحلة (إذا وجدت)
-      let queryFilter = { teacher_id: teacherId }
+      // جلب الملاحظات (مصفاة حسب المرحلة)
+      let notesQuery = supabase.from("notes").select("*").eq("teacher_id", teacherId)
       if (studentStage) {
-        queryFilter.stage = studentStage
+        notesQuery = notesQuery.eq("stage", studentStage)
       }
+      const { data: notes } = await notesQuery
 
-      const [
-        { data: notes },
-        { data: videos },
-        { data: pdfs },
-        { data: pdfs2 },
-        { data: profiles },
-        { data: socials },
-        { data: solutions }
-      ] = await Promise.all([
-        supabase.from("notes").select("*").eq("teacher_id", teacherId).then(res =>
-          studentStage ? supabase.from("notes").select("*").eq("teacher_id", teacherId).eq("stage", studentStage) : res
-        ),
-        supabase.from("videos").select("*").eq("teacher_id", teacherId).then(res =>
-          studentStage ? supabase.from("videos").select("*").eq("teacher_id", teacherId).eq("stage", studentStage) : res
-        ),
-        supabase.from("pdfs").select("*").eq("teacher_id", teacherId).then(res =>
-          studentStage ? supabase.from("pdfs").select("*").eq("teacher_id", teacherId).eq("stage", studentStage) : res
-        ),
-        supabase.from("pdfs2").select("*").eq("teacher_id", teacherId).then(res =>
-          studentStage ? supabase.from("pdfs2").select("*").eq("teacher_id", teacherId).eq("stage", studentStage) : res
-        ),
-        supabase.from("teacher_profile").select("*").eq("teacher_id", teacherId),
-        supabase.from("social_links").select("*").eq("teacher_id", teacherId),
-        supabase.from("solutions").select("*").eq("student_id", currentUser.id).order("created_at", { ascending: false })
-      ])
+      // جلب الفيديوهات (مصفاة حسب المرحلة)
+      let videosQuery = supabase.from("videos").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        videosQuery = videosQuery.eq("stage", studentStage)
+      }
+      const { data: videos } = await videosQuery
 
-      // تنفيذ الاستعلامات بشكل صحيح
-      const finalNotes = studentStage
-        ? (await supabase.from("notes").select("*").eq("teacher_id", teacherId).eq("stage", studentStage)).data || []
-        : notes || []
+      // جلب الواجبات (مصفاة حسب المرحلة)
+      let pdfsQuery = supabase.from("pdfs").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        pdfsQuery = pdfsQuery.eq("stage", studentStage)
+      }
+      const { data: pdfs } = await pdfsQuery
 
-      const finalVideos = studentStage
-        ? (await supabase.from("videos").select("*").eq("teacher_id", teacherId).eq("stage", studentStage)).data || []
-        : videos || []
+      // جلب المذكرات (مصفاة حسب المرحلة)
+      let pdfs2Query = supabase.from("pdfs2").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        pdfs2Query = pdfs2Query.eq("stage", studentStage)
+      }
+      const { data: pdfs2 } = await pdfs2Query
 
-      const finalPdfs = studentStage
-        ? (await supabase.from("pdfs").select("*").eq("teacher_id", teacherId).eq("stage", studentStage)).data || []
-        : pdfs || []
+      // جلب بيانات المدرس
+      const { data: profiles } = await supabase
+        .from("teacher_profile")
+        .select("*")
+        .eq("teacher_id", teacherId)
 
-      const finalPdfs2 = studentStage
-        ? (await supabase.from("pdfs2").select("*").eq("teacher_id", teacherId).eq("stage", studentStage)).data || []
-        : pdfs2 || []
+      const { data: socials } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("teacher_id", teacherId)
 
-      loadNotes(finalNotes)
-      loadVideos(finalVideos)
-      loadPDFs(finalPdfs, 'pdfList')
-      loadPDFs(finalPdfs2, 'pdfList2')
+      // جلب حلول الطالب
+      const { data: solutions } = await supabase
+        .from("solutions")
+        .select("*")
+        .eq("student_id", currentUser.id)
+        .order("created_at", { ascending: false })
+
+      // عرض البيانات
+      loadNotes(notes || [])
+      loadVideos(videos || [])
+      loadPDFs(pdfs || [], 'pdfList')
+      loadPDFs(pdfs2 || [], 'pdfList2')
       loadTeacherProfile(profiles || [], socials || [])
       loadMySolutions(solutions || [])
-      loadAssignmentsDropdown(finalPdfs)
-
-      if (studentStage) {
-        const stageText = document.querySelector('.header p')
-        if (stageText) stageText.innerHTML = `📚 مرحلتك الدراسية: ${studentStage} | يتم عرض المحتوى الخاص بك فقط`
-      }
+      loadAssignmentsDropdown(pdfs || [])
 
     } catch (error) {
       console.error("Load error:", error)
@@ -819,6 +874,7 @@
           <li>
             <a href="${escapeHtml(s.file_url)}" target="_blank">
               📄 حل تم رفعه بتاريخ ${date}
+              ${s.pdf_name ? `<span style="display:block; font-size:12px; color:#999;">📌 ${escapeHtml(s.pdf_name)}</span>` : ''}
             </a>
           </li>
         `
@@ -887,14 +943,15 @@
       .eq("student_id", currentUserLocal.id)
       .order("created_at", { ascending: false })
     loadMySolutions(newSolutions || [])
+
+    setTimeout(() => {
+      if (statusDiv) statusDiv.innerHTML = ''
+    }, 5000)
   }
 
   function showStatus(message, type, element) {
     if (!element) return
     element.innerHTML = `<div class="status ${type}">${message}</div>`
-    setTimeout(() => {
-      if (element.innerHTML.includes(message)) element.innerHTML = ''
-    }, 5000)
   }
 
   // Init
