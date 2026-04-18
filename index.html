@@ -2,85 +2,683 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>LMS Login</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600&display=swap" rel="stylesheet">
-</head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Ma'moun | نظام إدارة التعلم المتطور</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<body class="login-body">
+    body {
+      font-family: 'Cairo', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* خلفية ثلاثية الأبعاد متحركة */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-animation .circle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      animation: float 20s infinite ease-in-out;
+      backdrop-filter: blur(5px);
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-50px) translateX(30px) rotate(90deg);
+      }
+      50% {
+        transform: translateY(0) translateX(0) rotate(180deg);
+      }
+      75% {
+        transform: translateY(50px) translateX(-30px) rotate(270deg);
+      }
+    }
+
+    /* كرات متحركة */
+    .bg-animation .circle:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      top: -100px;
+      right: -100px;
+      animation-duration: 25s;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+    }
+
+    .bg-animation .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: -200px;
+      left: -200px;
+      animation-duration: 30s;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 82, 82, 0.2));
+    }
+
+    .bg-animation .circle:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      top: 50%;
+      left: 20%;
+      animation-duration: 18s;
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+    }
+
+    .bg-animation .circle:nth-child(4) {
+      width: 400px;
+      height: 400px;
+      bottom: 20%;
+      right: -100px;
+      animation-duration: 35s;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(33, 150, 243, 0.2));
+    }
+
+    .bg-animation .circle:nth-child(5) {
+      width: 150px;
+      height: 150px;
+      top: 20%;
+      right: 30%;
+      animation-duration: 12s;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    /* جزيئات متحركة */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: particleMove 8s infinite linear;
+    }
+
+    @keyframes particleMove {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* الحاوية الرئيسية */
+    .login-container {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* البطاقة الرئيسية - تأثير 3D و Glassmorphism */
+    .login-box-pro {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-radius: 40px;
+      padding: 50px 40px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transform: translateY(0);
+      animation: slideUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all 0.4s ease;
+    }
+
+    .login-box-pro:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 35px 60px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes slideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* الشعار والنص */
+    .login-box-pro h2 {
+      text-align: center;
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff, #a8c0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      animation: glow 3s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+      }
+      50% {
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+      }
+    }
+
+    .login-box-pro > p {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 16px;
+      margin-bottom: 35px;
+      position: relative;
+    }
+
+    .login-box-pro > p::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      margin: 10px auto 0;
+      border-radius: 3px;
+      animation: expandWidth 2s ease-in-out infinite;
+    }
+
+    @keyframes expandWidth {
+      0%, 100% {
+        width: 50px;
+      }
+      50% {
+        width: 100px;
+      }
+    }
+
+    /* مجموعة الإدخال - تصميم عصري */
+    .input-group {
+      position: relative;
+      margin-bottom: 35px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      font-size: 16px;
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+      transition: all 0.3s ease;
+      outline: none;
+      direction: rtl;
+    }
+
+    .input-group input:focus {
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .input-group label {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 16px;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      background: transparent;
+      padding: 0 5px;
+    }
+
+    .input-group input:focus ~ label,
+    .input-group input:valid ~ label {
+      top: 0;
+      right: 10px;
+      font-size: 12px;
+      color: #667eea;
+      background: linear-gradient(135deg, #0f0c29, #302b63);
+      padding: 0 8px;
+      border-radius: 10px;
+      transform: translateY(-50%);
+    }
+
+    /* زر الدخول - تأثير 3D */
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* حالة تسجيل الدخول */
+    #loginStatus {
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* الفوتر */
+    .footer-text {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      font-weight: 300;
+    }
+
+    /* زر الرجوع */
+    .back-home-btn {
+      margin-top: 15px;
+      background: rgba(108, 117, 125, 0.8);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .back-home-btn:hover {
+      background: rgba(108, 117, 125, 1);
+    }
+
+    /* أزرار التمرير */
+    #scrollTopBtn, #scrollBottomBtn {
+      position: fixed;
+      left: 20px;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #scrollTopBtn {
+      bottom: 80px;
+    }
+
+    #scrollBottomBtn {
+      bottom: 20px;
+    }
+
+    #scrollTopBtn:hover, #scrollBottomBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    /* تأثير التحميل */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* موبايل */
+    @media (max-width: 768px) {
+      .login-box-pro {
+        padding: 35px 25px;
+        margin: 20px;
+      }
+
+      .login-box-pro h2 {
+        font-size: 26px;
+      }
+
+      .input-group input {
+        padding: 12px 15px;
+      }
+
+      #scrollTopBtn, #scrollBottomBtn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+
+    /* رسالة النجاح والخطأ */
+    .status-success {
+      background: rgba(37, 211, 102, 0.2);
+      color: #25d366;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+    }
+
+    .status-error {
+      background: rgba(255, 77, 77, 0.2);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 77, 77, 0.3);
+    }
+
+    .status-info {
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+      border: 1px solid rgba(102, 126, 234, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+<!-- خلفية ثلاثية الأبعاد متحركة -->
+<div class="bg-animation">
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="circle"></div>
+</div>
+
+<!-- جزيئات متحركة -->
+<div class="particles" id="particles"></div>
 
 <div class="login-container">
-
   <div class="login-box-pro">
-
-    <h2>🎓 Al-Ma'moun 🎓</h2>
-    <p>تسجيل الدخول</p>
+    <h2>
+      <i class="fas fa-graduation-cap"></i>
+      Al-Ma'moun
+      <i class="fas fa-star-of-life"></i>
+    </h2>
+    <p>تسجيل الدخول إلى منصتك التعليمية</p>
 
     <!-- Email -->
     <div class="input-group">
-      <input type="email" id="email" required>
-      <label>📧 الايميل</label>
+      <input type="email" id="email" required autocomplete="email">
+      <label>
+        <i class="fas fa-envelope"></i> الايميل
+      </label>
     </div>
 
     <!-- Password -->
     <div class="input-group">
-      <input type="password" id="password" required>
-      <label>🔒 الباسورد</label>
+      <input type="password" id="password" required autocomplete="current-password">
+      <label>
+        <i class="fas fa-lock"></i> كلمة المرور
+      </label>
     </div>
 
     <!-- زر الدخول -->
-    <button onclick="handleLogin()" id="loginBtn">دخول</button>
+    <button onclick="handleLogin()" id="loginBtn">
+      <i class="fas fa-sign-in-alt"></i> دخول
+    </button>
 
     <!-- حالة تسجيل الدخول -->
-    <p id="loginStatus" style="text-align:center; margin-top:10px; color:#ff4d4d;"></p>
+    <p id="loginStatus"></p>
 
     <div class="footer-text">
-      Developer by Eng Mohamed Hesham 👨🏻‍💻
+      <i class="fas fa-code"></i> Developer by Eng Mohamed Hesham 👨🏻‍💻
     </div>
 
     <!-- زر الرجوع -->
-    <a href="dashboard-home.html">
-      <button style="margin-top:15px; background:#6c757d; width:100%; padding:10px; border:none; border-radius:8px; color:white; cursor:pointer; font-family:'Cairo', sans-serif;">
-        🏠 الرجوع للرئيسية
-      </button>
-    </a>
+    <button onclick="goToHome()" class="back-home-btn">
+      <i class="fas fa-home"></i> الرجوع للرئيسية
+    </button>
   </div>
-
 </div>
 
-<!-- Scroll -->
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇</button>
+<!-- أزرار التمرير -->
+<button id="scrollTopBtn" onclick="scrollToTop()">
+  <i class="fas fa-arrow-up"></i>
+</button>
+<button id="scrollBottomBtn" onclick="scrollToBottom()">
+  <i class="fas fa-arrow-down"></i>
+</button>
 
-<script type="module" src="js/app.js"></script>
+<script type="module">
+  // استيراد Supabase
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script>
-  // 🔥 تحسين تجربة تسجيل الدخول
-  async function handleLogin() {
-    let btn = document.getElementById("loginBtn")
-    let status = document.getElementById("loginStatus")
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  // دوال التمرير
+  window.scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  window.scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  }
+
+  window.goToHome = () => {
+    window.location.href = 'dashboard-home.html'
+  }
+
+  // دالة تسجيل الدخول
+  window.login = async function() {
+    const email = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value
+    const statusDiv = document.getElementById('loginStatus')
+
+    if (!email || !password) {
+      showStatus('❌ يرجى إدخال الايميل وكلمة المرور', 'error')
+      return false
+    }
+
+    try {
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .eq('password', password)
+
+      if (error) throw error
+
+      if (!users || users.length === 0) {
+        showStatus('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error')
+        return false
+      }
+
+      const user = users[0]
+
+      // حفظ بيانات المستخدم
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        stage: user.stage
+      }))
+
+      showStatus('✅ تم تسجيل الدخول بنجاح... جاري التحويل', 'success')
+
+      // التحويل حسب الدور
+      setTimeout(() => {
+        if (user.role === 'student') {
+          window.location.href = 'student-dashboard.html'
+        } else if (user.role === 'teacher') {
+          window.location.href = 'teacher-dashboard.html'
+        } else {
+          window.location.href = 'dashboard-home.html'
+        }
+      }, 1500)
+
+      return true
+
+    } catch (error) {
+      console.error('Login error:', error)
+      showStatus('❌ حدث خطأ في تسجيل الدخول: ' + error.message, 'error')
+      return false
+    }
+  }
+
+  function showStatus(message, type) {
+    const statusDiv = document.getElementById('loginStatus')
+    statusDiv.innerHTML = message
+    statusDiv.className = ''
+    statusDiv.classList.add(`status-${type}`)
+
+    setTimeout(() => {
+      if (statusDiv.innerHTML === message) {
+        statusDiv.innerHTML = ''
+        statusDiv.className = ''
+      }
+    }, 5000)
+  }
+
+  window.handleLogin = async function() {
+    const btn = document.getElementById('loginBtn')
+    const originalText = btn.innerHTML
 
     btn.disabled = true
-    btn.innerText = "⏳ جاري..."
-    status.innerText = ""
+    btn.innerHTML = '<span class="loading-spinner"></span> جاري...'
 
     try {
       await window.login()
     } catch (e) {
-      status.innerText = "❌ حصل خطأ: " + e.message
+      showStatus('❌ حصل خطأ: ' + e.message, 'error')
     }
 
     btn.disabled = false
-    btn.innerText = "دخول"
+    btn.innerHTML = originalText
   }
 
-  // 🔥 Enter للدخول
-  document.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
+  // إنشاء جزيئات متحركة
+  function createParticles() {
+    const container = document.getElementById('particles')
+    if (!container) return
+
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div')
+      particle.classList.add('particle')
+      particle.style.width = Math.random() * 5 + 2 + 'px'
+      particle.style.height = particle.style.width
+      particle.style.left = Math.random() * 100 + '%'
+      particle.style.animationDelay = Math.random() * 8 + 's'
+      particle.style.animationDuration = Math.random() * 10 + 5 + 's'
+      particle.style.opacity = Math.random() * 0.5 + 0.2
+      container.appendChild(particle)
+    }
+  }
+
+  // Enter للدخول
+  document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
       handleLogin()
     }
   })
 
+  // تحريك الخلفية بالماوس (تأثير 3D)
+  document.addEventListener('mousemove', function(e) {
+    const circles = document.querySelectorAll('.bg-animation .circle')
+    const mouseX = e.clientX / window.innerWidth
+    const mouseY = e.clientY / window.innerHeight
+
+    circles.forEach((circle, index) => {
+      const moveX = (mouseX - 0.5) * 20 * (index + 1)
+      const moveY = (mouseY - 0.5) * 20 * (index + 1)
+      circle.style.transform = `translate(${moveX}px, ${moveY}px)`
+    })
+  })
+
+  // بدء التشغيل
+  createParticles()
+
+  // التحقق من وجود مستخدم مسجل دخول
+  const currentUser = localStorage.getItem('currentUser')
+  if (currentUser) {
+    const user = JSON.parse(currentUser)
+    if (user.role === 'student') {
+      window.location.href = 'student-dashboard.html'
+    } else if (user.role === 'teacher') {
+      window.location.href = 'teacher-dashboard.html'
+    }
+  }
 </script>
 
 </body>
