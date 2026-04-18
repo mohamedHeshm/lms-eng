@@ -119,6 +119,7 @@
     /* ==================== MAIN CONTENT ==================== */
     .main-content {
       margin-left: 280px;
+      width: calc(100% - 280px);
       padding: 40px 30px;
       display: flex;
       flex-direction: column;
@@ -430,6 +431,10 @@
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 1024px) {
+    .main-content {
+  margin-left: 0;
+  width: 100%;
+}
       .layout {
         grid-template-columns: 1fr;
       }
@@ -496,6 +501,24 @@
     button:active {
       animation: pulse 0.5s ease-out;
     }
+    #menuToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 300;
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-size: 20px;
+  display: none;
+}
+    @media (max-width: 1024px) {
+  #menuToggle {
+    display: block;
+  }
+}
   </style>
 </head>
 <body>
@@ -530,6 +553,7 @@
   </div>
 
   <!-- MAIN CONTENT -->
+  <button id="menuToggle" onclick="toggleMenu()">☰</button>
   <div class="main-content">
     <!-- HEADER -->
     <div class="header">

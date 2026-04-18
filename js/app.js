@@ -1624,7 +1624,10 @@ window.deleteContent = async function(id) {
 </script>
 
 */
-
+function toggleMenu() {
+  const sidebar = document.getElementById("sidebar")
+  sidebar.classList.toggle("open")
+}
 
 
 console.log("✅ وظائف إدارة محتوى المدرس تم تحميلها بنجاح")
