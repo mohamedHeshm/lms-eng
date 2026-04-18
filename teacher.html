@@ -2,9 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Teacher Dashboard Pro - الحل المتكامل</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Teacher Dashboard - متجاوب بالكامل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -14,52 +14,98 @@
 
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       background-attachment: fixed;
       min-height: 100vh;
-      color: #1e293b;
-      overflow-x: hidden;
+      color: #333;
     }
 
-    /* ==================== LAYOUT ==================== */
+    /* ==================== زر القائمة للجوال ==================== */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.05);
+    }
+
+    /* ==================== LAYOUT متجاوب ==================== */
     .layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
+      display: flex;
       min-height: 100vh;
     }
 
     /* ==================== SIDEBAR ==================== */
     .sidebar {
-      background: linear-gradient(180deg, #1e1b4b 0%, #2e1065 100%);
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 30px 20px;
+      width: 280px;
       position: fixed;
       right: 0;
       top: 0;
-      width: 280px;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3);
-      z-index: 50;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: transform 0.3s ease;
+      transform: translateX(0);
     }
 
-    .sidebar h2 {
-      font-size: 26px;
-      margin-bottom: 30px;
+    /* وضع الجوال - الـ Sidebar مخفي */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .sidebar-header {
+      padding: 30px 20px;
       text-align: center;
       border-bottom: 3px solid rgba(255, 255, 255, 0.3);
-      padding-bottom: 20px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 24px;
       font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-header p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 5px;
     }
 
     .sidebar-section {
-      margin-bottom: 30px;
+      padding: 20px;
     }
 
     .sidebar-title {
-      font-size: 13px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
       margin-bottom: 15px;
       text-transform: uppercase;
@@ -69,530 +115,1003 @@
 
     .menu-btn {
       width: 100%;
-      padding: 13px 16px;
+      padding: 12px 16px;
       margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
-      border-radius: 16px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 14px;
       font-family: 'Cairo', sans-serif;
       font-weight: 600;
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      transition: all 0.3s ease;
       text-align: right;
       display: flex;
       align-items: center;
       gap: 10px;
-      justify-content: flex-start;
     }
 
     .menu-btn:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: translateX(-5px);
-      border-color: white;
     }
 
     .menu-btn.active {
-      background: linear-gradient(135deg, #f43f5e, #ec489a);
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       border-color: white;
-      box-shadow: 0 8px 20px rgba(244, 63, 94, 0.4);
     }
 
     /* ==================== MAIN CONTENT ==================== */
     .main-content {
+      flex: 1;
       margin-right: 280px;
-      width: calc(100% - 280px);
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      padding: 20px;
+      transition: margin 0.3s ease;
     }
 
+    @media (max-width: 768px) {
+      .main-content {
+        margin-right: 0;
+        padding: 15px;
+        padding-top: 80px;
+      }
+    }
+
+    /* ==================== HEADER ==================== */
     .header {
-      background: linear-gradient(135deg, #ffffffcc, #ffffffdd);
-      backdrop-filter: blur(12px);
-      color: #1e1b4b;
-      padding: 50px 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 30px;
       text-align: center;
-      border-radius: 32px;
-      margin-bottom: 40px;
-      width: 100%;
-      max-width: 1100px;
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
 
     .header h1 {
-      font-size: 48px;
+      font-size: 28px;
+      margin-bottom: 10px;
       font-weight: 800;
     }
 
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @media (min-width: 768px) {
+      .header {
+        padding: 50px 40px;
+      }
+      .header h1 {
+        font-size: 36px;
+      }
+      .header p {
+        font-size: 16px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .header h1 {
+        font-size: 44px;
+      }
+    }
+
+    /* ==================== CARD ==================== */
     .card {
-      background: rgba(255, 255, 255, 0.98);
-      padding: 40px;
-      border-radius: 28px;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      width: 100%;
-      max-width: 1100px;
-      transition: transform 0.2s;
-      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.97);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      transition: all 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 30px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .card {
+        padding: 40px;
+      }
     }
 
     .card h3 {
-      font-size: 28px;
-      color: #4f46e5;
-      margin-bottom: 24px;
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 22px;
       font-weight: 700;
     }
 
+    @media (min-width: 768px) {
+      .card h3 {
+        font-size: 24px;
+        margin-bottom: 25px;
+      }
+    }
+
+    /* ==================== INPUTS ==================== */
     input, select, textarea {
       width: 100%;
-      padding: 14px 18px;
-      margin: 12px 0;
-      border-radius: 20px;
-      border: 2px solid #e2e8f0;
-      font-size: 16px;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      font-size: 14px;
       font-family: 'Cairo', sans-serif;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      input, select, textarea {
+        padding: 14px 16px;
+        font-size: 16px;
+      }
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
+    /* ==================== BUTTONS ==================== */
     button {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-radius: 40px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       font-family: 'Cairo', sans-serif;
-      transition: all 0.3s;
-      margin-top: 15px;
-      box-shadow: 0 8px 14px -6px rgba(79, 70, 229, 0.4);
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 768px) {
+      button {
+        padding: 14px;
+        font-size: 16px;
+      }
     }
 
     button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 25px -8px #4f46e5;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
     }
 
     .logout {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      max-width: 1100px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      margin-top: 20px;
     }
 
+    /* ==================== CONTENT BOX ==================== */
     .content-box {
-      background: #f8fafc;
-      padding: 20px;
-      border-radius: 24px;
-      margin-bottom: 20px;
-      border-right: 6px solid #4f46e5;
-      transition: 0.2s;
+      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 12px;
+      border-right: 4px solid #667eea;
     }
 
-    .content-box h4 {
-      color: #1e293b;
-      font-size: 18px;
+    @media (min-width: 768px) {
+      .content-box {
+        padding: 20px;
+      }
     }
 
-    .status-message {
-      padding: 12px;
-      border-radius: 20px;
-      margin: 10px 0;
-      font-weight: 600;
-      text-align: center;
+    /* ==================== TAB CONTENT ==================== */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
     }
 
-    .status-success { background: #dcfce7; color: #166534; border-right: 4px solid #22c55e; }
-    .status-error { background: #fee2e2; color: #991b1b; border-right: 4px solid #ef4444; }
+    .tab-content.active {
+      display: block;
+    }
 
-    #scrollTopBtn, #scrollBottomBtn {
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==================== SCROLL BUTTONS ==================== */
+    .scroll-buttons {
       position: fixed;
-      left: 30px;
-      width: 52px;
-      height: 52px;
-      border-radius: 30px;
-      background: #4f46e5;
+      left: 20px;
+      bottom: 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .scroll-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      font-size: 24px;
       cursor: pointer;
-      box-shadow: 0 4px 12px black;
-      z-index: 99;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
     }
 
-    #scrollTopBtn { bottom: 100px; }
-    #scrollBottomBtn { bottom: 35px; }
+    @media (min-width: 768px) {
+      .scroll-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+      }
+    }
 
-    #menuToggle {
+    .scroll-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* ==================== GRID للمحتوى ==================== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    @media (min-width: 768px) {
+      .content-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .content-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .content-item {
+      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+      padding: 15px;
+      border-radius: 15px;
+      border-right: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      .content-item {
+        padding: 20px;
+      }
+    }
+
+    /* ==================== STATUS MESSAGES ==================== */
+    .status-message {
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px 0;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* ==================== RESPONSIVE UTILITIES ==================== */
+    .hide-on-mobile {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .hide-on-mobile {
+        display: block;
+      }
+    }
+
+    .show-on-mobile {
+      display: block;
+    }
+
+    @media (min-width: 768px) {
+      .show-on-mobile {
+        display: none;
+      }
+    }
+
+    /* ==================== OVERLAY للجوال ==================== */
+    .sidebar-overlay {
       display: none;
       position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 300;
-      background: #4f46e5;
-      width: auto;
-      padding: 10px 18px;
-      border-radius: 30px;
-      font-size: 22px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
     }
 
-    @media (max-width: 1024px) {
-      .sidebar { right: -280px; }
-      .sidebar.open { right: 0; }
-      .main-content { margin-right: 0; width: 100%; }
-      #menuToggle { display: block; }
+    .sidebar-overlay.active {
+      display: block;
     }
 
-    .file-label {
-      background: #eef2ff;
-      padding: 12px;
-      border-radius: 20px;
-      text-align: center;
-      font-weight: 600;
-      margin: 10px 0;
+    @media (min-width: 768px) {
+      .sidebar-overlay {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
 
 <div class="layout">
+  <!-- Overlay للجوال -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- زر القائمة للجوال -->
+  <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+
+  <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
-    <h2>📚 لوحة المدرس</h2>
+    <div class="sidebar-header">
+      <h2>📚 لوحة المدرس</h2>
+      <p>إدارة المحتوى الدراسي</p>
+    </div>
+
     <div class="sidebar-section">
-      <div class="sidebar-title">الإدارة</div>
+      <div class="sidebar-title">القائمة الرئيسية</div>
       <button class="menu-btn active" onclick="openTab('profile', this)">👤 البروفايل الشخصي</button>
       <button class="menu-btn" onclick="openTab('social', this)">🔗 روابط التواصل</button>
       <button class="menu-btn" onclick="openTab('note', this)">📝 نشر ملاحظة</button>
       <button class="menu-btn" onclick="openTab('video', this)">🎥 نشر فيديو</button>
-      <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع واجبات</button>
-      <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع مذكرات</button>
-      <button class="menu-btn" onclick="openTab('content', this)">📋 كل المحتوى</button>
+      <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع الواجبات</button>
+      <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع المذكرات</button>
+      <button class="menu-btn" onclick="openTab('content', this)">📋 المحتوى المنشور</button>
     </div>
+
     <div class="sidebar-section">
+      <div class="sidebar-title">الخيارات</div>
       <button class="menu-btn" onclick="goHome()">🏠 الرئيسية</button>
-      <button class="menu-btn" onclick="resetAllData()">🔄 إعادة ضبط التجريبي</button>
+      <button class="menu-btn" onclick="goToChangePassword()">🔐 تغيير الباسورد</button>
     </div>
   </div>
 
-  <button id="menuToggle" onclick="toggleMenu()">☰</button>
+  <!-- MAIN CONTENT -->
   <div class="main-content">
     <div class="header">
-      <h1>👨‍🏫 لوحة التحكم الشاملة</h1>
-      <p>إدارة المحتوى الديناميكي - حفظ تلقائي بالمتصفح</p>
+      <h1>👨‍🏫 لوحة المدرس</h1>
+      <p>إدارة المحتوى الدراسي والطلاب</p>
     </div>
 
-    <!-- TABS -->
+    <!-- PROFILE TAB -->
     <div id="profile" class="tab-content active">
       <div class="card">
-        <h3>👤 الملف الشخصي</h3>
-        <div id="profilePreview" class="content-box"><h4>الاسم: المدرس النموذجي</h4><p>مرحباً! أنا مدرس متخصص في المواد العلمية.</p></div>
-        <textarea id="bio" placeholder="اكتب نبذة تعريفية عنك ..."></textarea>
-        <input type="text" id="teacherName" placeholder="الاسم الكامل للمدرس">
+        <h3>👤 صفحتي الشخصية</h3>
+        <div id="profilePreview" class="content-box">
+          <p>لم تقم بإضافة بروفايل بعد</p>
+        </div>
+        <textarea id="bio" placeholder="📝 عرف نفسك بكلمات معبرة وملهمة..." rows="4"></textarea>
         <input type="file" id="imgFile" accept="image/*">
         <button onclick="saveProfile()">💾 حفظ البروفايل</button>
       </div>
     </div>
 
+    <!-- SOCIAL TAB -->
     <div id="social" class="tab-content">
       <div class="card">
-        <h3>🔗 روابط التواصل</h3>
-        <input type="text" id="facebook" placeholder="رابط فيسبوك">
-        <input type="text" id="whatsapp" placeholder="رابط واتساب">
-        <input type="text" id="youtube" placeholder="رابط يوتيوب">
+        <h3>🔗 روابط التواصل الاجتماعي</h3>
+        <input type="text" id="facebook" placeholder="📘 رابط فيسبوك">
+        <input type="text" id="whatsapp" placeholder="💬 رابط واتساب">
+        <input type="text" id="youtube" placeholder="▶️ رابط يوتيوب">
         <button onclick="saveSocial()">💾 حفظ الروابط</button>
       </div>
     </div>
 
+    <!-- NOTE TAB -->
     <div id="note" class="tab-content">
       <div class="card">
-        <h3>📝 نشر ملاحظة</h3>
-        <select id="noteStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
-        <textarea id="noteInput" placeholder="نص الملاحظة المهمة ..."></textarea>
-        <button onclick="addNote()">➕ نشر الملاحظة</button>
-        <div id="noteStatus" class="status-message" style="display:none"></div>
+        <h3>📝 نشر ملاحظة مهمة</h3>
+        <select id="noteStageSelect">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
+        <textarea id="noteInput" placeholder="اكتب ملاحظة مهمة للطلاب..." rows="5"></textarea>
+        <button onclick="addNote()">🚀 نشر الملاحظة</button>
       </div>
     </div>
 
+    <!-- VIDEO TAB -->
     <div id="video" class="tab-content">
       <div class="card">
-        <h3>🎥 فيديو تعليمي</h3>
-        <select id="videoStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
-        <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
-        <button onclick="addVideo()">🎬 نشر الفيديو</button>
-        <div id="videoStatus" class="status-message" style="display:none"></div>
+        <h3>🎥 نشر فيديو تعليمي</h3>
+        <select id="videoStageSelect">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
+        <input type="text" id="videoInput" placeholder="رابط الفيديو من YouTube">
+        <button onclick="addVideo()">🚀 نشر الفيديو</button>
       </div>
     </div>
 
+    <!-- PDF TAB -->
     <div id="pdf" class="tab-content">
       <div class="card">
-        <h3>📁 رفع واجب (PDF)</h3>
-        <select id="pdfStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
+        <h3>📁 رفع الواجبات (Sheets)</h3>
+        <select id="pdfStageSelect">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <input type="file" id="pdfFile" accept="application/pdf">
-        <button onclick="uploadPDF()">📤 رفع الواجب</button>
-        <div id="pdfStatus" class="status-message" style="display:none"></div>
+        <button onclick="uploadPDF()">📤 رفع الملف</button>
       </div>
     </div>
 
+    <!-- PDF2 TAB -->
     <div id="pdf2" class="tab-content">
       <div class="card">
-        <h3>📚 رفع مذكرة</h3>
-        <select id="pdf2StageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
+        <h3>📚 رفع المذكرات</h3>
+        <select id="pdf2StageSelect">
+          <option value="">📚 اختر المرحلة الدراسية</option>
+          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+          <option value="الأولى الثانوي">الأولى الثانوي</option>
+          <option value="الثانية الثانوي">الثانية الثانوي</option>
+          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+        </select>
         <input type="file" id="pdf2File" accept="application/pdf">
-        <button onclick="uploadPDF2()">📤 رفع المذكرة</button>
-        <div id="pdf2Status" class="status-message" style="display:none"></div>
+        <button onclick="uploadPDF2()">📤 رفع الملف</button>
       </div>
     </div>
 
+    <!-- CONTENT TAB -->
     <div id="content" class="tab-content">
       <div class="card">
-        <h3>📋 المحتوى المنشور (ملاحظات، فيديوهات، ملفات)</h3>
-        <div id="contentList" style="max-height: 600px; overflow-y: auto;"></div>
+        <h3>📋 المحتوى المنشور</h3>
+
+        <!-- أزرار التصفية -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
+          <button onclick="filterTeacherContent('all')" id="filterAllBtn" class="filter-btn" style="width: auto; padding: 8px 16px; background: #667eea;">الكل</button>
+          <button onclick="filterTeacherContent('notes')" id="filterNotesBtn" class="filter-btn" style="width: auto; padding: 8px 16px;">📝 ملاحظات</button>
+          <button onclick="filterTeacherContent('videos')" id="filterVideosBtn" class="filter-btn" style="width: auto; padding: 8px 16px;">🎥 فيديوهات</button>
+          <button onclick="filterTeacherContent('pdfs')" id="filterPdfsBtn" class="filter-btn" style="width: auto; padding: 8px 16px;">📁 واجبات</button>
+          <button onclick="filterTeacherContent('pdfs2')" id="filterPdfs2Btn" class="filter-btn" style="width: auto; padding: 8px 16px;">📚 مذكرات</button>
+        </div>
+
+        <div id="teacherContentContainer" style="max-height: 500px; overflow-y: auto;">
+          <p style="text-align: center; color: #999;">جاري تحميل المحتوى...</p>
+        </div>
       </div>
     </div>
 
-    <button class="logout" onclick="logout()">🚪 تسجيل الخروج والعودة للصفحة الرئيسية</button>
+    <!-- LOGOUT BUTTON -->
+    <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
   </div>
 </div>
 
-<button id="scrollTopBtn" onclick="scrollToTop()">⬆️</button>
-<button id="scrollBottomBtn" onclick="scrollToBottom()">⬇️</button>
+<!-- SCROLL BUTTONS -->
+<div class="scroll-buttons">
+  <button class="scroll-btn" onclick="scrollToTop()">⬆️</button>
+  <button class="scroll-btn" onclick="scrollToBottom()">⬇️</button>
+</div>
 
-<script>
-  // ------------------- KEYS STORAGE -------------------
-  const STORAGE = {
-    profile: "teacher_profile_data",
-    social: "teacher_social_links",
-    notes: "teacher_notes_array",
-    videos: "teacher_videos_array",
-    pdfs: "teacher_pdfs_array",      // الواجبات
-    books: "teacher_books_array"     // المذكرات
-  };
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  // تحميل البيانات الأولية
-  let notesArray = JSON.parse(localStorage.getItem(STORAGE.notes)) || [];
-  let videosArray = JSON.parse(localStorage.getItem(STORAGE.videos)) || [];
-  let pdfsArray = JSON.parse(localStorage.getItem(STORAGE.pdfs)) || [];
-  let booksArray = JSON.parse(localStorage.getItem(STORAGE.books)) || [];
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
 
-  // حفظ عام للمصفوفات
-  function persistAll() {
-    localStorage.setItem(STORAGE.notes, JSON.stringify(notesArray));
-    localStorage.setItem(STORAGE.videos, JSON.stringify(videosArray));
-    localStorage.setItem(STORAGE.pdfs, JSON.stringify(pdfsArray));
-    localStorage.setItem(STORAGE.books, JSON.stringify(booksArray));
+  // Helper functions
+  function escapeHtml(text) {
+    if (!text) return ''
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
   }
 
-  // تحميل البروفايل
-  function loadCurrentProfile() {
-    const profile = localStorage.getItem(STORAGE.profile);
-    if(profile) {
-      try {
-        const p = JSON.parse(profile);
-        document.getElementById("bio").value = p.bio || "";
-        document.getElementById("teacherName").value = p.name || "";
-        let preview = `<h4>👨‍🏫 ${p.name || "المدرس"}</h4><p>${p.bio || "لا توجد نبذة"}</p>`;
-        if(p.imgData) preview += `<img src="${p.imgData}" style="max-width:120px; border-radius:20px; margin-top:10px;">`;
-        document.getElementById("profilePreview").innerHTML = preview;
-      } catch(e) {}
-    } else {
-      document.getElementById("profilePreview").innerHTML = "<h4>المدرس</h4><p>أهلاً بك، قم بحفظ البروفايل</p>";
+  function getCurrentUser() {
+    try {
+      const userJson = localStorage.getItem("currentUser")
+      return userJson ? JSON.parse(userJson) : null
+    } catch (e) {
+      return null
     }
   }
 
-  function saveProfile() {
-    const bio = document.getElementById("bio").value;
-    const name = document.getElementById("teacherName").value;
-    const fileInput = document.getElementById("imgFile");
-    let imgData = null;
-    if(fileInput.files && fileInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const finalProfile = { bio, name, imgData: e.target.result };
-        localStorage.setItem(STORAGE.profile, JSON.stringify(finalProfile));
-        updateProfilePreview(finalProfile);
-        showStatusMessage("profileStatus", "✅ تم حفظ البروفايل بنجاح!", "success");
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    } else {
-      const finalProfile = { bio, name, imgData: null };
-      localStorage.setItem(STORAGE.profile, JSON.stringify(finalProfile));
-      updateProfilePreview(finalProfile);
-      showStatusMessage("profileStatus", "✅ تم حفظ البيانات", "success");
+  // متغيرات التصفية
+  let currentTeacherContent = { videos: [], pdfs: [], pdfs2: [], notes: [] }
+  let currentContentFilter = 'all'
+
+  // ================== SIDEBAR FUNCTIONS ==================
+  window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.toggle('open')
+    overlay.classList.toggle('active')
+  }
+
+  window.closeSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.remove('open')
+    overlay.classList.remove('active')
+  }
+
+  // ================== TAB FUNCTIONS ==================
+  window.openTab = function(tabName, button) {
+    // إغلاق الـ Sidebar في الجوال
+    if (window.innerWidth <= 768) {
+      closeSidebar()
     }
-  }
 
-  function updateProfilePreview(p) {
-    let html = `<h4>👨‍🏫 ${p.name || "المدرس"}</h4><p>${p.bio || ""}</p>`;
-    if(p.imgData) html += `<img src="${p.imgData}" style="max-width:130px; border-radius:24px; margin-top:12px;">`;
-    document.getElementById("profilePreview").innerHTML = html;
-  }
+    // إخفاء جميع التبويبات
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.remove('active')
+    })
 
-  function loadCurrentSocial() {
-    const social = localStorage.getItem(STORAGE.social);
-    if(social) {
-      const s = JSON.parse(social);
-      document.getElementById("facebook").value = s.facebook || "";
-      document.getElementById("whatsapp").value = s.whatsapp || "";
-      document.getElementById("youtube").value = s.youtube || "";
-    }
-  }
+    // إزالة active من جميع الأزرار
+    document.querySelectorAll('.menu-btn').forEach(btn => {
+      btn.classList.remove('active')
+    })
 
-  function saveSocial() {
-    const socialData = {
-      facebook: document.getElementById("facebook").value,
-      whatsapp: document.getElementById("whatsapp").value,
-      youtube: document.getElementById("youtube").value
-    };
-    localStorage.setItem(STORAGE.social, JSON.stringify(socialData));
-    alert("✅ تم حفظ روابط التواصل");
-  }
+    // فتح التبويب المختار
+    const selectedTab = document.getElementById(tabName)
+    if (selectedTab) {
+      selectedTab.classList.add('active')
+      if (button) button.classList.add('active')
 
-  // إضافة ملاحظة
-  function addNote() {
-    const stage = document.getElementById("noteStageSelect").value;
-    const text = document.getElementById("noteInput").value.trim();
-    if(!stage || !text) { alert("يرجى اختيار المرحلة وكتابة الملاحظة"); return; }
-    const newNote = { id: Date.now(), type: "note", stage, content: text, date: new Date().toLocaleString() };
-    notesArray.unshift(newNote);
-    persistAll();
-    document.getElementById("noteInput").value = "";
-    showStatusMessage("noteStatus", "📌 تم نشر الملاحظة بنجاح!", "success");
-    setTimeout(() => hideStatus("noteStatus"), 2000);
-  }
-
-  function addVideo() {
-    const stage = document.getElementById("videoStageSelect").value;
-    const url = document.getElementById("videoInput").value.trim();
-    if(!stage || !url) { alert("اختر المرحلة وأدخل رابط الفيديو"); return; }
-    const newVideo = { id: Date.now(), type: "video", stage, url, date: new Date().toLocaleString() };
-    videosArray.unshift(newVideo);
-    persistAll();
-    document.getElementById("videoInput").value = "";
-    showStatusMessage("videoStatus", "🎥 تم نشر الفيديو!", "success");
-    setTimeout(() => hideStatus("videoStatus"), 2000);
-  }
-
-  function uploadPDF() {
-    const stage = document.getElementById("pdfStageSelect").value;
-    const file = document.getElementById("pdfFile").files[0];
-    if(!stage || !file) { alert("اختر المرحلة وملف PDF"); return; }
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      const newPDF = { id: Date.now(), type: "assignment", stage, filename: file.name, fileData: ev.target.result, date: new Date().toLocaleString() };
-      pdfsArray.unshift(newPDF);
-      persistAll();
-      document.getElementById("pdfFile").value = "";
-      showStatusMessage("pdfStatus", "📄 تم رفع الواجب!", "success");
-      setTimeout(() => hideStatus("pdfStatus"), 2000);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function uploadPDF2() {
-    const stage = document.getElementById("pdf2StageSelect").value;
-    const file = document.getElementById("pdf2File").files[0];
-    if(!stage || !file) { alert("اختر المرحلة والملف"); return; }
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      const newBook = { id: Date.now(), type: "book", stage, filename: file.name, fileData: ev.target.result, date: new Date().toLocaleString() };
-      booksArray.unshift(newBook);
-      persistAll();
-      document.getElementById("pdf2File").value = "";
-      showStatusMessage("pdf2Status", "📚 تم رفع المذكرة!", "success");
-      setTimeout(() => hideStatus("pdf2Status"), 2000);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // عرض المحتوى الكامل
-  function loadTeacherContent() {
-    const container = document.getElementById("contentList");
-    if(!container) return;
-    const allItems = [...notesArray, ...videosArray, ...pdfsArray, ...booksArray];
-    allItems.sort((a,b) => b.id - a.id);
-    if(allItems.length === 0) {
-      container.innerHTML = "<div class='content-box'><p>✨ لا يوجد محتوى منشور بعد. أضف ملاحظات أو فيديوهات أو ملفات!</p></div>";
-      return;
-    }
-    let html = "";
-    allItems.forEach(item => {
-      if(item.type === "note") {
-        html += `<div class="content-box"><h4>📝 ملاحظة - ${item.stage}</h4><p>${item.content}</p><small>📅 ${item.date}</small></div>`;
-      } else if(item.type === "video") {
-        let embedUrl = item.url.replace("watch?v=", "embed/").split("&")[0];
-        html += `<div class="content-box"><h4>🎥 فيديو - ${item.stage}</h4><a href="${item.url}" target="_blank" style="color:#4f46e5;">▶️ مشاهدة الفيديو</a><br><iframe width="100%" height="200" src="${embedUrl}" frameborder="0" allowfullscreen style="border-radius:16px; margin-top:10px;"></iframe><small>📅 ${item.date}</small></div>`;
-      } else if(item.type === "assignment") {
-        html += `<div class="content-box"><h4>📄 واجب - ${item.stage}</h4><p>${item.filename}</p><a href="${item.fileData}" download="${item.filename}" style="background:#4f46e5; color:white; padding:8px 16px; border-radius:30px; text-decoration:none; display:inline-block;">⬇️ تحميل الواجب</a><small> 📅 ${item.date}</small></div>`;
-      } else if(item.type === "book") {
-        html += `<div class="content-box"><h4>📚 مذكرة - ${item.stage}</h4><p>${item.filename}</p><a href="${item.fileData}" download="${item.filename}" style="background:#7c3aed; color:white; padding:8px 16px; border-radius:30px;">📖 تحميل المذكرة</a><small> 📅 ${item.date}</small></div>`;
+      // تحميل المحتوى عند الحاجة
+      if (tabName === 'content') {
+        loadTeacherContent()
       }
-    });
-    container.innerHTML = html;
-  }
-
-  // مساعد عرض الرسائل
-  function showStatusMessage(elementId, msg, type) {
-    const el = document.getElementById(elementId);
-    if(el) {
-      el.style.display = "block";
-      el.className = `status-message status-${type === "success" ? "success" : "error"}`;
-      el.innerText = msg;
-      setTimeout(() => { if(el) el.style.display = "none"; }, 2500);
-    } else alert(msg);
-  }
-  function hideStatus(id) { const e = document.getElementById(id); if(e) e.style.display = "none"; }
-
-  // باقي الدوال الأساسية
-  function openTab(tabName, btn) {
-    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(tabName)?.classList.add("active");
-    if(btn) btn.classList.add("active");
-    if(tabName === "content") loadTeacherContent();
-    if(tabName === "profile") loadCurrentProfile();
-    if(tabName === "social") loadCurrentSocial();
-    if(window.innerWidth <= 1024) document.getElementById("sidebar")?.classList.remove("open");
-  }
-
-  function toggleMenu() { document.getElementById("sidebar")?.classList.toggle("open"); }
-  function scrollToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
-  function scrollToBottom() { window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }
-  function goHome() { openTab('profile', document.querySelector(".menu-btn")); }
-  function logout() {
-    if(confirm("تسجيل الخروج؟ سيتم حفظ بياناتك محلياً.")) {
-      window.location.href = "about:blank";
-      document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px'>تم تسجيل الخروج، يمكنك إغلاق الصفحة.</h2>";
-    }
-  }
-  function resetAllData() {
-    if(confirm("⚠️ هل أنت متأكد؟ سيتم مسح جميع البيانات: الملاحظات، الفيديوهات، الملفات، البروفايل. لا يمكن التراجع.")) {
-      localStorage.clear();
-      notesArray = []; videosArray = []; pdfsArray = []; booksArray = [];
-      persistAll();
-      location.reload();
+      if (tabName === 'profile') {
+        loadCurrentProfile()
+      }
+      if (tabName === 'social') {
+        loadCurrentSocial()
+      }
     }
   }
 
-  // تهيئة عند تحميل الصفحة
+  // ================== LOAD CONTENT ==================
+  window.loadTeacherContent = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const [
+        { data: videos },
+        { data: pdfs },
+        { data: pdfs2 },
+        { data: notes }
+      ] = await Promise.all([
+        supabase.from("videos").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("notes").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false })
+      ])
+
+      currentTeacherContent = { videos: videos || [], pdfs: pdfs || [], pdfs2: pdfs2 || [], notes: notes || [] }
+      renderTeacherContent(currentContentFilter)
+
+    } catch (error) {
+      console.error("Load error:", error)
+      const container = document.getElementById("teacherContentContainer")
+      if (container) {
+        container.innerHTML = "<p style='text-align:center; color:red;'>❌ حدث خطأ في تحميل المحتوى</p>"
+      }
+    }
+  }
+
+  function renderTeacherContent(filter) {
+    const container = document.getElementById("teacherContentContainer")
+    if (!container) return
+
+    let allItems = []
+
+    if (filter === 'all' || filter === 'notes') {
+      currentTeacherContent.notes.forEach(note => {
+        allItems.push({
+          type: 'note', typeIcon: '📝', typeName: 'ملاحظة',
+          id: note.id, stage: note.stage, content: note.content,
+          deleteFunc: 'deleteNote'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'videos') {
+      currentTeacherContent.videos.forEach(video => {
+        allItems.push({
+          type: 'video', typeIcon: '🎥', typeName: 'فيديو',
+          id: video.id, stage: video.stage, url: video.url,
+          deleteFunc: 'deleteVideo'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'pdfs') {
+      currentTeacherContent.pdfs.forEach(pdf => {
+        allItems.push({
+          type: 'pdf', typeIcon: '📁', typeName: 'واجب',
+          id: pdf.id, stage: pdf.stage, fileName: pdf.file_name, fileUrl: pdf.file_url,
+          deleteFunc: 'deletePDF'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'pdfs2') {
+      currentTeacherContent.pdfs2.forEach(pdf => {
+        allItems.push({
+          type: 'pdf2', typeIcon: '📚', typeName: 'مذكرة',
+          id: pdf.id, stage: pdf.stage, fileName: pdf.file_name, fileUrl: pdf.file_url,
+          deleteFunc: 'deletePDF2'
+        })
+      })
+    }
+
+    if (allItems.length === 0) {
+      container.innerHTML = `<p style='text-align:center; color:#999; padding:40px;'>📭 لا يوجد محتوى${filter !== 'all' ? ' في هذا التصنيف' : ''}</p>`
+      return
+    }
+
+    container.innerHTML = `
+      <div class="content-grid">
+        ${allItems.map(item => `
+          <div class="content-item">
+            <h4 style="color: #667eea; margin-bottom: 10px;">${item.typeIcon} ${item.typeName}</h4>
+            <p style="margin: 5px 0;"><strong>📚 المرحلة:</strong> ${escapeHtml(item.stage || "غير محدد")}</p>
+            ${item.content ? `<p style="margin: 10px 0; background: white; padding: 10px; border-radius: 8px;">📝 ${escapeHtml(item.content)}</p>` : ''}
+            ${item.url ? `<p><a href="${escapeHtml(item.url)}" target="_blank" style="color: #667eea;">🔗 مشاهدة الفيديو</a></p>` : ''}
+            ${item.fileUrl ? `<p><a href="${escapeHtml(item.fileUrl)}" target="_blank" style="color: #667eea;">📄 ${escapeHtml(item.fileName)}</a></p>` : ''}
+            <button onclick="window.${item.deleteFunc}('${item.id}')" style="margin-top: 10px; padding: 8px; background: #ff5252; width: 100%;">🗑 حذف</button>
+          </div>
+        `).join('')}
+      </div>
+    `
+  }
+
+  window.filterTeacherContent = function(filter) {
+    currentContentFilter = filter
+    renderTeacherContent(filter)
+
+    // تحديث أزرار التصفية
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.style.background = '#764ba2'
+    })
+    const activeBtn = document.getElementById(`filter${filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}Btn`)
+    if (activeBtn) activeBtn.style.background = '#667eea'
+  }
+
+  // ================== PROFILE FUNCTIONS ==================
+  window.loadCurrentProfile = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const { data } = await supabase
+        .from("teacher_profile")
+        .select("*")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      const preview = document.getElementById("profilePreview")
+      if (preview) {
+        if (data) {
+          preview.innerHTML = `
+            ${data.image_url ? `<img src="${escapeHtml(data.image_url)}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px;">` : ''}
+            <h4>${escapeHtml(currentUser.name)}</h4>
+            <p>${escapeHtml(data.bio || "")}</p>
+          `
+        } else {
+          preview.innerHTML = "<p>لم تقم بإضافة بروفايل بعد</p>"
+        }
+      }
+
+      const bioInput = document.getElementById("bio")
+      if (bioInput && data) bioInput.value = data.bio || ""
+
+    } catch (error) {
+      console.error("Load profile error:", error)
+    }
+  }
+
+  window.saveProfile = async function() {
+    try {
+      const bio = document.getElementById("bio")?.value.trim()
+      const file = document.getElementById("imgFile")?.files[0]
+      const currentUser = getCurrentUser()
+
+      if (!currentUser) {
+        alert("❗ مش مسجل دخول")
+        return
+      }
+
+      let imageUrl = null
+      if (file) {
+        const path = `profiles/${currentUser.id}_${Date.now()}_${file.name}`
+        const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+        if (uploadError) {
+          alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+          return
+        }
+        const { data } = supabase.storage.from("files").getPublicUrl(path)
+        imageUrl = data.publicUrl
+      }
+
+      const { data: existing } = await supabase
+        .from("teacher_profile")
+        .select("id")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      const updateData = {}
+      if (bio) updateData.bio = bio
+      if (imageUrl) updateData.image_url = imageUrl
+
+      if (existing) {
+        await supabase.from("teacher_profile").update(updateData).eq("teacher_id", currentUser.id)
+      } else if (Object.keys(updateData).length > 0) {
+        await supabase.from("teacher_profile").insert([{ teacher_id: currentUser.id, ...updateData }])
+      }
+
+      alert("✅ تم الحفظ")
+      document.getElementById("imgFile").value = ""
+      loadCurrentProfile()
+
+    } catch (error) {
+      console.error("Save profile error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
+  // ================== SOCIAL FUNCTIONS ==================
+  window.loadCurrentSocial = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const { data } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      if (data) {
+        if (document.getElementById("facebook")) document.getElementById("facebook").value = data.facebook || ""
+        if (document.getElementById("whatsapp")) document.getElementById("whatsapp").value = data.whatsapp || ""
+        if (document.getElementById("youtube")) document.getElementById("youtube").value = data.youtube || ""
+      }
+
+    } catch (error) {
+      console.error("Load social error:", error)
+    }
+  }
+
+  window.saveSocial = async function() {
+    try {
+      const facebook = document.getElementById("facebook")?.value.trim()
+      const whatsapp = document.getElementById("whatsapp")?.value.trim()
+      const youtube = document.getElementById("youtube")?.value.trim()
+      const currentUser = getCurrentUser()
+
+      if (!currentUser) {
+        alert("❗ مش مسجل دخول")
+        return
+      }
+
+      const { data: existing } = await supabase
+        .from("social_links")
+        .select("id")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      if (existing) {
+        await supabase.from("social_links").update({ facebook, whatsapp, youtube }).eq("teacher_id", currentUser.id)
+      } else {
+        await supabase.from("social_links").insert([{ teacher_id: currentUser.id, facebook, whatsapp, youtube }])
+      }
+
+      alert("✅ تم الحفظ")
+
+    } catch (error) {
+      console.error("Save social error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
+  // ================== CRUD FUNCTIONS (مختصرة) ==================
+  window.addNote = async function() {
+    const noteInput = document.getElementById("noteInput")
+    const note = noteInput?.value.trim()
+    const stageSelect = document.getElementById("noteStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!note) return alert("❗ اكتب الملاحظة")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const { error } = await supabase.from("notes").insert([{ teacher_id: currentUser.id, content: note, stage: stage }])
+    if (error) return alert("❌ خطأ: " + error.message)
+
+    noteInput.value = ""
+    stageSelect.value = ""
+    alert("✅ تم النشر")
+    loadTeacherContent()
+  }
+
+  window.addVideo = async function() {
+    const input = document.getElementById("videoInput")
+    const url = input?.value.trim()
+    const stageSelect = document.getElementById("videoStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!url) return alert("❗ حط رابط الفيديو")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    let embedUrl = url
+    if (url.includes("watch?v=")) embedUrl = url.replace("watch?v=", "embed/")
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1].split("?")[0]
+      embedUrl = "https://www.youtube.com/embed/" + id
+    }
+
+    const { error } = await supabase.from("videos").insert([{ teacher_id: currentUser.id, url: embedUrl, stage: stage }])
+    if (error) return alert("❌ خطأ: " + error.message)
+
+    input.value = ""
+    stageSelect.value = ""
+    alert("✅ تم نشر الفيديو")
+    loadTeacherContent()
+  }
+
+  window.uploadPDF = async function() {
+    const file = document.getElementById("pdfFile")?.files[0]
+    const stageSelect = document.getElementById("pdfStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!file) return alert("❗ اختار ملف PDF")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const path = `pdfs/${currentUser.id}_${Date.now()}_${file.name.replace(/\s+/g, "_")}`
+    const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+    if (uploadError) return alert("❌ خطأ في الرفع: " + uploadError.message)
+
+    const { data } = supabase.storage.from("files").getPublicUrl(path)
+    const { error: dbError } = await supabase.from("pdfs").insert([{ teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, stage: stage }])
+    if (dbError) return alert("❌ خطأ في الحفظ: " + dbError.message)
+
+    alert("✅ تم النشر بنجاح")
+    document.getElementById("pdfFile").value = ""
+    stageSelect.value = ""
+    loadTeacherContent()
+  }
+
+  window.uploadPDF2 = async function() {
+    const file = document.getElementById("pdf2File")?.files[0]
+    const stageSelect = document.getElementById("pdf2StageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!file) return alert("❗ اختار ملف PDF")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const path = `pdfs2/${currentUser.id}_${Date.now()}_${file.name.replace(/\s+/g, "_")}`
+    const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+    if (uploadError) return alert("❌ خطأ في الرفع: " + uploadError.message)
+
+    const { data } = supabase.storage.from("files").getPublicUrl(path)
+    const { error: dbError } = await supabase.from("pdfs2").insert([{ teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, stage: stage }])
+    if (dbError) return alert("❌ خطأ في الحفظ: " + dbError.message)
+
+    alert("✅ تم النشر بنجاح")
+    document.getElementById("pdf2File").value = ""
+    stageSelect.value = ""
+    loadTeacherContent()
+  }
+
+  // Delete functions
+  window.deleteVideo = async function(id) {
+    if (!confirm("هل متأكد من حذف الفيديو؟")) return
+    const { error } = await supabase.from("videos").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deleteNote = async function(id) {
+    if (!confirm("هل متأكد من حذف الملاحظة؟")) return
+    const { error } = await supabase.from("notes").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deletePDF = async function(id) {
+    if (!confirm("هل متأكد من حذف الملف؟")) return
+    const { error } = await supabase.from("pdfs").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deletePDF2 = async function(id) {
+    if (!confirm("هل متأكد من حذف الملف؟")) return
+    const { error } = await supabase.from("pdfs2").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  // ================== UTILITIES ==================
+  window.goHome = function() {
+    window.location.href = 'index.html'
+  }
+
+  window.goToChangePassword = function() {
+    window.location.href = 'change-password.html'
+  }
+
+  window.logout = function() {
+    localStorage.removeItem("currentUser")
+    window.location.href = "index.html"
+  }
+
+  window.scrollToTop = function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  window.scrollToBottom = function() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  }
+
+  // ================== INIT ==================
   document.addEventListener("DOMContentLoaded", () => {
-    loadCurrentProfile();
-    loadCurrentSocial();
-    if(document.getElementById("content")?.classList.contains("active")) loadTeacherContent();
-    // ضبط active أول تبويب
-  });
-  window.loadTeacherContent = loadTeacherContent;
-
+    loadCurrentProfile()
+    loadCurrentSocial()
+  })
 </script>
+
 </body>
 </html>
