@@ -2,10 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Dashboard - Complete</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Teacher Dashboard Pro - الحل المتكامل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -18,7 +17,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
       background-attachment: fixed;
       min-height: 100vh;
-      color: #333;
+      color: #1e293b;
       overflow-x: hidden;
     }
 
@@ -31,18 +30,19 @@
 
     /* ==================== SIDEBAR ==================== */
     .sidebar {
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(180deg, #1e1b4b 0%, #2e1065 100%);
       color: white;
       padding: 30px 20px;
       position: fixed;
-      left: 0;
+      right: 0;
       top: 0;
       width: 280px;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: 10px 0 40px rgba(0, 0, 0, 0.3);
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3);
       z-index: 50;
       backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
 
     .sidebar h2 {
@@ -51,9 +51,7 @@
       text-align: center;
       border-bottom: 3px solid rgba(255, 255, 255, 0.3);
       padding-bottom: 20px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      font-weight: 800;
     }
 
     .sidebar-section {
@@ -73,674 +71,528 @@
       width: 100%;
       padding: 13px 16px;
       margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: white;
-      border-radius: 12px;
+      border-radius: 16px;
       cursor: pointer;
       font-size: 14px;
       font-family: 'Cairo', sans-serif;
       font-weight: 600;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .menu-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-start;
     }
 
     .menu-btn:hover {
       background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.7);
-      transform: translateX(5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    }
-
-    .menu-btn:hover::before {
-      left: 100%;
+      transform: translateX(-5px);
+      border-color: white;
     }
 
     .menu-btn.active {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #f43f5e, #ec489a);
       border-color: white;
-      box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
-      transform: translateX(5px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(244, 63, 94, 0.4);
     }
 
     /* ==================== MAIN CONTENT ==================== */
     .main-content {
-      margin-left: 280px;
+      margin-right: 280px;
       width: calc(100% - 280px);
       padding: 40px 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
       min-height: 100vh;
     }
 
-    /* ==================== HEADER ==================== */
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 60px 50px;
+      background: linear-gradient(135deg, #ffffffcc, #ffffffdd);
+      backdrop-filter: blur(12px);
+      color: #1e1b4b;
+      padding: 50px 40px;
       text-align: center;
-      border-radius: 25px;
-      margin-bottom: 50px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      border-radius: 32px;
+      margin-bottom: 40px;
       width: 100%;
-      max-width: 1000px;
-      animation: slideDown 0.8s ease-out;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-      background-size: 50px 50px;
-      animation: moveGrid 20s linear infinite;
-    }
-
-    @keyframes moveGrid {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(50px, 50px); }
-    }
-
-    .header-content {
-      position: relative;
-      z-index: 2;
+      max-width: 1100px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255,255,255,0.6);
     }
 
     .header h1 {
       font-size: 48px;
-      margin-bottom: 12px;
       font-weight: 800;
-      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
-      letter-spacing: 2px;
     }
 
-    .header p {
-      font-size: 18px;
-      opacity: 0.95;
-      font-weight: 300;
-    }
-
-    /* ==================== TAB CONTENT ==================== */
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.5s ease-out;
-      width: 100%;
-      max-width: 1000px;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ==================== CARD ==================== */
     .card {
-      background: rgba(255, 255, 255, 0.97);
+      background: rgba(255, 255, 255, 0.98);
       padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      border-radius: 28px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
       margin-bottom: 30px;
-      border: 2px solid rgba(102, 126, 234, 0.1);
-      transition: all 0.4s ease;
-      backdrop-filter: blur(10px);
       width: 100%;
-      transform: translateY(0);
-    }
-
-    .card:hover {
-      box-shadow: 0 25px 70px rgba(102, 126, 234, 0.2);
-      border-color: rgba(102, 126, 234, 0.3);
-      transform: translateY(-3px);
+      max-width: 1100px;
+      transition: transform 0.2s;
+      border: 1px solid #e2e8f0;
     }
 
     .card h3 {
-      color: #667eea;
-      margin-bottom: 25px;
-      font-size: 26px;
+      font-size: 28px;
+      color: #4f46e5;
+      margin-bottom: 24px;
       font-weight: 700;
-      letter-spacing: 0.5px;
     }
 
-    /* ==================== INPUT & TEXTAREA ==================== */
     input, select, textarea {
       width: 100%;
-      padding: 14px 16px;
+      padding: 14px 18px;
       margin: 12px 0;
-      border-radius: 12px;
-      border: 2px solid #e0e0e0;
-      box-sizing: border-box;
+      border-radius: 20px;
+      border: 2px solid #e2e8f0;
       font-size: 16px;
       font-family: 'Cairo', sans-serif;
-      transition: all 0.3s ease;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15), 0 0 20px rgba(102, 126, 234, 0.3);
-      transform: translateY(-2px);
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #999;
-    }
-
-    /* ==================== BUTTON ==================== */
     button {
       width: 100%;
       padding: 14px;
       border: none;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
       color: white;
-      border-radius: 12px;
+      border-radius: 40px;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       font-family: 'Cairo', sans-serif;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-      position: relative;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
-    }
-
-    button:hover::before {
-      left: 100%;
+      transition: all 0.3s;
+      margin-top: 15px;
+      box-shadow: 0 8px 14px -6px rgba(79, 70, 229, 0.4);
     }
 
     button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-    }
-
-    button:active {
-      transform: translateY(-1px);
+      box-shadow: 0 15px 25px -8px #4f46e5;
     }
 
     .logout {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
-      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important;
-      margin-top: 40px !important;
-      width: 100%;
-      max-width: 1000px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      max-width: 1100px;
     }
 
-    .logout:hover {
-      box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5) !important;
-    }
-
-    /* ==================== CONTENT BOX ==================== */
     .content-box {
-      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
-      padding: 24px;
-      margin: 18px 0;
-      border-radius: 16px;
-      border-left: 5px solid #667eea;
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1);
-    }
-
-    .content-box:hover {
-      transform: translateX(-5px);
-      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      border-right: 6px solid #4f46e5;
+      transition: 0.2s;
     }
 
     .content-box h4 {
-      color: #667eea;
-      margin-bottom: 10px;
+      color: #1e293b;
       font-size: 18px;
-      font-weight: 700;
     }
 
-    .content-box p {
-      color: #666;
-      margin: 8px 0;
-      font-size: 15px;
-      line-height: 1.6;
-    }
-
-    /* ==================== SCROLL BUTTONS ==================== */
-    #scrollTopBtn, #scrollBottomBtn {
-      position: fixed;
-      right: 30px;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 26px;
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-      transition: all 0.3s ease;
-      z-index: 100;
-    }
-
-    #scrollTopBtn {
-      bottom: 130px;
-    }
-
-    #scrollBottomBtn {
-      bottom: 70px;
-    }
-
-    #scrollTopBtn:hover, #scrollBottomBtn:hover {
-      transform: scale(1.12);
-      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
-    }
-
-    /* ==================== STATUS MESSAGE ==================== */
     .status-message {
-      padding: 15px 20px;
-      border-radius: 10px;
-      margin: 15px 0;
+      padding: 12px;
+      border-radius: 20px;
+      margin: 10px 0;
       font-weight: 600;
       text-align: center;
-      animation: slideIn 0.3s ease-out;
     }
 
-    .status-success {
-      background: #d4edda;
-      color: #155724;
-      border: 2px solid #28a745;
+    .status-success { background: #dcfce7; color: #166534; border-right: 4px solid #22c55e; }
+    .status-error { background: #fee2e2; color: #991b1b; border-right: 4px solid #ef4444; }
+
+    #scrollTopBtn, #scrollBottomBtn {
+      position: fixed;
+      left: 30px;
+      width: 52px;
+      height: 52px;
+      border-radius: 30px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px black;
+      z-index: 99;
     }
 
-    .status-error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 2px solid #f5c6cb;
-    }
+    #scrollTopBtn { bottom: 100px; }
+    #scrollBottomBtn { bottom: 35px; }
 
-    .status-info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 2px solid #bee5eb;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 1024px) {
-    .main-content {
-  margin-left: 0;
-  width: 100%;
-}
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: fixed;
-        left: -280px;
-        transition: left 0.3s ease;
-        width: 280px;
-        z-index: 200;
-      }
-
-      .sidebar.open {
-        left: 0;
-      }
-
-      .main-content {
-        margin-left: 0;
-      }
-
-      .header {
-        padding: 40px 30px;
-      }
-
-      .header h1 {
-        font-size: 36px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        padding: 20px 15px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      .header h1 {
-        font-size: 28px;
-      }
-
-      .header {
-        padding: 30px 20px;
-      }
-
-      .sidebar {
-        width: 100%;
-        left: -100%;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* ==================== ANIMATIONS ==================== */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    button:active {
-      animation: pulse 0.5s ease-out;
-    }
     #menuToggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 300;
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 10px;
-  font-size: 20px;
-  display: none;
-}
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 300;
+      background: #4f46e5;
+      width: auto;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 22px;
+    }
+
     @media (max-width: 1024px) {
-  #menuToggle {
-    display: block;
-  }
-}
+      .sidebar { right: -280px; }
+      .sidebar.open { right: 0; }
+      .main-content { margin-right: 0; width: 100%; }
+      #menuToggle { display: block; }
+    }
+
+    .file-label {
+      background: #eef2ff;
+      padding: 12px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 600;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
 
 <div class="layout">
-  <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
-    <h2>📚 المدرس</h2>
-
+    <h2>📚 لوحة المدرس</h2>
     <div class="sidebar-section">
-      <div class="sidebar-title">القائمة الرئيسية</div>
-
+      <div class="sidebar-title">الإدارة</div>
       <button class="menu-btn active" onclick="openTab('profile', this)">👤 البروفايل الشخصي</button>
       <button class="menu-btn" onclick="openTab('social', this)">🔗 روابط التواصل</button>
       <button class="menu-btn" onclick="openTab('note', this)">📝 نشر ملاحظة</button>
       <button class="menu-btn" onclick="openTab('video', this)">🎥 نشر فيديو</button>
-      <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع الواجبات</button>
-      <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع المذكرات</button>
-      <button class="menu-btn" onclick="openTab('content', this)">📋 المحتوى المنشور</button>
+      <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع واجبات</button>
+      <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع مذكرات</button>
+      <button class="menu-btn" onclick="openTab('content', this)">📋 كل المحتوى</button>
     </div>
-
     <div class="sidebar-section">
-      <div class="sidebar-title">الخيارات</div>
-
-      <button class="menu-btn" onclick="goHome()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
-        🏠 الرئيسية
-      </button>
-      <button class="menu-btn" onclick="goToChangePassword()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5);">
-        🔐 تغيير الباسورد
-      </button>
+      <button class="menu-btn" onclick="goHome()">🏠 الرئيسية</button>
+      <button class="menu-btn" onclick="resetAllData()">🔄 إعادة ضبط التجريبي</button>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <button id="menuToggle" onclick="toggleMenu()">☰</button>
   <div class="main-content">
-    <!-- HEADER -->
     <div class="header">
-      <div class="header-content">
-        <h1>👨‍🏫 لوحة المدرس</h1>
-        <p>إدارة المحتوى الدراسي والطلاب</p>
-      </div>
+      <h1>👨‍🏫 لوحة التحكم الشاملة</h1>
+      <p>إدارة المحتوى الديناميكي - حفظ تلقائي بالمتصفح</p>
     </div>
 
-    <!-- PROFILE TAB -->
+    <!-- TABS -->
     <div id="profile" class="tab-content active">
       <div class="card">
-        <h3>👤 صفحتي الشخصية</h3>
-        <div id="profilePreview" class="content-box">
-          <h4>اسم المدرس</h4>
-          <p>نبذة بسيطة عن الملف الشخصي...</p>
-        </div>
-        <textarea id="bio" placeholder="📝 عرف نفسك بكلمات معبرة وملهمة..."></textarea>
-        <input type="file" id="imgFile" accept="image/*" placeholder="صورتك الشخصية">
-        <p id="profileStatus" style="margin-top: 10px; color: #667eea;"></p>
+        <h3>👤 الملف الشخصي</h3>
+        <div id="profilePreview" class="content-box"><h4>الاسم: المدرس النموذجي</h4><p>مرحباً! أنا مدرس متخصص في المواد العلمية.</p></div>
+        <textarea id="bio" placeholder="اكتب نبذة تعريفية عنك ..."></textarea>
+        <input type="text" id="teacherName" placeholder="الاسم الكامل للمدرس">
+        <input type="file" id="imgFile" accept="image/*">
         <button onclick="saveProfile()">💾 حفظ البروفايل</button>
       </div>
     </div>
 
-    <!-- SOCIAL TAB -->
     <div id="social" class="tab-content">
       <div class="card">
-        <h3>🔗 روابط التواصل الاجتماعي</h3>
-        <input type="text" id="facebook" placeholder="📘 رابط فيسبوك">
-        <input type="text" id="whatsapp" placeholder="💬 رابط واتساب">
-        <input type="text" id="youtube" placeholder="▶️ رابط يوتيوب">
+        <h3>🔗 روابط التواصل</h3>
+        <input type="text" id="facebook" placeholder="رابط فيسبوك">
+        <input type="text" id="whatsapp" placeholder="رابط واتساب">
+        <input type="text" id="youtube" placeholder="رابط يوتيوب">
         <button onclick="saveSocial()">💾 حفظ الروابط</button>
       </div>
     </div>
 
-    <!-- NOTE TAB -->
     <div id="note" class="tab-content">
       <div class="card">
-        <h3>📝 نشر ملاحظة مهمة</h3>
-        <select id="noteStageSelect" style="margin-bottom:15px;">
-          <option value="">📚 اختر المرحلة الدراسية</option>
-          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
-          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
-          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
-          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
-          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
-          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
-          <option value="الأولى الثانوي">الأولى الثانوي</option>
-          <option value="الثانية الثانوي">الثانية الثانوي</option>
-          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
-        </select>
-        <textarea id="noteInput" placeholder="اكتب ملاحظة مهمة للطلاب..."></textarea>
-        <p id="noteStatus" style="color: #667eea;"></p>
-        <button onclick="addNote()">🚀 نشر الملاحظة</button>
+        <h3>📝 نشر ملاحظة</h3>
+        <select id="noteStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
+        <textarea id="noteInput" placeholder="نص الملاحظة المهمة ..."></textarea>
+        <button onclick="addNote()">➕ نشر الملاحظة</button>
+        <div id="noteStatus" class="status-message" style="display:none"></div>
       </div>
     </div>
 
-    <!-- VIDEO TAB -->
     <div id="video" class="tab-content">
       <div class="card">
-        <h3>🎥 نشر فيديو تعليمي</h3>
-        <select id="videoStageSelect" style="margin-bottom:15px;">
-          <option value="">📚 اختر المرحلة الدراسية</option>
-          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
-          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
-          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
-          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
-          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
-          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
-          <option value="الأولى الثانوي">الأولى الثانوي</option>
-          <option value="الثانية الثانوي">الثانية الثانوي</option>
-          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
-        </select>
-        <input type="text" id="videoInput" placeholder="رابط الفيديو من YouTube">
-        <p id="videoStatus" style="color: #667eea;"></p>
-        <button onclick="addVideo()">🚀 نشر الفيديو</button>
+        <h3>🎥 فيديو تعليمي</h3>
+        <select id="videoStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
+        <input type="text" id="videoInput" placeholder="رابط الفيديو (YouTube)">
+        <button onclick="addVideo()">🎬 نشر الفيديو</button>
+        <div id="videoStatus" class="status-message" style="display:none"></div>
       </div>
     </div>
 
-    <!-- PDF TAB -->
     <div id="pdf" class="tab-content">
       <div class="card">
-        <h3>📁 رفع الواجبات (Sheets)</h3>
-        <select id="pdfStageSelect" style="margin-bottom:15px;">
-          <option value="">📚 اختر المرحلة الدراسية</option>
-          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
-          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
-          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
-          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
-          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
-          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
-          <option value="الأولى الثانوي">الأولى الثانوي</option>
-          <option value="الثانية الثانوي">الثانية الثانوي</option>
-          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
-        </select>
+        <h3>📁 رفع واجب (PDF)</h3>
+        <select id="pdfStageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
         <input type="file" id="pdfFile" accept="application/pdf">
-        <p id="pdfStatus" style="color: #667eea;"></p>
-        <button onclick="uploadPDF()">📤 رفع الملف</button>
+        <button onclick="uploadPDF()">📤 رفع الواجب</button>
+        <div id="pdfStatus" class="status-message" style="display:none"></div>
       </div>
     </div>
 
-    <!-- PDF2 TAB -->
     <div id="pdf2" class="tab-content">
       <div class="card">
-        <h3>📚 رفع المذكرات</h3>
-        <select id="pdf2StageSelect" style="margin-bottom:15px;">
-          <option value="">📚 اختر المرحلة الدراسية</option>
-          <option value="الأولى الابتدائي">الأولى الابتدائي</option>
-          <option value="الثانية الابتدائي">الثانية الابتدائي</option>
-          <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
-          <option value="الأولى الإعدادي">الأولى الإعدادي</option>
-          <option value="الثانية الإعدادي">الثانية الإعدادي</option>
-          <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
-          <option value="الأولى الثانوي">الأولى الثانوي</option>
-          <option value="الثانية الثانوي">الثانية الثانوي</option>
-          <option value="الثالثة الثانوي">الثالثة الثانوي</option>
-        </select>
+        <h3>📚 رفع مذكرة</h3>
+        <select id="pdf2StageSelect"><option value="">اختر المرحلة</option><option>الأولى الابتدائي</option><option>الثانية الابتدائي</option><option>الثالثة الابتدائي</option><option>الأولى الإعدادي</option><option>الثانية الإعدادي</option><option>الثالثة الإعدادي</option><option>الأولى الثانوي</option><option>الثانية الثانوي</option><option>الثالثة الثانوي</option></select>
         <input type="file" id="pdf2File" accept="application/pdf">
-        <p id="pdf2Status" style="color: #667eea;"></p>
-        <button onclick="uploadPDF2()">📤 رفع الملف</button>
+        <button onclick="uploadPDF2()">📤 رفع المذكرة</button>
+        <div id="pdf2Status" class="status-message" style="display:none"></div>
       </div>
     </div>
 
-    <!-- CONTENT TAB -->
     <div id="content" class="tab-content">
       <div class="card">
-        <h3>📋 المحتوى المنشور</h3>
-        <div id="contentList" style="max-height: 600px; overflow-y: auto;">
-          <p style="text-align: center; color: #999;">جاري تحميل المحتوى...</p>
-        </div>
+        <h3>📋 المحتوى المنشور (ملاحظات، فيديوهات، ملفات)</h3>
+        <div id="contentList" style="max-height: 600px; overflow-y: auto;"></div>
       </div>
     </div>
 
-    <!-- LOGOUT BUTTON -->
-    <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
+    <button class="logout" onclick="logout()">🚪 تسجيل الخروج والعودة للصفحة الرئيسية</button>
   </div>
 </div>
 
-<!-- SCROLL BUTTONS -->
 <button id="scrollTopBtn" onclick="scrollToTop()">⬆️</button>
 <button id="scrollBottomBtn" onclick="scrollToBottom()">⬇️</button>
 
-<script type="module" src="js/app.js"></script>
-
 <script>
-  // فتح التبويب مع تحديث الأزرار
-  function openTab(tabName, button) {
-    // إخفاء جميع التبويبات
-    let tabs = document.querySelectorAll(".tab-content")
-    tabs.forEach(tab => tab.classList.remove("active"))
+  // ------------------- KEYS STORAGE -------------------
+  const STORAGE = {
+    profile: "teacher_profile_data",
+    social: "teacher_social_links",
+    notes: "teacher_notes_array",
+    videos: "teacher_videos_array",
+    pdfs: "teacher_pdfs_array",      // الواجبات
+    books: "teacher_books_array"     // المذكرات
+  };
 
-    // إزالة active من جميع الأزرار
-    let buttons = document.querySelectorAll(".menu-btn")
-    buttons.forEach(btn => btn.classList.remove("active"))
+  // تحميل البيانات الأولية
+  let notesArray = JSON.parse(localStorage.getItem(STORAGE.notes)) || [];
+  let videosArray = JSON.parse(localStorage.getItem(STORAGE.videos)) || [];
+  let pdfsArray = JSON.parse(localStorage.getItem(STORAGE.pdfs)) || [];
+  let booksArray = JSON.parse(localStorage.getItem(STORAGE.books)) || [];
 
-    // فتح التبويب المختار
-    let selectedTab = document.getElementById(tabName)
-    if (selectedTab) {
-      selectedTab.classList.add("active")
+  // حفظ عام للمصفوفات
+  function persistAll() {
+    localStorage.setItem(STORAGE.notes, JSON.stringify(notesArray));
+    localStorage.setItem(STORAGE.videos, JSON.stringify(videosArray));
+    localStorage.setItem(STORAGE.pdfs, JSON.stringify(pdfsArray));
+    localStorage.setItem(STORAGE.books, JSON.stringify(booksArray));
+  }
 
-      // إضافة active للزر
-      if (button) {
-        button.classList.add("active")
-      }
-
-      // تحميل المحتوى عند فتح تبويب المحتوى
-      if (tabName === 'content') {
-        loadTeacherContent()
-      }
+  // تحميل البروفايل
+  function loadCurrentProfile() {
+    const profile = localStorage.getItem(STORAGE.profile);
+    if(profile) {
+      try {
+        const p = JSON.parse(profile);
+        document.getElementById("bio").value = p.bio || "";
+        document.getElementById("teacherName").value = p.name || "";
+        let preview = `<h4>👨‍🏫 ${p.name || "المدرس"}</h4><p>${p.bio || "لا توجد نبذة"}</p>`;
+        if(p.imgData) preview += `<img src="${p.imgData}" style="max-width:120px; border-radius:20px; margin-top:10px;">`;
+        document.getElementById("profilePreview").innerHTML = preview;
+      } catch(e) {}
+    } else {
+      document.getElementById("profilePreview").innerHTML = "<h4>المدرس</h4><p>أهلاً بك، قم بحفظ البروفايل</p>";
     }
   }
 
-  // Scroll functions
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  function saveProfile() {
+    const bio = document.getElementById("bio").value;
+    const name = document.getElementById("teacherName").value;
+    const fileInput = document.getElementById("imgFile");
+    let imgData = null;
+    if(fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const finalProfile = { bio, name, imgData: e.target.result };
+        localStorage.setItem(STORAGE.profile, JSON.stringify(finalProfile));
+        updateProfilePreview(finalProfile);
+        showStatusMessage("profileStatus", "✅ تم حفظ البروفايل بنجاح!", "success");
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      const finalProfile = { bio, name, imgData: null };
+      localStorage.setItem(STORAGE.profile, JSON.stringify(finalProfile));
+      updateProfilePreview(finalProfile);
+      showStatusMessage("profileStatus", "✅ تم حفظ البيانات", "success");
+    }
   }
 
-  function scrollToBottom() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  function updateProfilePreview(p) {
+    let html = `<h4>👨‍🏫 ${p.name || "المدرس"}</h4><p>${p.bio || ""}</p>`;
+    if(p.imgData) html += `<img src="${p.imgData}" style="max-width:130px; border-radius:24px; margin-top:12px;">`;
+    document.getElementById("profilePreview").innerHTML = html;
   }
 
-  // تحميل البروفايل والتواصل عند الدخول
-  document.addEventListener("DOMContentLoaded", function() {
-    loadCurrentProfile()
-    loadCurrentSocial()
-  })
+  function loadCurrentSocial() {
+    const social = localStorage.getItem(STORAGE.social);
+    if(social) {
+      const s = JSON.parse(social);
+      document.getElementById("facebook").value = s.facebook || "";
+      document.getElementById("whatsapp").value = s.whatsapp || "";
+      document.getElementById("youtube").value = s.youtube || "";
+    }
+  }
+
+  function saveSocial() {
+    const socialData = {
+      facebook: document.getElementById("facebook").value,
+      whatsapp: document.getElementById("whatsapp").value,
+      youtube: document.getElementById("youtube").value
+    };
+    localStorage.setItem(STORAGE.social, JSON.stringify(socialData));
+    alert("✅ تم حفظ روابط التواصل");
+  }
+
+  // إضافة ملاحظة
+  function addNote() {
+    const stage = document.getElementById("noteStageSelect").value;
+    const text = document.getElementById("noteInput").value.trim();
+    if(!stage || !text) { alert("يرجى اختيار المرحلة وكتابة الملاحظة"); return; }
+    const newNote = { id: Date.now(), type: "note", stage, content: text, date: new Date().toLocaleString() };
+    notesArray.unshift(newNote);
+    persistAll();
+    document.getElementById("noteInput").value = "";
+    showStatusMessage("noteStatus", "📌 تم نشر الملاحظة بنجاح!", "success");
+    setTimeout(() => hideStatus("noteStatus"), 2000);
+  }
+
+  function addVideo() {
+    const stage = document.getElementById("videoStageSelect").value;
+    const url = document.getElementById("videoInput").value.trim();
+    if(!stage || !url) { alert("اختر المرحلة وأدخل رابط الفيديو"); return; }
+    const newVideo = { id: Date.now(), type: "video", stage, url, date: new Date().toLocaleString() };
+    videosArray.unshift(newVideo);
+    persistAll();
+    document.getElementById("videoInput").value = "";
+    showStatusMessage("videoStatus", "🎥 تم نشر الفيديو!", "success");
+    setTimeout(() => hideStatus("videoStatus"), 2000);
+  }
+
+  function uploadPDF() {
+    const stage = document.getElementById("pdfStageSelect").value;
+    const file = document.getElementById("pdfFile").files[0];
+    if(!stage || !file) { alert("اختر المرحلة وملف PDF"); return; }
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const newPDF = { id: Date.now(), type: "assignment", stage, filename: file.name, fileData: ev.target.result, date: new Date().toLocaleString() };
+      pdfsArray.unshift(newPDF);
+      persistAll();
+      document.getElementById("pdfFile").value = "";
+      showStatusMessage("pdfStatus", "📄 تم رفع الواجب!", "success");
+      setTimeout(() => hideStatus("pdfStatus"), 2000);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function uploadPDF2() {
+    const stage = document.getElementById("pdf2StageSelect").value;
+    const file = document.getElementById("pdf2File").files[0];
+    if(!stage || !file) { alert("اختر المرحلة والملف"); return; }
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const newBook = { id: Date.now(), type: "book", stage, filename: file.name, fileData: ev.target.result, date: new Date().toLocaleString() };
+      booksArray.unshift(newBook);
+      persistAll();
+      document.getElementById("pdf2File").value = "";
+      showStatusMessage("pdf2Status", "📚 تم رفع المذكرة!", "success");
+      setTimeout(() => hideStatus("pdf2Status"), 2000);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // عرض المحتوى الكامل
+  function loadTeacherContent() {
+    const container = document.getElementById("contentList");
+    if(!container) return;
+    const allItems = [...notesArray, ...videosArray, ...pdfsArray, ...booksArray];
+    allItems.sort((a,b) => b.id - a.id);
+    if(allItems.length === 0) {
+      container.innerHTML = "<div class='content-box'><p>✨ لا يوجد محتوى منشور بعد. أضف ملاحظات أو فيديوهات أو ملفات!</p></div>";
+      return;
+    }
+    let html = "";
+    allItems.forEach(item => {
+      if(item.type === "note") {
+        html += `<div class="content-box"><h4>📝 ملاحظة - ${item.stage}</h4><p>${item.content}</p><small>📅 ${item.date}</small></div>`;
+      } else if(item.type === "video") {
+        let embedUrl = item.url.replace("watch?v=", "embed/").split("&")[0];
+        html += `<div class="content-box"><h4>🎥 فيديو - ${item.stage}</h4><a href="${item.url}" target="_blank" style="color:#4f46e5;">▶️ مشاهدة الفيديو</a><br><iframe width="100%" height="200" src="${embedUrl}" frameborder="0" allowfullscreen style="border-radius:16px; margin-top:10px;"></iframe><small>📅 ${item.date}</small></div>`;
+      } else if(item.type === "assignment") {
+        html += `<div class="content-box"><h4>📄 واجب - ${item.stage}</h4><p>${item.filename}</p><a href="${item.fileData}" download="${item.filename}" style="background:#4f46e5; color:white; padding:8px 16px; border-radius:30px; text-decoration:none; display:inline-block;">⬇️ تحميل الواجب</a><small> 📅 ${item.date}</small></div>`;
+      } else if(item.type === "book") {
+        html += `<div class="content-box"><h4>📚 مذكرة - ${item.stage}</h4><p>${item.filename}</p><a href="${item.fileData}" download="${item.filename}" style="background:#7c3aed; color:white; padding:8px 16px; border-radius:30px;">📖 تحميل المذكرة</a><small> 📅 ${item.date}</small></div>`;
+      }
+    });
+    container.innerHTML = html;
+  }
+
+  // مساعد عرض الرسائل
+  function showStatusMessage(elementId, msg, type) {
+    const el = document.getElementById(elementId);
+    if(el) {
+      el.style.display = "block";
+      el.className = `status-message status-${type === "success" ? "success" : "error"}`;
+      el.innerText = msg;
+      setTimeout(() => { if(el) el.style.display = "none"; }, 2500);
+    } else alert(msg);
+  }
+  function hideStatus(id) { const e = document.getElementById(id); if(e) e.style.display = "none"; }
+
+  // باقي الدوال الأساسية
+  function openTab(tabName, btn) {
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(tabName)?.classList.add("active");
+    if(btn) btn.classList.add("active");
+    if(tabName === "content") loadTeacherContent();
+    if(tabName === "profile") loadCurrentProfile();
+    if(tabName === "social") loadCurrentSocial();
+    if(window.innerWidth <= 1024) document.getElementById("sidebar")?.classList.remove("open");
+  }
+
+  function toggleMenu() { document.getElementById("sidebar")?.classList.toggle("open"); }
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function scrollToBottom() { window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }
+  function goHome() { openTab('profile', document.querySelector(".menu-btn")); }
+  function logout() {
+    if(confirm("تسجيل الخروج؟ سيتم حفظ بياناتك محلياً.")) {
+      window.location.href = "about:blank";
+      document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px'>تم تسجيل الخروج، يمكنك إغلاق الصفحة.</h2>";
+    }
+  }
+  function resetAllData() {
+    if(confirm("⚠️ هل أنت متأكد؟ سيتم مسح جميع البيانات: الملاحظات، الفيديوهات، الملفات، البروفايل. لا يمكن التراجع.")) {
+      localStorage.clear();
+      notesArray = []; videosArray = []; pdfsArray = []; booksArray = [];
+      persistAll();
+      location.reload();
+    }
+  }
+
+  // تهيئة عند تحميل الصفحة
+  document.addEventListener("DOMContentLoaded", () => {
+    loadCurrentProfile();
+    loadCurrentSocial();
+    if(document.getElementById("content")?.classList.contains("active")) loadTeacherContent();
+    // ضبط active أول تبويب
+  });
+  window.loadTeacherContent = loadTeacherContent;
+
 </script>
-
 </body>
 </html>
