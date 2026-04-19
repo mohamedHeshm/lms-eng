@@ -38,7 +38,7 @@ function protectPage() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html'
 
   // الصفحات المحمية
-  const protectedPages = ['student-modern.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html']
+  const protectedPages = ['student-modern.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html', 'teacher-playlists.html']
 
   // إذا كان على صفحة محمية وما في user مسجل دخول
   if (protectedPages.includes(currentPage) && !currentUser) {
@@ -54,8 +54,8 @@ function protectPage() {
       window.location.href = 'index.html'
       return false
     }
-    if (currentPage === 'teacher.html' && currentUser.role !== 'teacher') {
-      alert('❌ صفحة المدرس حصرية للمدرسين')
+    if ((currentPage === 'teacher.html' || currentPage === 'teacher-playlists.html') && currentUser.role !== 'teacher') {
+      alert('❌ هذه الصفحة حصرية للمدرسين')
       window.location.href = 'index.html'
       return false
     }
@@ -334,6 +334,7 @@ let allLoginLogs = []
 
 window.loadLoginLogs = async function() {
   try {
+    console.log("Loading login logs...")
     let { data: logs, error } = await supabase
       .from("login_logs")
       .select("*")
@@ -345,6 +346,7 @@ window.loadLoginLogs = async function() {
     }
 
     allLoginLogs = logs || []
+    console.log("Logs loaded:", allLoginLogs.length)
     displayLoginLogs('all')
 
   } catch (error) {
@@ -614,6 +616,313 @@ window.uploadPDF2 = async function() {
     console.error("Upload PDF2 error:", error)
     let status = document.getElementById("status2")
     status.innerText = "❌ خطأ: " + error.message
+  }
+}
+
+// ================== Playlists Functions ==================
+window.createPlaylist = async function() {
+  try {
+    let name = document.getElementById("playlistName")?.value.trim()
+    let price = document.getElementById("playlistPrice")?.value.trim()
+    let currentUser = getCurrentUser()
+
+    if (!name || !price) {
+      alert("❗ من فضلك أدخل اسم القائمة والسعر")
+      return
+    }
+    if (!currentUser || currentUser.role !== 'teacher') {
+      alert("❌ غير مصرح لك بهذا الإجراء")
+      return
+    }
+
+    let { error } = await supabase.from("playlists").insert([
+      { teacher_id: currentUser.id, name: name, price: parseFloat(price) }
+    ])
+
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
+
+    alert("✅ تم إنشاء القائمة بنجاح")
+    document.getElementById("playlistName").value = ""
+    document.getElementById("playlistPrice").value = ""
+    loadTeacherPlaylists()
+
+  } catch (error) {
+    console.error("Create playlist error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.loadTeacherPlaylists = async function() {
+  try {
+    let currentUser = getCurrentUser()
+    if (!currentUser) return
+
+    let { data: playlists, error } = await supabase
+      .from("playlists")
+      .select("*")
+      .eq("teacher_id", currentUser.id)
+      .order("created_at", { ascending: false })
+
+    if (error) throw error
+
+    let container = document.getElementById("playlistsList")
+    if (!container) return
+
+    if (!playlists || playlists.length === 0) {
+      container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد قوائم تشغيل حالياً</p>"
+      return
+    }
+
+    container.innerHTML = ""
+    for (let playlist of playlists) {
+      // جلب عدد الفيديوهات في القائمة
+      let { count, error: countError } = await supabase
+        .from("playlist_videos")
+        .select("*", { count: 'exact', head: true })
+        .eq("playlist_id", playlist.id)
+
+      let videosCount = count || 0
+
+      container.innerHTML += `
+        <div class="playlist-card" style="background:white; border-radius:15px; padding:20px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+              <h3 style="color:#667eea;">${escapeHtml(playlist.name)}</h3>
+              <p style="color:#666;">💰 السعر: ${playlist.price} جنيه</p>
+              <p style="color:#666;">🎬 عدد الفيديوهات: ${videosCount}</p>
+            </div>
+            <div>
+              <button onclick="deletePlaylist('${playlist.id}')" class="danger" style="width:auto; padding:8px 16px; background:#ff5252;">🗑 حذف القائمة</button>
+            </div>
+          </div>
+          <hr style="margin:15px 0;">
+          <h4>➕ إضافة فيديو جديد للقائمة</h4>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <input type="text" id="videoTitle_${playlist.id}" placeholder="عنوان الفيديو" style="flex:2; min-width:150px;">
+            <input type="text" id="videoUrl_${playlist.id}" placeholder="رابط YouTube" style="flex:3; min-width:200px;">
+            <button onclick="addVideoToPlaylist('${playlist.id}')" style="width:auto; padding:8px 20px;">➕ إضافة</button>
+          </div>
+          <div id="videosList_${playlist.id}" style="margin-top:20px;">
+            <p style="color:#999;">جاري تحميل الفيديوهات...</p>
+          </div>
+        </div>
+      `
+      // تحميل فيديوهات القائمة
+      await loadPlaylistVideos(playlist.id)
+    }
+
+  } catch (error) {
+    console.error("Load playlists error:", error)
+  }
+}
+
+window.loadPlaylistVideos = async function(playlistId) {
+  try {
+    let { data: videos, error } = await supabase
+      .from("playlist_videos")
+      .select("*")
+      .eq("playlist_id", playlistId)
+      .order("created_at", { ascending: true })
+
+    if (error) throw error
+
+    let container = document.getElementById(`videosList_${playlistId}`)
+    if (!container) return
+
+    if (!videos || videos.length === 0) {
+      container.innerHTML = "<p style='color:#999;'>لا توجد فيديوهات في هذه القائمة</p>"
+      return
+    }
+
+    container.innerHTML = ""
+    videos.forEach(video => {
+      container.innerHTML += `
+        <div style="background:#f5f7ff; padding:12px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+          <div>
+            <strong>${escapeHtml(video.title)}</strong><br>
+            <a href="${escapeHtml(video.url)}" target="_blank" style="color:#667eea; font-size:14px;">${escapeHtml(video.url)}</a>
+          </div>
+          <button onclick="deleteVideoFromPlaylist('${video.id}')" style="width:auto; padding:5px 12px; background:#ff5252; margin:0;">🗑</button>
+        </div>
+      `
+    })
+
+  } catch (error) {
+    console.error("Load playlist videos error:", error)
+  }
+}
+
+window.addVideoToPlaylist = async function(playlistId) {
+  try {
+    let title = document.getElementById(`videoTitle_${playlistId}`)?.value.trim()
+    let url = document.getElementById(`videoUrl_${playlistId}`)?.value.trim()
+
+    if (!title || !url) {
+      alert("❗ من فضلك أدخل عنوان الفيديو والرابط")
+      return
+    }
+
+    // تحويل الرابط إلى صيغة embed
+    let embedUrl = url
+    if (url.includes("watch?v=")) embedUrl = url.replace("watch?v=", "embed/")
+    if (url.includes("youtu.be/")) {
+      let id = url.split("youtu.be/")[1].split("?")[0]
+      embedUrl = "https://www.youtube.com/embed/" + id
+    }
+
+    let { error } = await supabase.from("playlist_videos").insert([
+      { playlist_id: playlistId, title: title, url: embedUrl }
+    ])
+
+    if (error) {
+      alert("❌ خطأ: " + error.message)
+      return
+    }
+
+    alert("✅ تم إضافة الفيديو بنجاح")
+    document.getElementById(`videoTitle_${playlistId}`).value = ""
+    document.getElementById(`videoUrl_${playlistId}`).value = ""
+    loadPlaylistVideos(playlistId)
+
+  } catch (error) {
+    console.error("Add video error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.deletePlaylist = async function(playlistId) {
+  if (!confirm("هل أنت متأكد من حذف هذه القائمة وجميع فيديوهاتها؟")) return
+  try {
+    let { error } = await supabase.from("playlists").delete().eq("id", playlistId)
+    if (error) throw error
+    alert("✅ تم حذف القائمة")
+    loadTeacherPlaylists()
+  } catch (error) {
+    console.error("Delete playlist error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.deleteVideoFromPlaylist = async function(videoId) {
+  if (!confirm("هل أنت متأكد من حذف هذا الفيديو؟")) return
+  try {
+    let { error } = await supabase.from("playlist_videos").delete().eq("id", videoId)
+    if (error) throw error
+    alert("✅ تم حذف الفيديو")
+    // إعادة تحميل كل القوائم (يمكن تحسينها)
+    loadTeacherPlaylists()
+  } catch (error) {
+    console.error("Delete video error:", error)
+    alert("❌ خطأ: " + error.message)
+  }
+}
+
+window.loadAllPlaylistsForHome = async function() {
+  try {
+    let { data: playlists, error } = await supabase
+      .from("playlists")
+      .select("*, users!teacher_id(name)")
+      .order("created_at", { ascending: false })
+
+    if (error) throw error
+
+    let container = document.getElementById("playlistsContainer")
+    if (!container) return
+
+    if (!playlists || playlists.length === 0) {
+      container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد قوائم تشغيل متاحة حالياً</p>"
+      return
+    }
+
+    container.innerHTML = ""
+    for (let playlist of playlists) {
+      let teacherName = playlist.users?.name || "مدرس"
+      let { count, error: countError } = await supabase
+        .from("playlist_videos")
+        .select("*", { count: 'exact', head: true })
+        .eq("playlist_id", playlist.id)
+
+      let videosCount = count || 0
+
+      container.innerHTML += `
+        <div class="playlist-card">
+          <div class="playlist-info">
+            <h3>${escapeHtml(playlist.name)}</h3>
+            <p class="teacher-name">👨‍🏫 ${escapeHtml(teacherName)}</p>
+            <p class="playlist-price">💰 السعر: ${playlist.price} جنيه</p>
+            <p class="videos-count">🎬 عدد الفيديوهات: ${videosCount}</p>
+          </div>
+          <div class="playlist-actions">
+            <button class="btn-view" onclick="viewPlaylist('${playlist.id}')">📺 عرض التفاصيل</button>
+          </div>
+        </div>
+      `
+    }
+
+  } catch (error) {
+    console.error("Load home playlists error:", error)
+  }
+}
+
+window.viewPlaylist = function(playlistId) {
+  window.location.href = `playlist-view.html?id=${playlistId}`
+}
+
+window.loadSinglePlaylist = async function() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search)
+    const playlistId = urlParams.get('id')
+    if (!playlistId) {
+      document.getElementById("playlistTitle").innerText = "خطأ: لم يتم تحديد قائمة"
+      return
+    }
+
+    // جلب بيانات القائمة
+    let { data: playlist, error } = await supabase
+      .from("playlists")
+      .select("*, users!teacher_id(name)")
+      .eq("id", playlistId)
+      .single()
+
+    if (error) throw error
+
+    document.getElementById("playlistTitle").innerText = playlist.name
+    document.getElementById("playlistTeacher").innerHTML = `👨‍🏫 المدرس: ${escapeHtml(playlist.users?.name || "مدرس")}`
+    document.getElementById("playlistPrice").innerHTML = `💰 السعر: ${playlist.price} جنيه`
+
+    // جلب فيديوهات القائمة
+    let { data: videos, error: videosError } = await supabase
+      .from("playlist_videos")
+      .select("*")
+      .eq("playlist_id", playlistId)
+      .order("created_at", { ascending: true })
+
+    if (videosError) throw videosError
+
+    let videosContainer = document.getElementById("playlistVideos")
+    if (!videos || videos.length === 0) {
+      videosContainer.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد فيديوهات في هذه القائمة</p>"
+      return
+    }
+
+    videosContainer.innerHTML = ""
+    videos.forEach(video => {
+      videosContainer.innerHTML += `
+        <div class="video-item">
+          <h4>🎬 ${escapeHtml(video.title)}</h4>
+          <div class="video-wrapper">
+            <iframe src="${escapeHtml(video.url)}" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      `
+    })
+
+  } catch (error) {
+    console.error("Load single playlist error:", error)
+    document.getElementById("playlistTitle").innerText = "حدث خطأ في تحميل البيانات"
   }
 }
 
@@ -1358,7 +1667,7 @@ window.addEventListener("load", function() {
     window.loadStudentData()
   }
 
-  // صفحة المدرس
+  // صفحة المدرس الرئيسية
   if (document.getElementById("solutionsList")) {
     window.openTab("profile")
     window.loadSolutions()
@@ -1366,6 +1675,21 @@ window.addEventListener("load", function() {
     window.loadCurrentSocial()
     window.loadTeacherContent()
     window.loadTeacherStages()
+  }
+
+  // صفحة قوائم التشغيل للمدرس
+  if (document.getElementById("playlistsList")) {
+    loadTeacherPlaylists()
+  }
+
+  // الصفحة الرئيسية dashboard-home
+  if (document.getElementById("playlistsContainer")) {
+    loadAllPlaylistsForHome()
+  }
+
+  // صفحة عرض قائمة تشغيل واحدة
+  if (document.getElementById("playlistTitle")) {
+    loadSinglePlaylist()
   }
 })
 
@@ -1590,42 +1914,6 @@ window.deleteContent = async function(id) {
     alert("❌ خطأ: " + error.message)
   }
 }
-
-// ================== مثال استخدام الوظائف ==================
-/*
-
-// مثال 1: إضافة محتوى جديد
-// HTML:
-<select id="contentStageSelect">
-  <option value="الأول">الأول</option>
-  <option value="الثاني">الثاني</option>
-</select>
-
-<select id="contentTypeSelect">
-  <option value="pdf">PDF</option>
-  <option value="video">Video</option>
-  <option value="note">Note</option>
-</select>
-
-<input type="text" id="contentTitle" placeholder="عنوان المحتوى">
-<textarea id="contentText" placeholder="المحتوى أو الرابط"></textarea>
-<div id="contentStatus"></div>
-
-<button onclick="addTeacherContent()">إضافة</button>
-
-// مثال 2: عرض المحتوى
-<div id="contentList"></div>
-
-<script>
-  // عند اختيار مرحلة
-  document.getElementById("contentStageSelect").addEventListener("change", function() {
-    window.loadContentByStage(this.value)
-  })
-</script>
-
-*/
-
-
 
 console.log("✅ وظائف إدارة محتوى المدرس تم تحميلها بنجاح")
 
