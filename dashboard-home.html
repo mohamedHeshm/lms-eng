@@ -1027,46 +1027,56 @@
   }
 
   // عرض كل القوائم في الصفحة الرئيسية
-  window.loadAllPlaylistsHome = async function() {
-    let container = document.getElementById("playlistsHomeGrid")
-    if (!container) return
+ // عرض كل القوائم في الصفحة الرئيسية (مع الصور)
+window.loadAllPlaylistsHome = async function() {
+  let container = document.getElementById("playlistsHomeGrid")
+  if (!container) return
 
-    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
+  container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
 
-    let { data: playlists, error } = await supabase
-      .from("playlists")
-      .select("*")
-      .order("id", { ascending: false })
+  let { data: playlists, error } = await supabase
+    .from("playlists")
+    .select("*")
+    .order("id", { ascending: false })
 
-    if (error || !playlists) {
-      container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
-      return
-    }
-    if (playlists.length === 0) {
-      container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
-      return
-    }
-
-    let { data: vids } = await supabase.from("playlist_videos").select("playlist_id")
-
-    container.innerHTML = ""
-    playlists.forEach(p => {
-      let count = (vids || []).filter(v => v.playlist_id === p.id).length
-      container.innerHTML += `
-        <div class="playlist-home-card" onclick="window.checkAccessAndOpen('${p.id}')">
-          <div class="playlist-thumb">🎬</div>
-          <div class="playlist-body">
-            <h3>${escapeHtml(p.name)}</h3>
-            <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
-            <div class="playlist-meta">
-              <span>📺 ${count} فيديو</span>
-              <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
-            </div>
-          </div>
-        </div>`
-    })
+  if (error || !playlists) {
+    container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
+    return
+  }
+  if (playlists.length === 0) {
+    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
+    return
   }
 
+  let { data: vids } = await supabase.from("playlist_videos").select("playlist_id")
+
+  container.innerHTML = ""
+  playlists.forEach(p => {
+    let count = (vids || []).filter(v => v.playlist_id === p.id).length
+
+    // صورة القائمة (إذا وجدت) أو أيقونة افتراضية
+    const thumbnailStyle = p.thumbnail_url
+      ? `background-image: url('${escapeHtml(p.thumbnail_url)}'); background-size: cover; background-position: center; font-size: 0;`
+      : `background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 200%; animation: thumbGrad 5s ease infinite; font-size: 70px; display: flex; align-items: center; justify-content: center;`
+
+    const thumbnailContent = p.thumbnail_url ? '' : '🎬'
+
+    container.innerHTML += `
+      <div class="playlist-home-card" onclick="window.checkAccessAndOpen('${p.id}')">
+        <div class="playlist-thumb" style="${thumbnailStyle}">
+          ${thumbnailContent}
+        </div>
+        <div class="playlist-body">
+          <h3>${escapeHtml(p.name)}</h3>
+          <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
+          <div class="playlist-meta">
+            <span>📺 ${count} فيديو</span>
+            <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
+          </div>
+        </div>
+      </div>`
+  })
+}
   // التحقق من صلاحية الطالب قبل فتح القائمة
   window.checkAccessAndOpen = async function(playlistId) {
     const currentUser = getCurrentUser()
