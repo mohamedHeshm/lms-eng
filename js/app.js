@@ -1160,53 +1160,109 @@ window.loadTeacherProfile = async function(teacherId) {
 }
 
 // ================== رفع حل الطالب ==================
+// ================== رفع حل الطالب ==================
 window.uploadSolution = async function() {
   try {
     let file = document.getElementById("solutionFile")?.files[0]
+    let assignmentSelect = document.getElementById("assignmentSelect")
+    let selectedIndex = assignmentSelect?.value
     let status = document.getElementById("uploadStatus")
     let currentUser = getCurrentUser()
 
     if (!file) {
-      status.innerText = "❗ اختار ملف"
-      return
-    }
-    if (!currentUser) {
-      status.innerText = "❗ مش مسجل دخول"
+      if (status) status.innerText = "❗ اختار ملف"
       return
     }
 
-    status.innerText = "⏳ جاري الرفع..."
+    if (!selectedIndex || selectedIndex === "") {
+      if (status) status.innerText = "❗ اختر الواجب أولاً"
+      return
+    }
+
+    if (!currentUser) {
+      if (status) status.innerText = "❗ مش مسجل دخول"
+      return
+    }
+
+    if (status) status.innerText = "⏳ جاري الرفع..."
+
+    // الحصول على بيانات الواجب المختار
+    let selectedAssignment = assignmentsList[parseInt(selectedIndex)]
+    if (!selectedAssignment) {
+      if (status) status.innerText = "❌ الواجب غير موجود"
+      return
+    }
 
     let safeName = file.name.replace(/\s+/g, "_")
     let path = "solutions/" + currentUser.id + "_" + Date.now() + "_" + safeName
 
     let { error: uploadError } = await supabase.storage.from("files").upload(path, file)
     if (uploadError) {
-      status.innerText = "❌ خطأ في الرفع: " + uploadError.message
+      if (status) status.innerText = "❌ خطأ في الرفع: " + uploadError.message
       return
     }
 
     let { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
 
-    let { error: dbError } = await supabase.from("solutions").insert([
-      { student_id: currentUser.id, file_url: urlData.publicUrl }
-    ])
+    // تحويل pdf_id إلى رقم صحيح إذا كان موجوداً
+    let pdfIdValue = null
+    if (selectedAssignment.id) {
+      // محاولة تحويل المعرف إلى رقم
+      const parsedId = parseInt(selectedAssignment.id)
+      if (!isNaN(parsedId)) {
+        pdfIdValue = parsedId
+      }
+    }
+
+    // بيانات الإدراج - تأكد من تطابق أسماء الأعمدة مع قاعدة البيانات
+    const solutionData = {
+      student_id: currentUser.id,
+      file_url: urlData.publicUrl,
+      pdf_name: selectedAssignment.file_name || null
+    }
+
+    // إضافة pdf_id فقط إذا كان رقماً صالحاً
+    if (pdfIdValue !== null) {
+      solutionData.pdf_id = pdfIdValue
+    }
+
+    let { error: dbError } = await supabase.from("solutions").insert([solutionData])
 
     if (dbError) {
-      status.innerText = "❌ خطأ في الحفظ: " + dbError.message
+      console.error("Database error:", dbError)
+      if (status) status.innerText = "❌ خطأ في الحفظ: " + dbError.message
       return
     }
 
-    status.innerText = "✅ تم رفع الحل بنجاح"
+    if (status) {
+      status.innerText = "✅ تم رفع الحل بنجاح"
+      status.style.color = "#25d366"
+    }
+
     document.getElementById("solutionFile").value = ""
+    document.getElementById("assignmentSelect").value = ""
+
+    // إعادة تحميل الحلول
+    const { data: newSolutions } = await supabase
+      .from("solutions")
+      .select("*")
+      .eq("student_id", currentUser.id)
+      .order("created_at", { ascending: false })
+
+    if (typeof loadMySolutions === 'function') {
+      loadMySolutions(newSolutions || [])
+    }
+
+    setTimeout(() => {
+      if (status) status.innerText = ""
+    }, 3000)
 
   } catch (error) {
     console.error("Upload solution error:", error)
     let status = document.getElementById("uploadStatus")
-    status.innerText = "❌ خطأ: " + error.message
+    if (status) status.innerText = "❌ خطأ: " + error.message
   }
 }
-
 // ================== تحميل الحلول (للمدرس) ==================
 window.loadSolutions = async function() {
   try {
