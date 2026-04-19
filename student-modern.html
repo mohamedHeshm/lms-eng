@@ -455,6 +455,16 @@
       margin-top: 10px;
       font-size: 14px;
     }
+
+    /* زر الرجوع للصفحة الرئيسية - تصميم مميز */
+    .home-btn {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      border-color: rgba(255,255,255,0.6);
+    }
+    .home-btn:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 5px 15px rgba(67,233,123,0.3);
+    }
   </style>
 </head>
 <body>
@@ -472,6 +482,8 @@
 
     <div class="sidebar-section">
       <div class="sidebar-title">القائمة الرئيسية</div>
+      <!-- زر الرجوع للصفحة الرئيسية الجديدة dashboard-home.html -->
+      <button class="menu-btn home-btn" onclick="goToHomeDashboard()">🏠 الرئيسية</button>
       <button class="menu-btn active" onclick="openTab('profile', this)">👤 المدرس</button>
       <button class="menu-btn" onclick="openTab('videosTab', this)">🎥 الفيديوهات</button>
       <button class="menu-btn" onclick="openTab('pdfsTab', this)">📁 الواجبات</button>
@@ -639,6 +651,17 @@
   // Navigation
   window.goToChangePassword = () => {
     window.location.href = 'change-password.html'
+  }
+
+  // وظيفة جديدة: الانتقال إلى الصفحة الرئيسية dashboard-home.html
+  window.goToHomeDashboard = () => {
+    // حفظ بيانات الجلسة قبل الانتقال للتأكد من استمرار الجلسة
+    const user = getCurrentUser();
+    if (user && user.id) {
+      // يمكن إضافة أي بيانات إضافية إذا لزم الأمر
+      console.log("الانتقال إلى الصفحة الرئيسية dashboard-home.html");
+    }
+    window.location.href = 'dashboard-home.html';
   }
 
   window.goToTeacherProfile = () => {
