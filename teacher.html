@@ -448,6 +448,53 @@
         display: none !important;
       }
     }
+
+    /* ==================== حلول الطلاب ==================== */
+    .solution-card {
+      background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+      padding: 20px;
+      border-radius: 15px;
+      border-right: 5px solid #667eea;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+    }
+
+    .solution-card:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    .filter-bar {
+      background: rgba(102, 126, 234, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar label {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .filter-bar select {
+      flex: 1;
+      margin: 0;
+      min-width: 200px;
+    }
+
+    .stats-badge {
+      background: rgba(102, 126, 234, 0.15);
+      padding: 10px 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #667eea;
+    }
   </style>
 </head>
 <body>
@@ -476,6 +523,8 @@
       <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع المذكرات</button>
       <button class="menu-btn" onclick="openTab('content', this)">📋 المحتوى المنشور</button>
       <button class="menu-btn" onclick="window.location.href='teacher-playlists.html'" style="background:linear-gradient(135deg,#f093fb,#f5576c) !important; color:white !important;">🎬 قوائم التشغيل</button>
+      <!-- زر حلول الطلاب الجديد -->
+      <button class="menu-btn" onclick="openTab('studentsSolutions', this)" style="background:linear-gradient(135deg,#43e97b,#38f9d7) !important;">📋 حلول الطلاب</button>
     </div>
 
     <div class="sidebar-section">
@@ -620,6 +669,34 @@
       </div>
     </div>
 
+    <!-- STUDENTS SOLUTIONS TAB - جديد -->
+    <div id="studentsSolutions" class="tab-content">
+      <div class="card">
+        <h3>📋 حلول الطلاب</h3>
+
+        <div class="filter-bar">
+          <label>📚 فلتر حسب المرحلة:</label>
+          <select id="filterSolutionStage" onchange="window.loadStudentsSolutions()">
+            <option value="all">جميع المراحل</option>
+            <option value="الأولى الابتدائي">الأولى الابتدائي</option>
+            <option value="الثانية الابتدائي">الثانية الابتدائي</option>
+            <option value="الثالثة الابتدائي">الثالثة الابتدائي</option>
+            <option value="الأولى الإعدادي">الأولى الإعدادي</option>
+            <option value="الثانية الإعدادي">الثانية الإعدادي</option>
+            <option value="الثالثة الإعدادي">الثالثة الإعدادي</option>
+            <option value="الأولى الثانوي">الأولى الثانوي</option>
+            <option value="الثانية الثانوي">الثانية الثانوي</option>
+            <option value="الثالثة الثانوي">الثالثة الثانوي</option>
+          </select>
+          <button onclick="window.loadStudentsSolutions()" style="width: auto; padding: 12px 24px; margin: 0;">🔄 تحديث</button>
+        </div>
+
+        <div id="studentsSolutionsContainer" style="max-height: 550px; overflow-y: auto;">
+          <p style="text-align:center; color:#999;">⏳ جاري تحميل الحلول...</p>
+        </div>
+      </div>
+    </div>
+
     <!-- LOGOUT BUTTON -->
     <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
   </div>
@@ -706,6 +783,9 @@
       }
       if (tabName === 'social') {
         loadCurrentSocial()
+      }
+      if (tabName === 'studentsSolutions') {
+        loadStudentsSolutions()
       }
     }
   }
@@ -956,7 +1036,7 @@
     }
   }
 
-  // ================== CRUD FUNCTIONS (مختصرة) ==================
+  // ================== CRUD FUNCTIONS ==================
   window.addNote = async function() {
     const noteInput = document.getElementById("noteInput")
     const note = noteInput?.value.trim()
@@ -1085,6 +1165,143 @@
     loadTeacherContent()
   }
 
+  // ================== STUDENTS SOLUTIONS (جديد) ==================
+  window.loadStudentsSolutions = async function() {
+    try {
+      let container = document.getElementById("studentsSolutionsContainer");
+      let stageFilter = document.getElementById("filterSolutionStage")?.value || "all";
+      let currentUser = getCurrentUser();
+
+      if (!container) return;
+      if (!currentUser || currentUser.role !== "teacher") {
+        container.innerHTML = "<p style='text-align:center; color:#ff4d4d;'>❌ هذه الصفحة مخصصة للمدرسين فقط</p>";
+        return;
+      }
+
+      container.innerHTML = "<p style='text-align:center; color:#999;'>⏳ جاري تحميل الحلول...</p>";
+
+      // 1. جلب جميع الطلاب التابعين لهذا المدرس
+      let { data: students, error: studentsError } = await supabase
+        .from("users")
+        .select("id, name, email, stage")
+        .eq("teacher_id", currentUser.id)
+        .eq("role", "student");
+
+      if (studentsError) {
+        console.error("Error loading students:", studentsError);
+        container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ خطأ في تحميل الطلاب: ${escapeHtml(studentsError.message)}</p>`;
+        return;
+      }
+
+      if (!students || students.length === 0) {
+        container.innerHTML = "<p style='text-align:center; color:#999;'>📭 لا يوجد طلاب مسجلين لديك حتى الآن</p>";
+        return;
+      }
+
+      // تصفية الطلاب حسب المرحلة إذا لم يكن الكل
+      let filteredStudents = students;
+      if (stageFilter !== "all") {
+        filteredStudents = students.filter(s => s.stage === stageFilter);
+      }
+
+      if (filteredStudents.length === 0) {
+        container.innerHTML = `<p style='text-align:center; color:#999;'>📭 لا يوجد طلاب في المرحلة: ${escapeHtml(stageFilter)}</p>`;
+        return;
+      }
+
+      // 2. جلب حلول هؤلاء الطلاب
+      let studentIds = filteredStudents.map(s => s.id);
+      let { data: solutions, error: solutionsError } = await supabase
+        .from("solutions")
+        .select("*, users(name, email, stage)")
+        .in("student_id", studentIds)
+        .order("created_at", { ascending: false });
+
+      if (solutionsError) {
+        console.error("Error loading solutions:", solutionsError);
+        container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ خطأ في تحميل الحلول: ${escapeHtml(solutionsError.message)}</p>`;
+        return;
+      }
+
+      if (!solutions || solutions.length === 0) {
+        container.innerHTML = "<p style='text-align:center; color:#999;'>📭 لا توجد حلول مرفوعة بعد</p>";
+        return;
+      }
+
+      // 3. عرض الإحصائيات والحلول
+      const statsHtml = `
+        <div class="stats-badge">
+          📊 إجمالي الحلول: ${solutions.length} |
+          👨‍🎓 عدد الطلاب: ${filteredStudents.length} |
+          📚 المرحلة: ${stageFilter === "all" ? "جميع المراحل" : stageFilter}
+        </div>
+      `;
+
+      let solutionsHtml = '<div style="display: flex; flex-direction: column; gap: 15px;">';
+
+      for (const sol of solutions) {
+        const studentName = sol.users?.name || "طالب";
+        const studentEmail = sol.users?.email || "";
+        const studentStage = sol.users?.stage || "غير محدد";
+        const date = new Date(sol.created_at).toLocaleDateString('ar-EG', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        const time = new Date(sol.created_at).toLocaleTimeString('ar-EG', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const pdfName = sol.pdf_name || "ملف الحل";
+
+        solutionsHtml += `
+          <div class="solution-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 style="color: #667eea; margin-bottom: 8px;">
+                  👨‍🎓 ${escapeHtml(studentName)}
+                </h4>
+                <p style="color: #666; font-size: 14px;">📧 ${escapeHtml(studentEmail)}</p>
+                <p style="color: #666; font-size: 14px;">📚 المرحلة: ${escapeHtml(studentStage)}</p>
+              </div>
+              <div style="text-align: left;">
+                <p style="color: #999; font-size: 13px;">📅 ${date}</p>
+                <p style="color: #999; font-size: 13px;">⏰ ${time}</p>
+              </div>
+            </div>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(102,126,234,0.2);">
+              <p style="margin-bottom: 10px;">
+                <strong>📄 الواجب:</strong> ${escapeHtml(pdfName)}
+              </p>
+              <a href="${escapeHtml(sol.file_url)}" target="_blank" style="
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 10px;
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.3s ease;
+              " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                📥 تحميل الحل
+              </a>
+            </div>
+          </div>
+        `;
+      }
+
+      solutionsHtml += '</div>';
+      container.innerHTML = statsHtml + solutionsHtml;
+
+    } catch (error) {
+      console.error("Load students solutions error:", error);
+      let container = document.getElementById("studentsSolutionsContainer");
+      if (container) {
+        container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ حدث خطأ: ${escapeHtml(error.message)}</p>`;
+      }
+    }
+  }
+
   // ================== UTILITIES ==================
   window.goHome = function() {
     window.location.href = 'index.html'
@@ -1111,6 +1328,10 @@
   document.addEventListener("DOMContentLoaded", () => {
     loadCurrentProfile()
     loadCurrentSocial()
+    // تحميل حلول الطلاب إذا كان التبويب نشطاً
+    if (document.getElementById("studentsSolutionsContainer")) {
+      // لا نحمله تلقائياً، سيتم تحميله عند فتح التبويب
+    }
   })
 </script>
 

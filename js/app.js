@@ -1263,6 +1263,168 @@ window.uploadSolution = async function() {
     if (status) status.innerText = "❌ خطأ: " + error.message
   }
 }
+// ================== حلول الطلاب للمدرس (حسب المرحلة) ==================
+/**
+ * تحميل وعرض حلول الطلاب حسب المرحلة المختارة
+ */
+window.loadStudentsSolutions = async function() {
+    try {
+        let container = document.getElementById("studentsSolutionsContainer");
+        let stageFilter = document.getElementById("filterSolutionStage")?.value || "all";
+        let currentUser = getCurrentUser();
+
+        if (!container) return;
+        if (!currentUser || currentUser.role !== "teacher") {
+            if (container) container.innerHTML = "<p style='text-align:center; color:#ff4d4d;'>❌ هذه الصفحة مخصصة للمدرسين فقط</p>";
+            return;
+        }
+
+        if (container) container.innerHTML = "<p style='text-align:center; color:#999;'>⏳ جاري تحميل الحلول...</p>";
+
+        // 1. جلب جميع الطلاب التابعين لهذا المدرس
+        let { data: students, error: studentsError } = await supabase
+            .from("users")
+            .select("id, name, email, stage")
+            .eq("teacher_id", currentUser.id)
+            .eq("role", "student");
+
+        if (studentsError) {
+            console.error("Error loading students:", studentsError);
+            if (container) container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ خطأ في تحميل الطلاب: ${escapeHtml(studentsError.message)}</p>`;
+            return;
+        }
+
+        if (!students || students.length === 0) {
+            if (container) container.innerHTML = "<p style='text-align:center; color:#999;'>📭 لا يوجد طلاب مسجلين لديك حتى الآن</p>";
+            return;
+        }
+
+        // تصفية الطلاب حسب المرحلة إذا لم يكن الكل
+        let filteredStudents = students;
+        if (stageFilter !== "all") {
+            filteredStudents = students.filter(s => s.stage === stageFilter);
+        }
+
+        if (filteredStudents.length === 0) {
+            if (container) container.innerHTML = `<p style='text-align:center; color:#999;'>📭 لا يوجد طلاب في المرحلة: ${escapeHtml(stageFilter)}</p>`;
+            return;
+        }
+
+        // 2. جلب حلول هؤلاء الطلاب
+        let studentIds = filteredStudents.map(s => s.id);
+        let { data: solutions, error: solutionsError } = await supabase
+            .from("solutions")
+            .select("*, users(name, email, stage)")
+            .in("student_id", studentIds)
+            .order("created_at", { ascending: false });
+
+        if (solutionsError) {
+            console.error("Error loading solutions:", solutionsError);
+            if (container) container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ خطأ في تحميل الحلول: ${escapeHtml(solutionsError.message)}</p>`;
+            return;
+        }
+
+        if (!solutions || solutions.length === 0) {
+            if (container) container.innerHTML = "<p style='text-align:center; color:#999;'>📭 لا توجد حلول مرفوعة بعد</p>";
+            return;
+        }
+
+        // 3. عرض الإحصائيات والحلول
+        const statsHtml = `
+            <div style="
+                background: rgba(102,126,234,0.1);
+                padding: 15px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+                text-align: center;
+                font-weight: 600;
+                color: #667eea;
+            ">
+                📊 إجمالي الحلول: ${solutions.length} |
+                👨‍🎓 عدد الطلاب: ${filteredStudents.length} |
+                📚 المرحلة: ${stageFilter === "all" ? "جميع المراحل" : stageFilter}
+            </div>
+        `;
+
+        let solutionsHtml = '<div style="display: flex; flex-direction: column; gap: 15px;">';
+
+        for (const sol of solutions) {
+            const studentName = sol.users?.name || "طالب";
+            const studentEmail = sol.users?.email || "";
+            const studentStage = sol.users?.stage || "غير محدد";
+            const date = new Date(sol.created_at).toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const time = new Date(sol.created_at).toLocaleTimeString('ar-EG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const pdfName = sol.pdf_name || "ملف الحل";
+
+            solutionsHtml += `
+                <div style="
+                    background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+                    padding: 20px;
+                    border-radius: 15px;
+                    border-right: 5px solid #667eea;
+                    transition: all 0.3s ease;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h4 style="color: #667eea; margin-bottom: 8px;">
+                                👨‍🎓 ${escapeHtml(studentName)}
+                            </h4>
+                            <p style="color: #666; font-size: 14px;">📧 ${escapeHtml(studentEmail)}</p>
+                            <p style="color: #666; font-size: 14px;">📚 المرحلة: ${escapeHtml(studentStage)}</p>
+                        </div>
+                        <div style="text-align: left;">
+                            <p style="color: #999; font-size: 13px;">📅 ${date}</p>
+                            <p style="color: #999; font-size: 13px;">⏰ ${time}</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(102,126,234,0.2);">
+                        <p style="margin-bottom: 10px;">
+                            <strong>📄 الواجب:</strong> ${escapeHtml(pdfName)}
+                        </p>
+                        <a href="${escapeHtml(sol.file_url)}" target="_blank" style="
+                            display: inline-block;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 10px 20px;
+                            border-radius: 10px;
+                            text-decoration: none;
+                            font-weight: 600;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            📥 تحميل الحل
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        solutionsHtml += '</div>';
+        if (container) container.innerHTML = statsHtml + solutionsHtml;
+
+    } catch (error) {
+        console.error("Load students solutions error:", error);
+        let container = document.getElementById("studentsSolutionsContainer");
+        if (container) {
+            container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ حدث خطأ: ${escapeHtml(error.message)}</p>`;
+        }
+    }
+}
+
+/**
+ * تهيئة تبويب حلول الطلاب
+ */
+window.initStudentsSolutionsTab = function() {
+    if (document.getElementById("studentsSolutionsContainer")) {
+        window.loadStudentsSolutions();
+    }
+}
 // ================== تحميل الحلول (للمدرس) ==================
 window.loadSolutions = async function() {
   try {
@@ -1302,6 +1464,11 @@ window.openTab = function(id, btnEl) {
   document.querySelectorAll(".tab-content").forEach(t => {
     t.style.display = "none"
     t.classList.remove("active")
+
+    // داخل دالة openTab، بعد باقي الشروط
+    if (id === "studentsSolutions" && window.loadStudentsSolutions) {
+        window.loadStudentsSolutions()
+    }
   })
   let el = document.getElementById(id)
   if (el) {
@@ -1429,7 +1596,10 @@ window.logout = function() {
 window.addEventListener("load", function() {
   // تأمين الصفحات
   protectPage()
-
+// صفحة المدرس - تحميل حلول الطلاب
+if (document.getElementById("studentsSolutionsContainer")) {
+    window.loadStudentsSolutions()
+}
   // صفحة الأدمن
   if (document.getElementById("users")) {
     window.openTab("addUserTab")
