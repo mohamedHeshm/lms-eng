@@ -615,32 +615,27 @@
     overlay.classList.remove('active')
   }
 
-  // Tab Functions -最关键的部分！
+  // Tab Functions
   window.openTab = function(tabName, button) {
-    // إغلاق القائمة في الجوال
     if (window.innerWidth <= 768) {
       closeSidebar()
     }
 
-    // إخفاء جميع التبويبات
     const allTabs = document.querySelectorAll('.tab-content')
     allTabs.forEach(tab => {
       tab.classList.remove('active')
     })
 
-    // إزالة active من جميع الأزرار
     const allButtons = document.querySelectorAll('.menu-btn')
     allButtons.forEach(btn => {
       btn.classList.remove('active')
     })
 
-    // إظهار التبويب المختار
     const selectedTab = document.getElementById(tabName)
     if (selectedTab) {
       selectedTab.classList.add('active')
     }
 
-    // تفعيل الزر المضغوط
     if (button) {
       button.classList.add('active')
     }
@@ -653,12 +648,9 @@
     window.location.href = 'change-password.html'
   }
 
-  // وظيفة جديدة: الانتقال إلى الصفحة الرئيسية dashboard-home.html
   window.goToHomeDashboard = () => {
-    // حفظ بيانات الجلسة قبل الانتقال للتأكد من استمرار الجلسة
     const user = getCurrentUser();
     if (user && user.id) {
-      // يمكن إضافة أي بيانات إضافية إذا لزم الأمر
       console.log("الانتقال إلى الصفحة الرئيسية dashboard-home.html");
     }
     window.location.href = 'dashboard-home.html';
@@ -690,7 +682,6 @@
     document.getElementById('studentNameHeader').innerHTML = `مرحباً ${escapeHtml(currentUser.name)}! 👋`
     document.getElementById('sidebarStudentName').innerHTML = `مرحباً ${escapeHtml(currentUser.name)}`
 
-    // جلب المرحلة الدراسية للطالب من جدول users
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("teacher_id, stage")
@@ -711,7 +702,6 @@
       return
     }
 
-    // عرض المرحلة الدراسية في الهيدر
     if (studentStage) {
       const headerP = document.querySelector('.header p')
       if (headerP) {
@@ -719,41 +709,35 @@
       }
     }
 
-    // جلب جميع البيانات (مصفاة حسب المرحلة)
     await loadAllContent()
   }
 
   async function loadAllContent() {
     try {
-      // جلب الملاحظات (مصفاة حسب المرحلة)
       let notesQuery = supabase.from("notes").select("*").eq("teacher_id", teacherId)
       if (studentStage) {
         notesQuery = notesQuery.eq("stage", studentStage)
       }
       const { data: notes } = await notesQuery
 
-      // جلب الفيديوهات (مصفاة حسب المرحلة)
       let videosQuery = supabase.from("videos").select("*").eq("teacher_id", teacherId)
       if (studentStage) {
         videosQuery = videosQuery.eq("stage", studentStage)
       }
       const { data: videos } = await videosQuery
 
-      // جلب الواجبات (مصفاة حسب المرحلة)
       let pdfsQuery = supabase.from("pdfs").select("*").eq("teacher_id", teacherId)
       if (studentStage) {
         pdfsQuery = pdfsQuery.eq("stage", studentStage)
       }
       const { data: pdfs } = await pdfsQuery
 
-      // جلب المذكرات (مصفاة حسب المرحلة)
       let pdfs2Query = supabase.from("pdfs2").select("*").eq("teacher_id", teacherId)
       if (studentStage) {
         pdfs2Query = pdfs2Query.eq("stage", studentStage)
       }
       const { data: pdfs2 } = await pdfs2Query
 
-      // جلب بيانات المدرس
       const { data: profiles } = await supabase
         .from("teacher_profile")
         .select("*")
@@ -764,14 +748,12 @@
         .select("*")
         .eq("teacher_id", teacherId)
 
-      // جلب حلول الطالب
       const { data: solutions } = await supabase
         .from("solutions")
         .select("*")
         .eq("student_id", currentUser.id)
         .order("created_at", { ascending: false })
 
-      // عرض البيانات
       loadNotes(notes || [])
       loadVideos(videos || [])
       loadPDFs(pdfs || [], 'pdfList')
@@ -907,6 +889,7 @@
     }
   }
 
+  // ✅ الدالة المعدلة - تم إزالة pdf_id نهائياً
   window.uploadSolution = async function() {
     const file = document.getElementById('solutionFile')?.files[0]
     const assignmentIndex = document.getElementById('assignmentSelect')?.value
@@ -941,16 +924,17 @@
 
     const { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
 
+    // ✅ تم إزالة pdf_id نهائياً - الآن يرسل فقط student_id, file_url, pdf_name
     const { error: dbError } = await supabase.from("solutions").insert([
       {
         student_id: currentUserLocal.id,
         file_url: urlData.publicUrl,
-        pdf_id: selectedAssignment.id,
         pdf_name: selectedAssignment.file_name
       }
     ])
 
     if (dbError) {
+      console.error("❌ خطأ في الحفظ:", dbError)
       showStatus('❌ خطأ في الحفظ: ' + dbError.message, 'error', statusDiv)
       return
     }
