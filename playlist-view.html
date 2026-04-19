@@ -14,41 +14,68 @@
 
         body {
           font-family: 'Cairo', sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
           min-height: 100vh;
           padding: 20px;
         }
 
         .container {
-          max-width: 900px;
+          max-width: 1000px;
           margin: 0 auto;
         }
 
-        .header {
-          background: white;
-          border-radius: 20px;
-          padding: 30px;
-          text-align: center;
-          margin-bottom: 30px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .back-btn {
+          display: inline-block;
+          margin-bottom: 20px;
+          padding: 10px 25px;
+          background: rgba(255,255,255,0.2);
+          border: none;
+          border-radius: 25px;
+          color: white;
+          cursor: pointer;
+          font-family: 'Cairo', sans-serif;
+          transition: all 0.3s ease;
         }
 
-        .header h1 {
-          color: #667eea;
+        .back-btn:hover {
+          background: rgba(255,255,255,0.3);
+          transform: translateX(-5px);
+        }
+
+        .playlist-header {
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(20px);
+          border-radius: 30px;
+          padding: 40px;
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .playlist-header h1 {
           font-size: 2rem;
+          margin-bottom: 15px;
+          color: #a8c0ff;
+        }
+
+        .price-tag {
+          display: inline-block;
+          background: #25d366;
+          padding: 8px 20px;
+          border-radius: 30px;
+          margin-top: 10px;
+          font-weight: bold;
         }
 
         .video-item {
-          background: white;
-          border-radius: 15px;
+          background: rgba(255,255,255,0.08);
+          border-radius: 20px;
           padding: 20px;
           margin-bottom: 20px;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .video-item h4 {
-          color: #333;
           margin-bottom: 15px;
+          color: #a8c0ff;
         }
 
         .video-wrapper {
@@ -56,7 +83,7 @@
           padding-bottom: 56.25%;
           height: 0;
           overflow: hidden;
-          border-radius: 12px;
+          border-radius: 15px;
         }
 
         .video-wrapper iframe {
@@ -68,39 +95,51 @@
           border: none;
         }
 
-        .back-link {
-          display: inline-block;
-          margin-bottom: 20px;
-          color: white;
-          text-decoration: none;
-          background: rgba(255,255,255,0.2);
-          padding: 10px 20px;
-          border-radius: 10px;
+        .protected-message {
+          text-align: center;
+          background: rgba(102,126,234,0.2);
+          padding: 60px 20px;
+          border-radius: 30px;
+          margin: 20px 0;
         }
 
-        .price-tag {
-          background: #25d366;
+        .protected-message h3 {
+          margin-bottom: 15px;
+          color: #a8c0ff;
+        }
+
+        .login-btn {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          padding: 12px 30px;
+          border: none;
+          border-radius: 30px;
           color: white;
-          padding: 8px 16px;
-          border-radius: 20px;
-          display: inline-block;
-          margin-top: 10px;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 15px;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="dashboard-home.html" class="back-link">← رجوع إلى الرئيسية</a>
+    <button class="back-btn" onclick="window.location.href='dashboard-home.html'">← رجوع للرئيسية</button>
 
-    <div class="header">
+    <div class="playlist-header">
         <h1 id="playlistTitle">...</h1>
-        <p id="playlistTeacher">👨‍🏫 المدرس: ...</p>
-        <p id="playlistPrice" class="price-tag">💰 ...</p>
+        <p id="playlistTeacher">👨‍🏫 جاري التحميل...</p>
+        <div id="playlistPrice" class="price-tag">💰 ...</div>
     </div>
 
     <div id="playlistVideos"></div>
 </div>
 
 <script type="module" src="js/app.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.loadSinglePlaylist === 'function') {
+        window.loadSinglePlaylist()
+      }
+    })
+</script>
 </body>
 </html>

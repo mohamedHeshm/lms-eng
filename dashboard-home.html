@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al-Ma'moun LMS - المنصة التعليمية الذكية</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <title>Al-Ma'moun | المنصة التعليمية الذكية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -14,9 +14,10 @@
 
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #0f0f1e 0%, #1a0f3f 50%, #2d1b4e 100%);
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
       min-height: 100vh;
       color: #fff;
+      overflow-x: hidden;
     }
 
     /* Header */
@@ -28,12 +29,17 @@
       background: rgba(15, 15, 30, 0.5);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
     }
 
     .logo {
       font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #667eea 50%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -51,38 +57,105 @@
 
     .login-btn:hover {
       transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
 
-    /* Hero */
+    /* Main Content */
+    main {
+      margin-top: 80px;
+    }
+
+    /* Hero Section */
     .hero {
       text-align: center;
       padding: 80px 20px;
+      background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
+      margin: 20px;
+      border-radius: 40px;
     }
 
     .hero h1 {
-      font-size: 3rem;
+      font-size: 3.5rem;
       margin-bottom: 1rem;
       background: linear-gradient(135deg, #fff, #667eea, #764ba2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    /* Playlists Section */
-    .playlists-section {
-      max-width: 1200px;
+    .hero p {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.8);
+      max-width: 600px;
       margin: 0 auto;
-      padding: 40px 20px;
+    }
+
+    /* Section Styles */
+    .section {
+      padding: 60px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .section-title {
-      font-size: 2rem;
+      font-size: 2.5rem;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+      position: relative;
     }
 
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 2px;
+    }
+
+    /* About Section */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 30px;
+      padding: 40px;
+    }
+
+    .about-text p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 20px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+
+    .stat-card {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 20px;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #a8c0ff;
+    }
+
+    /* Playlists Grid */
     .playlists-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 30px;
     }
 
@@ -91,35 +164,39 @@
       backdrop-filter: blur(10px);
       border-radius: 20px;
       padding: 25px;
-      transition: transform 0.3s ease;
+      transition: all 0.4s ease;
       border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
     }
 
     .playlist-card:hover {
       transform: translateY(-10px);
       background: rgba(255, 255, 255, 0.15);
+      border-color: #667eea;
     }
 
     .playlist-card h3 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       margin-bottom: 10px;
       color: #a8c0ff;
     }
 
     .teacher-name {
       color: #ccc;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
     }
 
     .playlist-price {
       color: #25d366;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .videos-count {
       color: #999;
-      margin-bottom: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 15px;
     }
 
     .btn-view {
@@ -131,27 +208,101 @@
       cursor: pointer;
       width: 100%;
       font-weight: 600;
-      transition: transform 0.2s;
+      transition: all 0.3s ease;
     }
 
     .btn-view:hover {
       transform: scale(1.02);
     }
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: 40px;
+    /* Teachers Grid */
+    .teachers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
     }
 
+    .teacher-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      transition: all 0.4s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+    }
+
+    .teacher-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .teacher-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid #667eea;
+    }
+
+    .teacher-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .teacher-card p {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .view-profile-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .view-profile-btn:hover {
+      background: #667eea;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
       header {
+        padding: 15px 20px;
         flex-direction: column;
         gap: 15px;
       }
+
       .hero h1 {
         font-size: 2rem;
+      }
+
+      .section {
+        padding: 40px 20px;
+      }
+
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -159,26 +310,80 @@
 <body>
 
 <header>
-  <div class="logo">🎓 Al-Ma'moun</div>
+  <div class="logo">🎓 Al-Ma'moun Academy</div>
   <button class="login-btn" onclick="window.location.href='index.html'">🔐 تسجيل الدخول</button>
 </header>
 
-<section class="hero">
-  <h1>اكتشف قوائم التشغيل</h1>
-  <p>اختر قائمة التشغيل المناسبة لك وابدأ التعلم</p>
-</section>
+<main>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>اكتشف قوائم التشغيل</h1>
+    <p>اختر قائمة التشغيل المناسبة لك وابدأ التعلم مع أفضل المدرسين</p>
+  </section>
 
-<section class="playlists-section">
-  <h2 class="section-title">🎬 قوائم التشغيل المتاحة</h2>
-  <div id="playlistsContainer" class="playlists-grid">
-    <p style="text-align:center; width:100%;">جاري التحميل...</p>
-  </div>
-</section>
+  <!-- Playlists Section -->
+  <section class="section">
+    <h2 class="section-title">🎬 قوائم التشغيل المتاحة</h2>
+    <div id="playlistsContainer" class="playlists-grid">
+      <p style="text-align:center; width:100%;">جاري التحميل...</p>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section">
+    <h2 class="section-title">🌟 عن المنصة</h2>
+    <div class="about-content">
+      <div class="about-text">
+        <p>منصة Al-Ma'moun التعليمية هي منصة متكاملة تهدف إلى تسهيل عملية التعليم عن بعد، حيث توفر بيئة تفاعلية بين المدرسين والطلاب.</p>
+        <p>نقدم محتوى تعليمي متنوع يشمل فيديوهات شرح، ملاحظات، واجبات، ومذكرات دراسية منظمة حسب المراحل التعليمية المختلفة.</p>
+        <p>انضم إلينا الآن واستمتع بتجربة تعليمية فريدة!</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">500+</div>
+          <div>طالب نشط</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">50+</div>
+          <div>مدرس متخصص</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">1000+</div>
+          <div>محتوى تعليمي</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">99%</div>
+          <div>رضا المستخدمين</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teachers Section -->
+  <section class="section">
+    <h2 class="section-title">👨‍🏫 نخبة المدرسين</h2>
+    <div id="teachersGrid" class="teachers-grid">
+      <p style="text-align:center; width:100%;">جاري التحميل...</p>
+    </div>
+  </section>
+</main>
 
 <footer>
   <p>© 2026 Al-Ma'moun Educational Platform | جميع الحقوق محفوظة</p>
+  <p style="margin-top: 10px; font-size: 0.8rem;">طورت بـ ❤️ لتحسين التعليم</p>
 </footer>
 
 <script type="module" src="js/app.js"></script>
+<script>
+  // تحميل البيانات عند فتح الصفحة
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.loadAllPlaylistsForHome === 'function') {
+      window.loadAllPlaylistsForHome()
+    }
+    if (typeof window.loadTeachersForHome === 'function') {
+      window.loadTeachersForHome()
+    }
+  })
+</script>
 </body>
 </html>
