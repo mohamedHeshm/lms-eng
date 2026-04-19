@@ -475,7 +475,7 @@
       <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع الواجبات</button>
       <button class="menu-btn" onclick="openTab('pdf2', this)">📚 رفع المذكرات</button>
       <button class="menu-btn" onclick="openTab('content', this)">📋 المحتوى المنشور</button>
-      <button class="menu-btn" onclick="window.location.href='teacher-playlists.html'">🎬 قوائم التشغيل</button>
+      <button class="menu-btn" onclick="window.location.href='teacher-playlists.html'" style="background:linear-gradient(135deg,#f093fb,#f5576c) !important; color:white !important;">🎬 قوائم التشغيل</button>
     </div>
 
     <div class="sidebar-section">
@@ -631,10 +631,50 @@
   <button class="scroll-btn" onclick="scrollToBottom()">⬇️</button>
 </div>
 
-<script type="module" src="js/app.js"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script>
-  // تعريف الدوال المحلية التي تستخدم الدوال المستوردة
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  // Helper functions
+  function escapeHtml(text) {
+    if (!text) return ''
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
+  function getCurrentUser() {
+    try {
+      const userJson = localStorage.getItem("currentUser")
+      return userJson ? JSON.parse(userJson) : null
+    } catch (e) {
+      return null
+    }
+  }
+
+  // متغيرات التصفية
+  let currentTeacherContent = { videos: [], pdfs: [], pdfs2: [], notes: [] }
+  let currentContentFilter = 'all'
+
+  // ================== SIDEBAR FUNCTIONS ==================
+  window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.toggle('open')
+    overlay.classList.toggle('active')
+  }
+
+  window.closeSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.remove('open')
+    overlay.classList.remove('active')
+  }
+
+  // ================== TAB FUNCTIONS ==================
   window.openTab = function(tabName, button) {
     // إغلاق الـ Sidebar في الجوال
     if (window.innerWidth <= 768) {
@@ -656,29 +696,407 @@
     if (selectedTab) {
       selectedTab.classList.add('active')
       if (button) button.classList.add('active')
+
+      // تحميل المحتوى عند الحاجة
+      if (tabName === 'content') {
+        loadTeacherContent()
+      }
+      if (tabName === 'profile') {
+        loadCurrentProfile()
+      }
+      if (tabName === 'social') {
+        loadCurrentSocial()
+      }
     }
   }
 
-  window.toggleSidebar = function() {
-    const sidebar = document.getElementById('sidebar')
-    const overlay = document.getElementById('sidebarOverlay')
-    sidebar.classList.toggle('open')
-    overlay.classList.toggle('active')
+  // ================== LOAD CONTENT ==================
+  window.loadTeacherContent = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const [
+        { data: videos },
+        { data: pdfs },
+        { data: pdfs2 },
+        { data: notes }
+      ] = await Promise.all([
+        supabase.from("videos").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("pdfs").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("pdfs2").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false }),
+        supabase.from("notes").select("*").eq("teacher_id", currentUser.id).order("id", { ascending: false })
+      ])
+
+      currentTeacherContent = { videos: videos || [], pdfs: pdfs || [], pdfs2: pdfs2 || [], notes: notes || [] }
+      renderTeacherContent(currentContentFilter)
+
+    } catch (error) {
+      console.error("Load error:", error)
+      const container = document.getElementById("teacherContentContainer")
+      if (container) {
+        container.innerHTML = "<p style='text-align:center; color:red;'>❌ حدث خطأ في تحميل المحتوى</p>"
+      }
+    }
   }
 
-  window.closeSidebar = function() {
-    const sidebar = document.getElementById('sidebar')
-    const overlay = document.getElementById('sidebarOverlay')
-    sidebar.classList.remove('open')
-    overlay.classList.remove('active')
+  function renderTeacherContent(filter) {
+    const container = document.getElementById("teacherContentContainer")
+    if (!container) return
+
+    let allItems = []
+
+    if (filter === 'all' || filter === 'notes') {
+      currentTeacherContent.notes.forEach(note => {
+        allItems.push({
+          type: 'note', typeIcon: '📝', typeName: 'ملاحظة',
+          id: note.id, stage: note.stage, content: note.content,
+          deleteFunc: 'deleteNote'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'videos') {
+      currentTeacherContent.videos.forEach(video => {
+        allItems.push({
+          type: 'video', typeIcon: '🎥', typeName: 'فيديو',
+          id: video.id, stage: video.stage, url: video.url,
+          deleteFunc: 'deleteVideo'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'pdfs') {
+      currentTeacherContent.pdfs.forEach(pdf => {
+        allItems.push({
+          type: 'pdf', typeIcon: '📁', typeName: 'واجب',
+          id: pdf.id, stage: pdf.stage, fileName: pdf.file_name, fileUrl: pdf.file_url,
+          deleteFunc: 'deletePDF'
+        })
+      })
+    }
+
+    if (filter === 'all' || filter === 'pdfs2') {
+      currentTeacherContent.pdfs2.forEach(pdf => {
+        allItems.push({
+          type: 'pdf2', typeIcon: '📚', typeName: 'مذكرة',
+          id: pdf.id, stage: pdf.stage, fileName: pdf.file_name, fileUrl: pdf.file_url,
+          deleteFunc: 'deletePDF2'
+        })
+      })
+    }
+
+    if (allItems.length === 0) {
+      container.innerHTML = `<p style='text-align:center; color:#999; padding:40px;'>📭 لا يوجد محتوى${filter !== 'all' ? ' في هذا التصنيف' : ''}</p>`
+      return
+    }
+
+    container.innerHTML = `
+      <div class="content-grid">
+        ${allItems.map(item => `
+          <div class="content-item">
+            <h4 style="color: #667eea; margin-bottom: 10px;">${item.typeIcon} ${item.typeName}</h4>
+            <p style="margin: 5px 0;"><strong>📚 المرحلة:</strong> ${escapeHtml(item.stage || "غير محدد")}</p>
+            ${item.content ? `<p style="margin: 10px 0; background: white; padding: 10px; border-radius: 8px;">📝 ${escapeHtml(item.content)}</p>` : ''}
+            ${item.url ? `<p><a href="${escapeHtml(item.url)}" target="_blank" style="color: #667eea;">🔗 مشاهدة الفيديو</a></p>` : ''}
+            ${item.fileUrl ? `<p><a href="${escapeHtml(item.fileUrl)}" target="_blank" style="color: #667eea;">📄 ${escapeHtml(item.fileName)}</a></p>` : ''}
+            <button onclick="window.${item.deleteFunc}('${item.id}')" style="margin-top: 10px; padding: 8px; background: #ff5252; width: 100%;">🗑 حذف</button>
+          </div>
+        `).join('')}
+      </div>
+    `
   }
 
+  window.filterTeacherContent = function(filter) {
+    currentContentFilter = filter
+    renderTeacherContent(filter)
+
+    // تحديث أزرار التصفية
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.style.background = '#764ba2'
+    })
+    const activeBtn = document.getElementById(`filter${filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}Btn`)
+    if (activeBtn) activeBtn.style.background = '#667eea'
+  }
+
+  // ================== PROFILE FUNCTIONS ==================
+  window.loadCurrentProfile = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const { data } = await supabase
+        .from("teacher_profile")
+        .select("*")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      const preview = document.getElementById("profilePreview")
+      if (preview) {
+        if (data) {
+          preview.innerHTML = `
+            ${data.image_url ? `<img src="${escapeHtml(data.image_url)}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:10px;">` : ''}
+            <h4>${escapeHtml(currentUser.name)}</h4>
+            <p>${escapeHtml(data.bio || "")}</p>
+          `
+        } else {
+          preview.innerHTML = "<p>لم تقم بإضافة بروفايل بعد</p>"
+        }
+      }
+
+      const bioInput = document.getElementById("bio")
+      if (bioInput && data) bioInput.value = data.bio || ""
+
+    } catch (error) {
+      console.error("Load profile error:", error)
+    }
+  }
+
+  window.saveProfile = async function() {
+    try {
+      const bio = document.getElementById("bio")?.value.trim()
+      const file = document.getElementById("imgFile")?.files[0]
+      const currentUser = getCurrentUser()
+
+      if (!currentUser) {
+        alert("❗ مش مسجل دخول")
+        return
+      }
+
+      let imageUrl = null
+      if (file) {
+        const path = `profiles/${currentUser.id}_${Date.now()}_${file.name}`
+        const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+        if (uploadError) {
+          alert("❌ خطأ في رفع الصورة: " + uploadError.message)
+          return
+        }
+        const { data } = supabase.storage.from("files").getPublicUrl(path)
+        imageUrl = data.publicUrl
+      }
+
+      const { data: existing } = await supabase
+        .from("teacher_profile")
+        .select("id")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      const updateData = {}
+      if (bio) updateData.bio = bio
+      if (imageUrl) updateData.image_url = imageUrl
+
+      if (existing) {
+        await supabase.from("teacher_profile").update(updateData).eq("teacher_id", currentUser.id)
+      } else if (Object.keys(updateData).length > 0) {
+        await supabase.from("teacher_profile").insert([{ teacher_id: currentUser.id, ...updateData }])
+      }
+
+      alert("✅ تم الحفظ")
+      document.getElementById("imgFile").value = ""
+      loadCurrentProfile()
+
+    } catch (error) {
+      console.error("Save profile error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
+  // ================== SOCIAL FUNCTIONS ==================
+  window.loadCurrentSocial = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const { data } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      if (data) {
+        if (document.getElementById("facebook")) document.getElementById("facebook").value = data.facebook || ""
+        if (document.getElementById("whatsapp")) document.getElementById("whatsapp").value = data.whatsapp || ""
+        if (document.getElementById("youtube")) document.getElementById("youtube").value = data.youtube || ""
+      }
+
+    } catch (error) {
+      console.error("Load social error:", error)
+    }
+  }
+
+  window.saveSocial = async function() {
+    try {
+      const facebook = document.getElementById("facebook")?.value.trim()
+      const whatsapp = document.getElementById("whatsapp")?.value.trim()
+      const youtube = document.getElementById("youtube")?.value.trim()
+      const currentUser = getCurrentUser()
+
+      if (!currentUser) {
+        alert("❗ مش مسجل دخول")
+        return
+      }
+
+      const { data: existing } = await supabase
+        .from("social_links")
+        .select("id")
+        .eq("teacher_id", currentUser.id)
+        .single()
+
+      if (existing) {
+        await supabase.from("social_links").update({ facebook, whatsapp, youtube }).eq("teacher_id", currentUser.id)
+      } else {
+        await supabase.from("social_links").insert([{ teacher_id: currentUser.id, facebook, whatsapp, youtube }])
+      }
+
+      alert("✅ تم الحفظ")
+
+    } catch (error) {
+      console.error("Save social error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
+  // ================== CRUD FUNCTIONS (مختصرة) ==================
+  window.addNote = async function() {
+    const noteInput = document.getElementById("noteInput")
+    const note = noteInput?.value.trim()
+    const stageSelect = document.getElementById("noteStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!note) return alert("❗ اكتب الملاحظة")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const { error } = await supabase.from("notes").insert([{ teacher_id: currentUser.id, content: note, stage: stage }])
+    if (error) return alert("❌ خطأ: " + error.message)
+
+    noteInput.value = ""
+    stageSelect.value = ""
+    alert("✅ تم النشر")
+    loadTeacherContent()
+  }
+
+  window.addVideo = async function() {
+    const input = document.getElementById("videoInput")
+    const url = input?.value.trim()
+    const stageSelect = document.getElementById("videoStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!url) return alert("❗ حط رابط الفيديو")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    let embedUrl = url
+    if (url.includes("watch?v=")) embedUrl = url.replace("watch?v=", "embed/")
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1].split("?")[0]
+      embedUrl = "https://www.youtube.com/embed/" + id
+    }
+
+    const { error } = await supabase.from("videos").insert([{ teacher_id: currentUser.id, url: embedUrl, stage: stage }])
+    if (error) return alert("❌ خطأ: " + error.message)
+
+    input.value = ""
+    stageSelect.value = ""
+    alert("✅ تم نشر الفيديو")
+    loadTeacherContent()
+  }
+
+  window.uploadPDF = async function() {
+    const file = document.getElementById("pdfFile")?.files[0]
+    const stageSelect = document.getElementById("pdfStageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!file) return alert("❗ اختار ملف PDF")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const path = `pdfs/${currentUser.id}_${Date.now()}_${file.name.replace(/\s+/g, "_")}`
+    const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+    if (uploadError) return alert("❌ خطأ في الرفع: " + uploadError.message)
+
+    const { data } = supabase.storage.from("files").getPublicUrl(path)
+    const { error: dbError } = await supabase.from("pdfs").insert([{ teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, stage: stage }])
+    if (dbError) return alert("❌ خطأ في الحفظ: " + dbError.message)
+
+    alert("✅ تم النشر بنجاح")
+    document.getElementById("pdfFile").value = ""
+    stageSelect.value = ""
+    loadTeacherContent()
+  }
+
+  window.uploadPDF2 = async function() {
+    const file = document.getElementById("pdf2File")?.files[0]
+    const stageSelect = document.getElementById("pdf2StageSelect")
+    const stage = stageSelect?.value
+    const currentUser = getCurrentUser()
+
+    if (!file) return alert("❗ اختار ملف PDF")
+    if (!stage) return alert("❗ اختر المرحلة الدراسية أولاً")
+    if (!currentUser) return alert("❗ مش مسجل دخول")
+
+    const path = `pdfs2/${currentUser.id}_${Date.now()}_${file.name.replace(/\s+/g, "_")}`
+    const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+    if (uploadError) return alert("❌ خطأ في الرفع: " + uploadError.message)
+
+    const { data } = supabase.storage.from("files").getPublicUrl(path)
+    const { error: dbError } = await supabase.from("pdfs2").insert([{ teacher_id: currentUser.id, file_url: data.publicUrl, file_name: file.name, stage: stage }])
+    if (dbError) return alert("❌ خطأ في الحفظ: " + dbError.message)
+
+    alert("✅ تم النشر بنجاح")
+    document.getElementById("pdf2File").value = ""
+    stageSelect.value = ""
+    loadTeacherContent()
+  }
+
+  // Delete functions
+  window.deleteVideo = async function(id) {
+    if (!confirm("هل متأكد من حذف الفيديو؟")) return
+    const { error } = await supabase.from("videos").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deleteNote = async function(id) {
+    if (!confirm("هل متأكد من حذف الملاحظة؟")) return
+    const { error } = await supabase.from("notes").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deletePDF = async function(id) {
+    if (!confirm("هل متأكد من حذف الملف؟")) return
+    const { error } = await supabase.from("pdfs").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  window.deletePDF2 = async function(id) {
+    if (!confirm("هل متأكد من حذف الملف؟")) return
+    const { error } = await supabase.from("pdfs2").delete().eq("id", id)
+    if (error) return alert("❌ خطأ في الحذف: " + error.message)
+    alert("✅ تم الحذف")
+    loadTeacherContent()
+  }
+
+  // ================== UTILITIES ==================
   window.goHome = function() {
     window.location.href = 'index.html'
   }
 
   window.goToChangePassword = function() {
     window.location.href = 'change-password.html'
+  }
+
+  window.logout = function() {
+    localStorage.removeItem("currentUser")
+    window.location.href = "index.html"
   }
 
   window.scrollToTop = function() {
@@ -688,6 +1106,12 @@
   window.scrollToBottom = function() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
   }
+
+  // ================== INIT ==================
+  document.addEventListener("DOMContentLoaded", () => {
+    loadCurrentProfile()
+    loadCurrentSocial()
+  })
 </script>
 
 </body>

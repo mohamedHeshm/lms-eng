@@ -38,7 +38,7 @@ function protectPage() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html'
 
   // الصفحات المحمية
-  const protectedPages = ['student-modern.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html', 'teacher-playlists.html']
+  const protectedPages = ['student-modern.html', 'teacher.html', 'admin.html', 'teacher-profile.html', 'dashboard-home.html']
 
   // إذا كان على صفحة محمية وما في user مسجل دخول
   if (protectedPages.includes(currentPage) && !currentUser) {
@@ -54,8 +54,8 @@ function protectPage() {
       window.location.href = 'index.html'
       return false
     }
-    if ((currentPage === 'teacher.html' || currentPage === 'teacher-playlists.html') && currentUser.role !== 'teacher') {
-      alert('❌ هذه الصفحة حصرية للمدرسين')
+    if (currentPage === 'teacher.html' && currentUser.role !== 'teacher') {
+      alert('❌ صفحة المدرس حصرية للمدرسين')
       window.location.href = 'index.html'
       return false
     }
@@ -107,16 +107,25 @@ window.login = async function() {
 
     localStorage.setItem("currentUser", JSON.stringify(data))
 
-    // حفظ سجل الدخول
-    await supabase.from("login_logs").insert([
-      {
-        user_id: data.id,
-        user_name: data.name,
-        user_email: data.email,
-        user_role: data.role,
-        login_time: new Date().toISOString()
+    // حفظ سجل الدخول (مع تتبع الأخطاء)
+    try {
+      const { error: logError } = await supabase.from("login_logs").insert([
+        {
+          user_id: data.id,
+          user_name: data.name,
+          user_email: data.email,
+          user_role: data.role,
+          login_time: new Date().toISOString()
+        }
+      ])
+      if (logError) {
+        console.error("⚠️ فشل تسجيل السجل:", logError.message, logError)
+      } else {
+        console.log("✅ تم تسجيل دخول المستخدم في login_logs")
       }
-    ])
+    } catch (logEx) {
+      console.error("⚠️ Exception أثناء تسجيل السجل:", logEx)
+    }
 
     showStatus("✅ تم! جاري التوجيه...", 'success')
 
@@ -333,24 +342,37 @@ window.loadStats = async function() {
 let allLoginLogs = []
 
 window.loadLoginLogs = async function() {
+  let container = document.getElementById("loginLogsContainer")
   try {
-    console.log("Loading login logs...")
+    if (container) container.innerHTML = "<p style='text-align:center; color:#999;'>⏳ جاري تحميل السجلات...</p>"
+
     let { data: logs, error } = await supabase
       .from("login_logs")
       .select("*")
       .order("login_time", { ascending: false })
+      .limit(500)
 
     if (error) {
-      console.error("Login logs error:", error)
+      console.error("❌ Login logs error:", error)
+      if (container) {
+        container.innerHTML = `
+          <div style="background:#fff3cd; border:2px solid #ffc107; padding:20px; border-radius:12px; color:#856404;">
+            <h4>⚠️ تعذّر تحميل السجل</h4>
+            <p style="margin-top:10px;">${escapeHtml(error.message)}</p>
+            <p style="margin-top:10px; font-size:13px;">السبب الأرجح: جدول <code>login_logs</code> غير موجود في قاعدة البيانات،
+            أو سياسات RLS لا تسمح بالقراءة. شغّل ملف <code>setup-database.sql</code> اللي موجود مع الملفات.</p>
+          </div>`
+      }
       return
     }
 
     allLoginLogs = logs || []
-    console.log("Logs loaded:", allLoginLogs.length)
+    console.log(`✅ تم تحميل ${allLoginLogs.length} سجل دخول`)
     displayLoginLogs('all')
 
   } catch (error) {
     console.error("Load login logs error:", error)
+    if (container) container.innerHTML = `<p style='color:#ff4d4d;'>❌ خطأ: ${escapeHtml(error.message)}</p>`
   }
 }
 
@@ -616,313 +638,6 @@ window.uploadPDF2 = async function() {
     console.error("Upload PDF2 error:", error)
     let status = document.getElementById("status2")
     status.innerText = "❌ خطأ: " + error.message
-  }
-}
-
-// ================== Playlists Functions ==================
-window.createPlaylist = async function() {
-  try {
-    let name = document.getElementById("playlistName")?.value.trim()
-    let price = document.getElementById("playlistPrice")?.value.trim()
-    let currentUser = getCurrentUser()
-
-    if (!name || !price) {
-      alert("❗ من فضلك أدخل اسم القائمة والسعر")
-      return
-    }
-    if (!currentUser || currentUser.role !== 'teacher') {
-      alert("❌ غير مصرح لك بهذا الإجراء")
-      return
-    }
-
-    let { error } = await supabase.from("playlists").insert([
-      { teacher_id: currentUser.id, name: name, price: parseFloat(price) }
-    ])
-
-    if (error) {
-      alert("❌ خطأ: " + error.message)
-      return
-    }
-
-    alert("✅ تم إنشاء القائمة بنجاح")
-    document.getElementById("playlistName").value = ""
-    document.getElementById("playlistPrice").value = ""
-    loadTeacherPlaylists()
-
-  } catch (error) {
-    console.error("Create playlist error:", error)
-    alert("❌ خطأ: " + error.message)
-  }
-}
-
-window.loadTeacherPlaylists = async function() {
-  try {
-    let currentUser = getCurrentUser()
-    if (!currentUser) return
-
-    let { data: playlists, error } = await supabase
-      .from("playlists")
-      .select("*")
-      .eq("teacher_id", currentUser.id)
-      .order("created_at", { ascending: false })
-
-    if (error) throw error
-
-    let container = document.getElementById("playlistsList")
-    if (!container) return
-
-    if (!playlists || playlists.length === 0) {
-      container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد قوائم تشغيل حالياً</p>"
-      return
-    }
-
-    container.innerHTML = ""
-    for (let playlist of playlists) {
-      // جلب عدد الفيديوهات في القائمة
-      let { count, error: countError } = await supabase
-        .from("playlist_videos")
-        .select("*", { count: 'exact', head: true })
-        .eq("playlist_id", playlist.id)
-
-      let videosCount = count || 0
-
-      container.innerHTML += `
-        <div class="playlist-card" style="background:white; border-radius:15px; padding:20px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-            <div>
-              <h3 style="color:#667eea;">${escapeHtml(playlist.name)}</h3>
-              <p style="color:#666;">💰 السعر: ${playlist.price} جنيه</p>
-              <p style="color:#666;">🎬 عدد الفيديوهات: ${videosCount}</p>
-            </div>
-            <div>
-              <button onclick="deletePlaylist('${playlist.id}')" class="danger" style="width:auto; padding:8px 16px; background:#ff5252;">🗑 حذف القائمة</button>
-            </div>
-          </div>
-          <hr style="margin:15px 0;">
-          <h4>➕ إضافة فيديو جديد للقائمة</h4>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-            <input type="text" id="videoTitle_${playlist.id}" placeholder="عنوان الفيديو" style="flex:2; min-width:150px;">
-            <input type="text" id="videoUrl_${playlist.id}" placeholder="رابط YouTube" style="flex:3; min-width:200px;">
-            <button onclick="addVideoToPlaylist('${playlist.id}')" style="width:auto; padding:8px 20px;">➕ إضافة</button>
-          </div>
-          <div id="videosList_${playlist.id}" style="margin-top:20px;">
-            <p style="color:#999;">جاري تحميل الفيديوهات...</p>
-          </div>
-        </div>
-      `
-      // تحميل فيديوهات القائمة
-      await loadPlaylistVideos(playlist.id)
-    }
-
-  } catch (error) {
-    console.error("Load playlists error:", error)
-  }
-}
-
-window.loadPlaylistVideos = async function(playlistId) {
-  try {
-    let { data: videos, error } = await supabase
-      .from("playlist_videos")
-      .select("*")
-      .eq("playlist_id", playlistId)
-      .order("created_at", { ascending: true })
-
-    if (error) throw error
-
-    let container = document.getElementById(`videosList_${playlistId}`)
-    if (!container) return
-
-    if (!videos || videos.length === 0) {
-      container.innerHTML = "<p style='color:#999;'>لا توجد فيديوهات في هذه القائمة</p>"
-      return
-    }
-
-    container.innerHTML = ""
-    videos.forEach(video => {
-      container.innerHTML += `
-        <div style="background:#f5f7ff; padding:12px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <strong>${escapeHtml(video.title)}</strong><br>
-            <a href="${escapeHtml(video.url)}" target="_blank" style="color:#667eea; font-size:14px;">${escapeHtml(video.url)}</a>
-          </div>
-          <button onclick="deleteVideoFromPlaylist('${video.id}')" style="width:auto; padding:5px 12px; background:#ff5252; margin:0;">🗑</button>
-        </div>
-      `
-    })
-
-  } catch (error) {
-    console.error("Load playlist videos error:", error)
-  }
-}
-
-window.addVideoToPlaylist = async function(playlistId) {
-  try {
-    let title = document.getElementById(`videoTitle_${playlistId}`)?.value.trim()
-    let url = document.getElementById(`videoUrl_${playlistId}`)?.value.trim()
-
-    if (!title || !url) {
-      alert("❗ من فضلك أدخل عنوان الفيديو والرابط")
-      return
-    }
-
-    // تحويل الرابط إلى صيغة embed
-    let embedUrl = url
-    if (url.includes("watch?v=")) embedUrl = url.replace("watch?v=", "embed/")
-    if (url.includes("youtu.be/")) {
-      let id = url.split("youtu.be/")[1].split("?")[0]
-      embedUrl = "https://www.youtube.com/embed/" + id
-    }
-
-    let { error } = await supabase.from("playlist_videos").insert([
-      { playlist_id: playlistId, title: title, url: embedUrl }
-    ])
-
-    if (error) {
-      alert("❌ خطأ: " + error.message)
-      return
-    }
-
-    alert("✅ تم إضافة الفيديو بنجاح")
-    document.getElementById(`videoTitle_${playlistId}`).value = ""
-    document.getElementById(`videoUrl_${playlistId}`).value = ""
-    loadPlaylistVideos(playlistId)
-
-  } catch (error) {
-    console.error("Add video error:", error)
-    alert("❌ خطأ: " + error.message)
-  }
-}
-
-window.deletePlaylist = async function(playlistId) {
-  if (!confirm("هل أنت متأكد من حذف هذه القائمة وجميع فيديوهاتها؟")) return
-  try {
-    let { error } = await supabase.from("playlists").delete().eq("id", playlistId)
-    if (error) throw error
-    alert("✅ تم حذف القائمة")
-    loadTeacherPlaylists()
-  } catch (error) {
-    console.error("Delete playlist error:", error)
-    alert("❌ خطأ: " + error.message)
-  }
-}
-
-window.deleteVideoFromPlaylist = async function(videoId) {
-  if (!confirm("هل أنت متأكد من حذف هذا الفيديو؟")) return
-  try {
-    let { error } = await supabase.from("playlist_videos").delete().eq("id", videoId)
-    if (error) throw error
-    alert("✅ تم حذف الفيديو")
-    // إعادة تحميل كل القوائم (يمكن تحسينها)
-    loadTeacherPlaylists()
-  } catch (error) {
-    console.error("Delete video error:", error)
-    alert("❌ خطأ: " + error.message)
-  }
-}
-
-window.loadAllPlaylistsForHome = async function() {
-  try {
-    let { data: playlists, error } = await supabase
-      .from("playlists")
-      .select("*, users!teacher_id(name)")
-      .order("created_at", { ascending: false })
-
-    if (error) throw error
-
-    let container = document.getElementById("playlistsContainer")
-    if (!container) return
-
-    if (!playlists || playlists.length === 0) {
-      container.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد قوائم تشغيل متاحة حالياً</p>"
-      return
-    }
-
-    container.innerHTML = ""
-    for (let playlist of playlists) {
-      let teacherName = playlist.users?.name || "مدرس"
-      let { count, error: countError } = await supabase
-        .from("playlist_videos")
-        .select("*", { count: 'exact', head: true })
-        .eq("playlist_id", playlist.id)
-
-      let videosCount = count || 0
-
-      container.innerHTML += `
-        <div class="playlist-card">
-          <div class="playlist-info">
-            <h3>${escapeHtml(playlist.name)}</h3>
-            <p class="teacher-name">👨‍🏫 ${escapeHtml(teacherName)}</p>
-            <p class="playlist-price">💰 السعر: ${playlist.price} جنيه</p>
-            <p class="videos-count">🎬 عدد الفيديوهات: ${videosCount}</p>
-          </div>
-          <div class="playlist-actions">
-            <button class="btn-view" onclick="viewPlaylist('${playlist.id}')">📺 عرض التفاصيل</button>
-          </div>
-        </div>
-      `
-    }
-
-  } catch (error) {
-    console.error("Load home playlists error:", error)
-  }
-}
-
-window.viewPlaylist = function(playlistId) {
-  window.location.href = `playlist-view.html?id=${playlistId}`
-}
-
-window.loadSinglePlaylist = async function() {
-  try {
-    const urlParams = new URLSearchParams(window.location.search)
-    const playlistId = urlParams.get('id')
-    if (!playlistId) {
-      document.getElementById("playlistTitle").innerText = "خطأ: لم يتم تحديد قائمة"
-      return
-    }
-
-    // جلب بيانات القائمة
-    let { data: playlist, error } = await supabase
-      .from("playlists")
-      .select("*, users!teacher_id(name)")
-      .eq("id", playlistId)
-      .single()
-
-    if (error) throw error
-
-    document.getElementById("playlistTitle").innerText = playlist.name
-    document.getElementById("playlistTeacher").innerHTML = `👨‍🏫 المدرس: ${escapeHtml(playlist.users?.name || "مدرس")}`
-    document.getElementById("playlistPrice").innerHTML = `💰 السعر: ${playlist.price} جنيه`
-
-    // جلب فيديوهات القائمة
-    let { data: videos, error: videosError } = await supabase
-      .from("playlist_videos")
-      .select("*")
-      .eq("playlist_id", playlistId)
-      .order("created_at", { ascending: true })
-
-    if (videosError) throw videosError
-
-    let videosContainer = document.getElementById("playlistVideos")
-    if (!videos || videos.length === 0) {
-      videosContainer.innerHTML = "<p style='text-align:center; color:#999;'>لا توجد فيديوهات في هذه القائمة</p>"
-      return
-    }
-
-    videosContainer.innerHTML = ""
-    videos.forEach(video => {
-      videosContainer.innerHTML += `
-        <div class="video-item">
-          <h4>🎬 ${escapeHtml(video.title)}</h4>
-          <div class="video-wrapper">
-            <iframe src="${escapeHtml(video.url)}" frameborder="0" allowfullscreen></iframe>
-          </div>
-        </div>
-      `
-    })
-
-  } catch (error) {
-    console.error("Load single playlist error:", error)
-    document.getElementById("playlistTitle").innerText = "حدث خطأ في تحميل البيانات"
   }
 }
 
@@ -1527,7 +1242,7 @@ window.loadSolutions = async function() {
 }
 
 // ================== Tabs ==================
-window.openTab = function(id) {
+window.openTab = function(id, btnEl) {
   document.querySelectorAll(".tab-content").forEach(t => {
     t.style.display = "none"
     t.classList.remove("active")
@@ -1536,6 +1251,14 @@ window.openTab = function(id) {
   if (el) {
     el.style.display = "block"
     el.classList.add("active")
+  }
+  if (btnEl) {
+    document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"))
+    btnEl.classList.add("active")
+  }
+  // إعادة تحميل السجل عند فتح التبويب
+  if (id === "loginLogsTab" && window.loadLoginLogs) {
+    window.loadLoginLogs()
   }
 }
 
@@ -1667,7 +1390,7 @@ window.addEventListener("load", function() {
     window.loadStudentData()
   }
 
-  // صفحة المدرس الرئيسية
+  // صفحة المدرس
   if (document.getElementById("solutionsList")) {
     window.openTab("profile")
     window.loadSolutions()
@@ -1677,19 +1400,19 @@ window.addEventListener("load", function() {
     window.loadTeacherStages()
   }
 
-  // صفحة قوائم التشغيل للمدرس
+  // صفحة قوائم تشغيل المدرس
   if (document.getElementById("playlistsList")) {
-    loadTeacherPlaylists()
+    window.loadMyPlaylists()
   }
 
-  // الصفحة الرئيسية dashboard-home
-  if (document.getElementById("playlistsContainer")) {
-    loadAllPlaylistsForHome()
+  // الصفحة الرئيسية: كروت قوائم التشغيل
+  if (document.getElementById("playlistsHomeGrid")) {
+    window.loadAllPlaylistsHome()
   }
 
-  // صفحة عرض قائمة تشغيل واحدة
-  if (document.getElementById("playlistTitle")) {
-    loadSinglePlaylist()
+  // صفحة عرض قائمة التشغيل (للطالب)
+  if (document.getElementById("playlistViewer")) {
+    window.loadPlaylistViewer()
   }
 })
 
@@ -1915,6 +1638,42 @@ window.deleteContent = async function(id) {
   }
 }
 
+// ================== مثال استخدام الوظائف ==================
+/*
+
+// مثال 1: إضافة محتوى جديد
+// HTML:
+<select id="contentStageSelect">
+  <option value="الأول">الأول</option>
+  <option value="الثاني">الثاني</option>
+</select>
+
+<select id="contentTypeSelect">
+  <option value="pdf">PDF</option>
+  <option value="video">Video</option>
+  <option value="note">Note</option>
+</select>
+
+<input type="text" id="contentTitle" placeholder="عنوان المحتوى">
+<textarea id="contentText" placeholder="المحتوى أو الرابط"></textarea>
+<div id="contentStatus"></div>
+
+<button onclick="addTeacherContent()">إضافة</button>
+
+// مثال 2: عرض المحتوى
+<div id="contentList"></div>
+
+<script>
+  // عند اختيار مرحلة
+  document.getElementById("contentStageSelect").addEventListener("change", function() {
+    window.loadContentByStage(this.value)
+  })
+</script>
+
+*/
+
+
+
 console.log("✅ وظائف إدارة محتوى المدرس تم تحميلها بنجاح")
 
 // تحديث الإحصائيات كل 30 ثانية
@@ -1925,3 +1684,283 @@ setInterval(() => {
 }, 30000)
 
 console.log("✅ LMS Loaded Successfully")
+
+
+// ================================================================
+// ================== 🎬 PLAYLISTS SYSTEM ==========================
+// ================================================================
+
+// إنشاء قائمة تشغيل جديدة (المدرس)
+window.createPlaylist = async function() {
+  try {
+    let name = document.getElementById("playlistName")?.value.trim()
+    let price = document.getElementById("playlistPrice")?.value.trim()
+    let currentUser = getCurrentUser()
+
+    if (!name) return alert("❗ اكتب اسم القائمة")
+    if (!price && price !== "0") return alert("❗ اكتب سعر القائمة (0 لو مجاني)")
+    if (!currentUser || currentUser.role !== "teacher") return alert("❌ لازم تكون مدرس")
+
+    let { error } = await supabase.from("playlists").insert([{
+      teacher_id: currentUser.id,
+      teacher_name: currentUser.name,
+      name: name,
+      price: parseFloat(price) || 0
+    }])
+
+    if (error) {
+      console.error("Create playlist error:", error)
+      return alert("❌ خطأ: " + error.message + "\n\nتأكد إن جدول playlists موجود في قاعدة البيانات.")
+    }
+
+    document.getElementById("playlistName").value = ""
+    document.getElementById("playlistPrice").value = ""
+    alert("✅ تم إنشاء قائمة التشغيل")
+    loadMyPlaylists()
+  } catch (e) {
+    console.error(e)
+    alert("❌ خطأ: " + e.message)
+  }
+}
+
+// تحميل قوائم المدرس الحالي
+window.loadMyPlaylists = async function() {
+  let container = document.getElementById("playlistsList")
+  if (!container) return
+  let currentUser = getCurrentUser()
+  if (!currentUser) return
+
+  container.innerHTML = "<p style='text-align:center; color:#999;'>⏳ جاري التحميل...</p>"
+
+  let { data: playlists, error } = await supabase
+    .from("playlists")
+    .select("*")
+    .eq("teacher_id", currentUser.id)
+    .order("id", { ascending: false })
+
+  if (error) {
+    container.innerHTML = `<div style="background:#fff3cd; border:2px solid #ffc107; padding:20px; border-radius:12px; color:#856404;">
+      <h4>⚠️ تعذّر تحميل القوائم</h4>
+      <p>${escapeHtml(error.message)}</p>
+      <p style="margin-top:10px; font-size:13px;">شغّل ملف <code>setup-database.sql</code> لإنشاء الجداول المطلوبة.</p>
+    </div>`
+    return
+  }
+
+  if (!playlists || playlists.length === 0) {
+    container.innerHTML = "<p style='text-align:center; color:#999;'>📭 لا توجد قوائم بعد. أنشئ أول قائمة من فوق.</p>"
+    return
+  }
+
+  // تحميل الفيديوهات لكل قائمة
+  let { data: allVideos } = await supabase
+    .from("playlist_videos")
+    .select("*")
+    .in("playlist_id", playlists.map(p => p.id))
+    .order("id", { ascending: true })
+
+  container.innerHTML = ""
+  playlists.forEach(p => {
+    let vids = (allVideos || []).filter(v => v.playlist_id === p.id)
+    let vidsHtml = vids.length === 0
+      ? "<p style='color:#999; font-size:13px;'>(لا فيديوهات بعد)</p>"
+      : vids.map(v => `
+          <div class="video-item" style="background:white; padding:10px; margin:8px 0; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <span>🎥 ${escapeHtml(v.title || "بدون عنوان")}</span>
+            <button onclick="window.deletePlaylistVideo('${v.id}', '${p.id}')" style="background:#ff5252; color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">🗑</button>
+          </div>`).join("")
+
+    container.innerHTML += `
+      <div class="playlist-card" style="background:#f8f9fa; border-radius:15px; padding:20px; margin-bottom:20px; border-right:5px solid #667eea;">
+        <h3 style="color:#667eea; margin-bottom:8px;">📺 ${escapeHtml(p.name)}</h3>
+        <p style="color:#666; margin-bottom:15px;">💰 السعر: <strong>${p.price > 0 ? p.price + " جنيه" : "مجاني"}</strong></p>
+
+        <div style="background:white; padding:15px; border-radius:10px; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px; color:#333;">➕ إضافة فيديو</h4>
+          <input type="text" id="vt_${p.id}" placeholder="عنوان الفيديو" style="width:100%; padding:10px; margin-bottom:8px; border:2px solid #e0e0e0; border-radius:8px; font-family:'Cairo', sans-serif;">
+          <input type="text" id="vu_${p.id}" placeholder="رابط YouTube" style="width:100%; padding:10px; margin-bottom:8px; border:2px solid #e0e0e0; border-radius:8px; font-family:'Cairo', sans-serif;">
+          <button onclick="window.addPlaylistVideo('${p.id}')" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-family:'Cairo', sans-serif;">➕ إضافة</button>
+        </div>
+
+        <h4 style="margin:10px 0; color:#333;">🎬 فيديوهات القائمة (${vids.length})</h4>
+        ${vidsHtml}
+
+        <button onclick="window.deletePlaylist('${p.id}')" style="background:#ff5252; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; margin-top:15px; font-family:'Cairo', sans-serif;">🗑 حذف القائمة كاملة</button>
+      </div>`
+  })
+}
+
+// إضافة فيديو لقائمة
+window.addPlaylistVideo = async function(playlistId) {
+  let title = document.getElementById("vt_" + playlistId)?.value.trim()
+  let url = document.getElementById("vu_" + playlistId)?.value.trim()
+  if (!title || !url) return alert("❗ اكتب العنوان والرابط")
+
+  let { error } = await supabase.from("playlist_videos").insert([{
+    playlist_id: playlistId,
+    title: title,
+    url: convertToEmbed(url)
+  }])
+
+  if (error) return alert("❌ خطأ: " + error.message)
+  alert("✅ تم إضافة الفيديو")
+  loadMyPlaylists()
+}
+
+// حذف فيديو
+window.deletePlaylistVideo = async function(videoId, playlistId) {
+  if (!confirm("حذف هذا الفيديو؟")) return
+  let { error } = await supabase.from("playlist_videos").delete().eq("id", videoId)
+  if (error) return alert("❌ " + error.message)
+  loadMyPlaylists()
+}
+
+// حذف قائمة كاملة
+window.deletePlaylist = async function(id) {
+  if (!confirm("⚠️ سيتم حذف القائمة وكل فيديوهاتها. متأكد؟")) return
+  await supabase.from("playlist_videos").delete().eq("playlist_id", id)
+  let { error } = await supabase.from("playlists").delete().eq("id", id)
+  if (error) return alert("❌ " + error.message)
+  alert("✅ تم الحذف")
+  loadMyPlaylists()
+}
+
+// عرض كل القوائم في الصفحة الرئيسية (للجميع)
+window.loadAllPlaylistsHome = async function() {
+  let container = document.getElementById("playlistsHomeGrid")
+  if (!container) return
+
+  container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
+
+  let { data: playlists, error } = await supabase
+    .from("playlists")
+    .select("*")
+    .order("id", { ascending: false })
+
+  if (error || !playlists) {
+    container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
+    return
+  }
+  if (playlists.length === 0) {
+    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
+    return
+  }
+
+  // عدد الفيديوهات لكل قائمة
+  let { data: vids } = await supabase
+    .from("playlist_videos")
+    .select("playlist_id")
+
+  container.innerHTML = ""
+  playlists.forEach(p => {
+    let count = (vids || []).filter(v => v.playlist_id === p.id).length
+    container.innerHTML += `
+      <div class="playlist-home-card" onclick="window.openPlaylist('${p.id}')">
+        <div class="playlist-thumb">🎬</div>
+        <div class="playlist-body">
+          <h3>${escapeHtml(p.name)}</h3>
+          <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
+          <div class="playlist-meta">
+            <span>📺 ${count} فيديو</span>
+            <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
+          </div>
+        </div>
+      </div>`
+  })
+}
+
+// فتح قائمة تشغيل (للطالب)
+window.openPlaylist = function(playlistId) {
+  window.location.href = `playlist-view.html?id=${playlistId}`
+}
+
+
+
+// ================== عرض قائمة تشغيل (للطالب) ==================
+window.loadPlaylistViewer = async function() {
+  let viewer = document.getElementById("playlistViewer")
+  if (!viewer) return
+
+  let urlParams = new URLSearchParams(window.location.search)
+  let playlistId = urlParams.get("id")
+  if (!playlistId) {
+    viewer.innerHTML = "<p style='color:#ff4d4d; text-align:center;'>❌ لم يتم تحديد قائمة</p>"
+    return
+  }
+
+  // تحميل بيانات القائمة + الفيديوهات
+  let { data: playlist } = await supabase
+    .from("playlists").select("*").eq("id", playlistId).single()
+
+  let { data: videos } = await supabase
+    .from("playlist_videos").select("*").eq("playlist_id", playlistId).order("id", { ascending: true })
+
+  if (!playlist) {
+    viewer.innerHTML = "<p style='color:#ff4d4d; text-align:center;'>❌ القائمة غير موجودة</p>"
+    return
+  }
+
+  let currentUser = getCurrentUser()
+
+  // تحقق من إن الطالب رفع حل (solution)
+  let canPlay = false
+  let lockReason = ""
+
+  if (!currentUser) {
+    lockReason = "🔐 يجب تسجيل الدخول كطالب لمشاهدة الفيديوهات"
+  } else if (currentUser.role !== "student") {
+    canPlay = true   // المدرس والأدمن يقدروا يتفرجوا
+  } else {
+    // الطالب: لازم يكون رفع solution على الأقل مرة
+    let { data: sols } = await supabase
+      .from("solutions")
+      .select("id")
+      .eq("student_id", currentUser.id)
+      .limit(1)
+
+    if (sols && sols.length > 0) {
+      canPlay = true
+    } else {
+      lockReason = "🔒 لمشاهدة الفيديوهات يجب أولاً رفع حل/تعديل على الملفات اللي بعتها لك المدرس"
+    }
+  }
+
+  let header = `
+    <div style="background:white; border-radius:20px; padding:30px; margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+      <h1 style="color:#667eea; margin-bottom:10px;">📺 ${escapeHtml(playlist.name)}</h1>
+      <p style="color:#666; margin-bottom:8px;">👨‍🏫 ${escapeHtml(playlist.teacher_name || "مدرس")}</p>
+      <p style="color:#666;">💰 ${playlist.price > 0 ? playlist.price + " جنيه" : "مجاني"} • 📺 ${(videos||[]).length} فيديو</p>
+    </div>`
+
+  if (!canPlay) {
+    viewer.innerHTML = header + `
+      <div style="background:linear-gradient(135deg,#fff3cd,#ffe8a1); border:2px solid #ffc107; padding:30px; border-radius:20px; text-align:center; color:#856404;">
+        <div style="font-size:60px; margin-bottom:15px;">🔒</div>
+        <h3 style="margin-bottom:15px;">القائمة مقفلة</h3>
+        <p style="font-size:16px; margin-bottom:20px;">${lockReason}</p>
+        ${currentUser && currentUser.role === "student"
+          ? `<button onclick="window.location.href='student-modern.html'" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer; font-family:'Cairo', sans-serif; font-size:16px;">📤 ادخل صفحتك ارفع الحل</button>`
+          : `<button onclick="window.location.href='index.html'" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer; font-family:'Cairo', sans-serif; font-size:16px;">🔐 تسجيل الدخول</button>`
+        }
+      </div>`
+    return
+  }
+
+  // عرض الفيديوهات
+  if (!videos || videos.length === 0) {
+    viewer.innerHTML = header + "<p style='text-align:center; color:#999;'>📭 لا توجد فيديوهات في القائمة بعد</p>"
+    return
+  }
+
+  viewer.innerHTML = header + `
+    <div style="display:grid; gap:20px;">
+      ${videos.map((v, i) => `
+        <div style="background:white; border-radius:15px; padding:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+          <h3 style="color:#667eea; margin-bottom:15px;">${i+1}. ${escapeHtml(v.title || "فيديو")}</h3>
+          <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px;">
+            <iframe src="${escapeHtml(v.url)}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+          </div>
+        </div>
+      `).join("")}
+    </div>`
+}
