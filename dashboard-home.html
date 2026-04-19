@@ -534,173 +534,277 @@
         width: 250px !important;
         height: 250px !important;
       }
-
-
     }
-         /* ==================== TEACHERS SECTION ==================== */
-.teachers {
-  padding: 100px 40px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
 
-.teachers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-}
+    /* ==================== TEACHERS SECTION ==================== */
+    .teachers {
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.teacher-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-  transition: 0.4s;
-  border: 1px solid rgba(255,255,255,0.1);
-}
+    .teachers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
 
-.teacher-card:hover {
-  transform: translateY(-10px) scale(1.05);
-  border-color: #667eea;
-  background: rgba(102,126,234,0.1);
-}
+    .teacher-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: 0.4s;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
 
-.teacher-card img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 15px;
-  border: 3px solid rgba(255,255,255,0.2);
-}
+    .teacher-card:hover {
+      transform: translateY(-10px) scale(1.05);
+      border-color: #667eea;
+      background: rgba(102,126,234,0.1);
+    }
 
-.teacher-card h3 {
-  margin-bottom: 10px;
-}
+    .teacher-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid rgba(255,255,255,0.2);
+    }
 
-.teacher-card p {
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 15px;
-}
+    .teacher-card h3 {
+      margin-bottom: 10px;
+    }
 
-.teacher-links {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+    .teacher-card p {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 15px;
+    }
 
-.teacher-links a {
-  text-decoration: none;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  transition: 0.3s;
-}
+    .teacher-links {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-.teacher-links a:hover {
-  background: #667eea;
-}
+    .teacher-links a {
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: 0.3s;
+    }
 
-/* ==================== PLAYLISTS HOME ==================== */
-.playlists-section {
-  position: relative;
-  z-index: 5;
-  padding: 100px 40px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+    .teacher-links a:hover {
+      background: #667eea;
+    }
 
-.playlists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 30px;
-}
+    /* ==================== PLAYLISTS HOME ==================== */
+    .playlists-section {
+      position: relative;
+      z-index: 5;
+      padding: 100px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.playlist-home-card {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-}
+    .playlists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+    }
 
-.playlist-home-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(245,87,108,0.2));
-  opacity: 0;
-  transition: 0.4s;
-  z-index: 0;
-}
+    .playlist-home-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
 
-.playlist-home-card:hover::before { opacity: 1; }
+    .playlist-home-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(245,87,108,0.2));
+      opacity: 0;
+      transition: 0.4s;
+      z-index: 0;
+    }
 
-.playlist-home-card:hover {
-  transform: translateY(-12px) scale(1.03);
-  border-color: #667eea;
-  box-shadow: 0 25px 60px rgba(102,126,234,0.3);
-}
+    .playlist-home-card:hover::before {
+      opacity: 1;
+    }
 
-.playlist-thumb {
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 70px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  background-size: 200% 200%;
-  animation: thumbGrad 5s ease infinite;
-  position: relative;
-  z-index: 1;
-}
+    .playlist-home-card:hover {
+      transform: translateY(-12px) scale(1.03);
+      border-color: #667eea;
+      box-shadow: 0 25px 60px rgba(102,126,234,0.3);
+    }
 
-@keyframes thumbGrad {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
+    .playlist-thumb {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 70px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 200% 200%;
+      animation: thumbGrad 5s ease infinite;
+      position: relative;
+      z-index: 1;
+    }
 
-.playlist-body {
-  padding: 22px;
-  position: relative;
-  z-index: 1;
-}
+    @keyframes thumbGrad {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
 
-.playlist-body h3 {
-  color: #fff;
-  font-size: 18px;
-  margin-bottom: 8px;
-}
+    .playlist-body {
+      padding: 22px;
+      position: relative;
+      z-index: 1;
+    }
 
-.playlist-body .teacher-name {
-  color: rgba(255,255,255,0.7);
-  font-size: 14px;
-  margin-bottom: 15px;
-}
+    .playlist-body h3 {
+      color: #fff;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
 
-.playlist-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: rgba(255,255,255,0.8);
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
+    .playlist-body .teacher-name {
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
 
-.playlist-meta .price {
-  background: linear-gradient(135deg, #667eea, #f093fb);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
+    .playlist-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .playlist-meta .price {
+      background: linear-gradient(135deg, #667eea, #f093fb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    /* Login Modal */
+    .login-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .login-modal-content {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      border: 1px solid rgba(102,126,234,0.3);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+
+    .login-modal-content h3 {
+      font-size: 28px;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea, #f093fb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-modal-content p {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 25px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 25px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .modal-btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+    }
+
+    .modal-btn-secondary:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .user-badge {
+      background: rgba(102,126,234,0.3);
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-badge .logout-icon {
+      cursor: pointer;
+      background: rgba(255,107,107,0.3);
+      padding: 5px 10px;
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+
+    .user-badge .logout-icon:hover {
+      background: #ff5252;
+    }
   </style>
 </head>
 <body>
@@ -721,9 +825,7 @@
     <a href="#playlists">قوائم التشغيل</a>
     <a href="#stats">الإحصائيات</a>
     <a href="#about">عن المنصة</a>
-    <button class="login-btn" onclick="window.location.href='index.html'">
-      <span>🔐 دخول</span>
-    </button>
+    <div id="authSection"></div>
   </nav>
 </header>
 
@@ -733,7 +835,7 @@
     <h1>منصة التعليم الذكية</h1>
     <p>تعلم أذكى، علم أفضل، نتائج أعظم</p>
     <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="window.location.href='index.html'">
+      <button class="btn btn-primary" onclick="handleStartNow()">
         <span>🚀 ابدأ الآن</span>
       </button>
       <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
@@ -792,36 +894,30 @@
     </div>
   </div>
 </section>
+
 <!-- TEACHERS SECTION -->
 <section class="teachers" id="teachers">
   <h2 class="section-title">👨‍🏫 المدرسين</h2>
-
   <div class="teachers-grid">
-
-    <!-- Teacher Card -->
     <div class="teacher-card">
       <img src="images/WhatsApp Image 2026-02-28 at 10.34.19 AM.jpeg" alt="teacher">
       <h3>Eng \ mohamed hesham mohamed</h3>
-      <p> Software engineer</p>
-
+      <p>Software engineer</p>
       <div class="teacher-links">
         <a href="https://www.facebook.com/share/1RbCdJVMjL/" target="_blank">📘 فيسبوك</a>
         <a href="https://wa.me/qr/FMXMGJVKOCLME1" target="_blank">📱 واتساب</a>
       </div>
     </div>
-
     <div class="teacher-card">
       <img src="images/abdo.jpeg" alt="teacher">
       <h3>أ/ عبد الرحمن مأمون</h3>
       <p>مدرس احياء وجيلوجيا وعلوم متكامله</p>
-
       <div class="teacher-links">
-        <a href="https://www.facebook.com/abdalrahman.moamen.39?mibextid=ZbWKwL">📘 فيسبوك</a>
-        <a href="https://wa.me/qr/2IMVJVOLZDK6J1">📱 واتساب</a>
-        <a href="https://youtube.com/@mr-mamoun-1?si=vYphwqasHmR0BPfO">▶ يوتيوب</a>
+        <a href="https://www.facebook.com/abdalrahman.moamen.39?mibextid=ZbWKwL" target="_blank">📘 فيسبوك</a>
+        <a href="https://wa.me/qr/2IMVJVOLZDK6J1" target="_blank">📱 واتساب</a>
+        <a href="https://youtube.com/@mr-mamoun-1?si=vYphwqasHmR0BPfO" target="_blank">▶ يوتيوب</a>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -842,9 +938,219 @@
   <p style="margin-top: 15px; font-size: 14px;">تصميم وتطوير: محمد هشام | جميع الحقوق محفوظة</p>
 </footer>
 
-<script type="module" src="js/app.js"></script>
-<script>
-  console.log("✅ Home page loaded successfully")
+<!-- Login Modal -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <h3>🔐 تسجيل الدخول مطلوب</h3>
+    <p>لمشاهدة محتوى هذه القائمة، يرجى تسجيل الدخول كطالب أولاً</p>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-primary" onclick="redirectToLogin()">تسجيل الدخول</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeLoginModal()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  let selectedPlaylistId = null
+
+  function getCurrentUser() {
+    try {
+      const userJson = localStorage.getItem("currentUser")
+      return userJson ? JSON.parse(userJson) : null
+    } catch (e) {
+      return null
+    }
+  }
+
+  function escapeHtml(text) {
+    if (!text) return ''
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
+  function convertToEmbed(url) {
+    if (url.includes("watch?v=")) return url.replace("watch?v=", "embed/")
+    if (url.includes("youtu.be/")) {
+      let id = url.split("youtu.be/")[1].split("?")[0]
+      return "https://www.youtube.com/embed/" + id
+    }
+    return url
+  }
+
+  // تحديث واجهة المستخدم بناءً على حالة تسجيل الدخول
+  function updateAuthUI() {
+    const currentUser = getCurrentUser()
+    const authSection = document.getElementById('authSection')
+
+    if (authSection) {
+      if (currentUser) {
+        let dashboardLink = ''
+        if (currentUser.role === 'admin') dashboardLink = 'admin.html'
+        else if (currentUser.role === 'teacher') dashboardLink = 'teacher.html'
+        else if (currentUser.role === 'student') dashboardLink = 'student-modern.html'
+
+        authSection.innerHTML = `
+          <div class="user-badge">
+            <span>👋 ${escapeHtml(currentUser.name)}</span>
+            <a href="${dashboardLink}" style="color:white; text-decoration:none; background:rgba(102,126,234,0.5); padding:5px 12px; border-radius:20px;">📊 لوحتي</a>
+            <span class="logout-icon" onclick="logout()">🚪</span>
+          </div>
+        `
+      } else {
+        authSection.innerHTML = `<button class="login-btn" onclick="window.location.href='index.html'"><span>🔐 دخول</span></button>`
+      }
+    }
+  }
+
+  window.logout = function() {
+    localStorage.removeItem("currentUser")
+    updateAuthUI()
+    window.location.reload()
+  }
+
+  window.handleStartNow = function() {
+    const currentUser = getCurrentUser()
+    if (currentUser) {
+      if (currentUser.role === 'admin') window.location.href = 'admin.html'
+      else if (currentUser.role === 'teacher') window.location.href = 'teacher.html'
+      else if (currentUser.role === 'student') window.location.href = 'student-modern.html'
+    } else {
+      window.location.href = 'index.html'
+    }
+  }
+
+  // عرض كل القوائم في الصفحة الرئيسية
+  window.loadAllPlaylistsHome = async function() {
+    let container = document.getElementById("playlistsHomeGrid")
+    if (!container) return
+
+    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
+
+    let { data: playlists, error } = await supabase
+      .from("playlists")
+      .select("*")
+      .order("id", { ascending: false })
+
+    if (error || !playlists) {
+      container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
+      return
+    }
+    if (playlists.length === 0) {
+      container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
+      return
+    }
+
+    let { data: vids } = await supabase.from("playlist_videos").select("playlist_id")
+
+    container.innerHTML = ""
+    playlists.forEach(p => {
+      let count = (vids || []).filter(v => v.playlist_id === p.id).length
+      container.innerHTML += `
+        <div class="playlist-home-card" onclick="window.checkAccessAndOpen('${p.id}')">
+          <div class="playlist-thumb">🎬</div>
+          <div class="playlist-body">
+            <h3>${escapeHtml(p.name)}</h3>
+            <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
+            <div class="playlist-meta">
+              <span>📺 ${count} فيديو</span>
+              <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
+            </div>
+          </div>
+        </div>`
+    })
+  }
+
+  // التحقق من صلاحية الطالب قبل فتح القائمة
+  window.checkAccessAndOpen = async function(playlistId) {
+    const currentUser = getCurrentUser()
+
+    // إذا لم يكن هناك مستخدم مسجل
+    if (!currentUser) {
+      selectedPlaylistId = playlistId
+      showLoginModal()
+      return
+    }
+
+    // إذا كان المستخدم مدرس أو أدمن => يسمح له
+    if (currentUser.role === 'teacher' || currentUser.role === 'admin') {
+      window.location.href = `playlist-view.html?id=${playlistId}`
+      return
+    }
+
+    // إذا كان طالب => لازم يكون رفع حل على الأقل مرة
+    if (currentUser.role === 'student') {
+      let { data: sols } = await supabase
+        .from("solutions")
+        .select("id")
+        .eq("student_id", currentUser.id)
+        .limit(1)
+
+      if (sols && sols.length > 0) {
+        window.location.href = `playlist-view.html?id=${playlistId}`
+      } else {
+        alert("🔒 لمشاهدة الفيديوهات يجب أولاً رفع حل/تعديل على الملفات اللي بعتها لك المدرس")
+        window.location.href = "student-modern.html"
+      }
+      return
+    }
+
+    // أي حالة أخرى
+    showLoginModal()
+  }
+
+  function showLoginModal() {
+    document.getElementById('loginModal').classList.add('active')
+  }
+
+  window.closeLoginModal = function() {
+    document.getElementById('loginModal').classList.remove('active')
+    selectedPlaylistId = null
+  }
+
+  window.redirectToLogin = function() {
+    if (selectedPlaylistId) {
+      localStorage.setItem('redirectAfterLogin', selectedPlaylistId)
+    }
+    window.location.href = 'index.html'
+  }
+
+  // التحقق من إعادة التوجيه بعد تسجيل الدخول
+  function checkRedirectAfterLogin() {
+    const redirectId = localStorage.getItem('redirectAfterLogin')
+    if (redirectId) {
+      localStorage.removeItem('redirectAfterLogin')
+      const currentUser = getCurrentUser()
+      if (currentUser && currentUser.role === 'student') {
+        // التحقق من وجود حلول
+        supabase.from("solutions").select("id").eq("student_id", currentUser.id).limit(1).then(({ data }) => {
+          if (data && data.length > 0) {
+            window.location.href = `playlist-view.html?id=${redirectId}`
+          } else {
+            alert("🔒 لمشاهدة الفيديوهات يجب أولاً رفع حل/تعديل على الملفات اللي بعتها لك المدرس")
+            window.location.href = "student-modern.html"
+          }
+        })
+      } else if (currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin')) {
+        window.location.href = `playlist-view.html?id=${redirectId}`
+      } else {
+        window.location.href = 'index.html'
+      }
+    }
+  }
+
+  // تحميل البيانات عند فتح الصفحة
+  window.addEventListener('load', () => {
+    updateAuthUI()
+    window.loadAllPlaylistsHome()
+    checkRedirectAfterLogin()
+  })
 </script>
 
 </body>

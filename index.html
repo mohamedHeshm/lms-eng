@@ -177,20 +177,13 @@
         0 15px 40px rgba(102, 126, 234, 0.5),
         inset 0 -5px 15px rgba(0, 0, 0, 0.2),
         inset 0 5px 15px rgba(255, 255, 255, 0.2);
-      transform: rotateY(0) rotateX(0);
       transform-style: preserve-3d;
-      animation: logoSpin 8s ease-in-out infinite;
-      cursor: pointer;
       transition: transform 0.4s;
+      cursor: pointer;
     }
 
     .logo-3d:hover {
       transform: rotateY(360deg) scale(1.1);
-    }
-
-    @keyframes logoSpin {
-      0%, 100% { transform: rotateY(0) translateZ(0); }
-      50% { transform: rotateY(180deg) translateZ(20px); }
     }
 
     .login-card h2 {
@@ -279,7 +272,7 @@
       transform: translateY(-50%) scale(1.2);
     }
 
-    /* ============ زرار الدخول ============ */
+    /* ============ أزرار ============ */
     .login-btn {
       width: 100%;
       padding: 16px;
@@ -330,17 +323,7 @@
 
     .login-btn:hover::before { left: 100%; }
 
-    /* رسائل الحالة */
-    #loginStatus {
-      text-align: center;
-      margin-top: 18px;
-      min-height: 22px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-
-    /* زرار الرجوع */
+    /* زر الرجوع */
     .back-btn {
       width: 100%;
       margin-top: 12px;
@@ -362,6 +345,33 @@
       transform: translateY(-2px);
     }
 
+    /* رسائل الحالة */
+    #loginStatus {
+      text-align: center;
+      margin-top: 18px;
+      min-height: 45px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.3s;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .status-success {
+      background: rgba(37, 211, 102, 0.2);
+      color: #25d366;
+    }
+
+    .status-error {
+      background: rgba(255, 77, 77, 0.2);
+      color: #ff4d4d;
+    }
+
+    .status-info {
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+    }
+
     .footer-text {
       text-align: center;
       margin-top: 25px;
@@ -370,7 +380,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ============ أيقونات عصرية ثلاثية الأبعاد عائمة حول الكارت ============ */
+    /* أيقونات عائمة */
     .floating-icon {
       position: absolute;
       font-size: 28px;
@@ -388,6 +398,23 @@
     @keyframes floatIcon {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-30px) rotate(15deg); }
+    }
+
+    /* مؤشر التحميل داخل الزر */
+    .btn-loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     @media (max-width: 480px) {
@@ -436,13 +463,13 @@
       <span class="input-icon">🔒</span>
     </div>
 
-    <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+    <button class="login-btn" id="loginBtn">
       ✨ تسجيل الدخول
     </button>
 
-    <p id="loginStatus"></p>
+    <div id="loginStatus"></div>
 
-    <button class="back-btn" onclick="window.location.href='dashboard-home.html'">
+    <button class="back-btn" id="backBtn">
       🏠 الرجوع للرئيسية
     </button>
 
@@ -452,54 +479,224 @@
   </div>
 </div>
 
-<script type="module" src="js/app.js"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script>
-  // إنشاء الجزيئات الطائرة
-  (function createParticles() {
-    const container = document.getElementById('particles')
-    for (let i = 0; i < 25; i++) {
-      const p = document.createElement('div')
-      p.className = 'particle'
-      p.style.left = Math.random() * 100 + '%'
-      p.style.animationDuration = (8 + Math.random() * 12) + 's'
-      p.style.animationDelay = Math.random() * 10 + 's'
-      container.appendChild(p)
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  // إظهار رسالة الحالة
+  function showStatus(message, type = 'info') {
+    const statusDiv = document.getElementById('loginStatus')
+    if (statusDiv) {
+      statusDiv.innerText = message
+      statusDiv.className = `status-${type}`
     }
-  })()
+  }
+
+  // إخفاء الرسالة بعد فترة
+  function hideStatusAfterDelay(delay = 3000) {
+    setTimeout(() => {
+      const statusDiv = document.getElementById('loginStatus')
+      if (statusDiv) {
+        statusDiv.innerText = ''
+        statusDiv.className = ''
+      }
+    }, delay)
+  }
+
+  // تعطيل/تفعيل الأزرار
+  function setButtonsEnabled(enabled) {
+    const loginBtn = document.getElementById('loginBtn')
+    const backBtn = document.getElementById('backBtn')
+
+    if (loginBtn) {
+      loginBtn.disabled = !enabled
+      if (!enabled) {
+        loginBtn.innerHTML = `<span class="btn-loading"></span> جاري التحقق...`
+      } else {
+        loginBtn.innerHTML = `✨ تسجيل الدخول`
+      }
+    }
+
+    if (backBtn) {
+      backBtn.disabled = !enabled
+    }
+  }
+
+  // دالة تسجيل الدخول الرئيسية
+  async function handleLogin() {
+    const emailInput = document.getElementById('email')
+    const passInput = document.getElementById('password')
+
+    const email = emailInput?.value.trim()
+    const pass = passInput?.value.trim()
+
+    // التحقق من الحقول
+    if (!email || !pass) {
+      showStatus('❌ يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error')
+      hideStatusAfterDelay(3000)
+      return false
+    }
+
+    if (!email.includes('@')) {
+      showStatus('❌ البريد الإلكتروني غير صحيح', 'error')
+      hideStatusAfterDelay(3000)
+      return false
+    }
+
+    // تعطيل الأزرار أثناء المعالجة
+    setButtonsEnabled(false)
+    showStatus('⏳ جاري التحقق من البيانات...', 'info')
+
+    try {
+      // البحث عن المستخدم في قاعدة البيانات
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .eq("password", pass)
+        .single()
+
+      if (error || !data) {
+        showStatus('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error')
+        hideStatusAfterDelay(3000)
+        setButtonsEnabled(true)
+        return false
+      }
+
+      // التحقق من حالة الحساب
+      if (data.is_active === false) {
+        showStatus('🚫 حسابك معطل. يرجى التواصل مع الإدارة', 'error')
+        hideStatusAfterDelay(4000)
+        setButtonsEnabled(true)
+        return false
+      }
+
+      showStatus('✅ تم التحقق بنجاح! جاري التوجيه...', 'success')
+
+      // حفظ بيانات المستخدم
+      localStorage.setItem("currentUser", JSON.stringify(data))
+
+      // تسجيل سجل الدخول (بدون await عشان ما يعلقش)
+      try {
+        supabase.from("login_logs").insert([
+          {
+            user_id: data.id,
+            user_name: data.name,
+            user_email: data.email,
+            user_role: data.role,
+            login_time: new Date().toISOString()
+          }
+        ]).then(({ error: logError }) => {
+          if (logError) console.warn("⚠️ فشل تسجيل السجل:", logError.message)
+        })
+      } catch (logEx) {
+        console.warn("⚠️ Exception أثناء تسجيل السجل:", logEx)
+      }
+
+      // التحقق من وجود قائمة محفوظة للتوجيه بعد تسجيل الدخول
+      const redirectPlaylistId = localStorage.getItem('redirectAfterLogin')
+      if (redirectPlaylistId) {
+        localStorage.removeItem('redirectAfterLogin')
+        setTimeout(() => {
+          window.location.href = `playlist-view.html?id=${redirectPlaylistId}`
+        }, 800)
+        return true
+      }
+
+      // التوجيه حسب الدور
+      setTimeout(() => {
+        if (data.role === "admin") window.location.href = "admin.html"
+        else if (data.role === "teacher") window.location.href = "teacher.html"
+        else if (data.role === "student") window.location.href = "student-modern.html"
+        else window.location.href = "dashboard-home.html"
+      }, 800)
+
+      return true
+
+    } catch (error) {
+      console.error("Login error:", error)
+      showStatus('❌ حدث خطأ في الاتصال. حاول مرة أخرى', 'error')
+      hideStatusAfterDelay(4000)
+      setButtonsEnabled(true)
+      return false
+    }
+  }
+
+  // الرجوع للصفحة الرئيسية
+  function goBack() {
+    const backBtn = document.getElementById('backBtn')
+    backBtn.disabled = true
+    backBtn.innerHTML = `⏳ جاري...`
+    window.location.href = "dashboard-home.html"
+  }
 
   // تأثير 3D Tilt على الكارت
   const card = document.getElementById('loginCard')
-  document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 12
-    const y = (e.clientY / window.innerHeight - 0.5) * -12
-    card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`
-  })
-  document.addEventListener('mouseleave', () => {
-    card.style.transform = 'rotateY(0) rotateX(0)'
-  })
-
-  // معالج تسجيل الدخول
-  async function handleLogin() {
-    const btn = document.getElementById("loginBtn")
-    const status = document.getElementById("loginStatus")
-    btn.disabled = true
-    btn.innerHTML = "⏳ جاري التحقق..."
-    status.innerText = ""
-    try {
-      await window.login()
-    } catch (e) {
-      status.innerText = "❌ حصل خطأ: " + e.message
-      status.style.color = "#ff6b6b"
-    }
-    btn.disabled = false
-    btn.innerHTML = "✨ تسجيل الدخول"
+  if (card) {
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 12
+      const y = (e.clientY / window.innerHeight - 0.5) * -12
+      card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`
+    })
+    document.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateY(0) rotateX(0)'
+    })
   }
-  window.handleLogin = handleLogin
 
-  document.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleLogin()
+  // إنشاء الجزيئات الطائرة
+  (function createParticles() {
+    const container = document.getElementById('particles')
+    if (container) {
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div')
+        p.className = 'particle'
+        p.style.left = Math.random() * 100 + '%'
+        p.style.animationDuration = (8 + Math.random() * 12) + 's'
+        p.style.animationDelay = Math.random() * 10 + 's'
+        container.appendChild(p)
+      }
+    }
+  })()
+
+  // ربط الأحداث
+  document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('loginBtn')
+    const backBtn = document.getElementById('backBtn')
+    const emailInput = document.getElementById('email')
+    const passInput = document.getElementById('password')
+
+    if (loginBtn) {
+      loginBtn.onclick = (e) => {
+        e.preventDefault()
+        handleLogin()
+      }
+    }
+
+    if (backBtn) {
+      backBtn.onclick = (e) => {
+        e.preventDefault()
+        goBack()
+      }
+    }
+
+    // دعم مفتاح Enter
+    const handleEnter = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleLogin()
+      }
+    }
+
+    if (emailInput) emailInput.addEventListener('keypress', handleEnter)
+    if (passInput) passInput.addEventListener('keypress', handleEnter)
   })
+
+  // تصدير الدوال للنطاق العام (للاستخدام من console)
+  window.handleLogin = handleLogin
+  window.goBack = goBack
 </script>
 
 </body>
