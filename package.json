@@ -1,0 +1,31 @@
+{
+  "name": "whatsapp-grades-system",
+  "version": "1.0.0",
+  "description": "نظام إدارة الدرجات والحضور مع تنبيهات واتساب تلقائية",
+  "main": "whatsapp-processor.js",
+  "type": "module",
+  "scripts": {
+    "start": "node whatsapp-processor.js",
+    "dev": "nodemon whatsapp-processor.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "grades",
+    "whatsapp",
+    "education",
+    "notifications"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.1",
+    "dotenv": "^16.3.1",
+    "twilio": "^3.85.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
