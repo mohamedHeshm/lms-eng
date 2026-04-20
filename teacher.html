@@ -585,7 +585,7 @@
 
     <div class="sidebar-section">
       <div class="sidebar-title">الخيارات</div>
-      <button class="menu-btn" onclick="goHome()">🏠 الرئيسية</button>
+      <a href="dashboard-home.html" class="menu-btn">🏠 الرئيسية</a>
       <button class="menu-btn" onclick="goToChangePassword()">🔐 تغيير الباسورد</button>
     </div>
   </div>
@@ -762,10 +762,6 @@
   const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
   const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
   const supabase = createClient(supabaseUrl, supabaseKey)
-
-function goHome() {
-  window.location.href = "dashboard-home.html";
-}
 
   function escapeHtml(text) {
     if (!text) return ''
