@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Student Dashboard - لوحة الطالب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* ==================== LIVE VIDEO MODAL ==================== */
+    .live-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .live-modal.active {
+      display: flex;
+    }
+
+    .live-container {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 1000px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .live-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .live-header h2 {
+      color: #25d366;
+      font-size: 28px;
+    }
+
+    .close-live-btn {
+      background: #ff5252;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .close-live-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 82, 82, 0.3);
+    }
+
+    /* Status Badge */
+    .live-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #25d366 0%, #128c45 100%);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Video Area */
+    .live-video-area {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    #teacher-video-container {
+      width: 100%;
+      height: 450px;
+      background: #000;
+      border-radius: 15px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    #local-video-container {
+      width: 100%;
+      height: 450px;
+      background: #1a1a1a;
+      border-radius: 15px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    /* Controls */
+    .student-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .control-btn {
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Cairo', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+
+    #student-mic-btn {
+      background: #25d366;
+    }
+
+    #student-camera-btn {
+      background: #4facfe;
+    }
+
+    .control-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .control-btn:active {
+      transform: translateY(-1px);
+    }
+
+    /* Info Section */
+    .session-info {
+      background: #f5f7ff;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #e0e8ff;
+    }
+
+    .session-info h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .session-info p {
+      margin: 8px 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .session-info strong {
+      color: #333;
+    }
+
+    /* Chat Section */
+    .chat-area {
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .chat-messages {
+      height: 150px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .chat-message {
+      padding: 8px;
+      margin: 5px 0;
+      background: #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .chat-input-area button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .chat-input-area button:hover {
+      background: #764ba2;
+    }
+
+    /* No Stream Available */
+    .no-stream {
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+      border: 2px solid #ffc107;
+      border-radius: 15px;
+      color: #856404;
+    }
+
+    .no-stream h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .no-stream p {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .live-video-area {
+        grid-template-columns: 1fr;
+      }
+
+      #teacher-video-container,
+      #local-video-container {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .live-container {
+        padding: 15px;
+      }
+
+      .live-header h2 {
+        font-size: 20px;
+      }
+
+      .student-controls {
+        grid-template-columns: 1fr;
+      }
+
+      #teacher-video-container,
+      #local-video-container {
+        height: 250px;
+      }
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Live Video Modal -->
+<div id="studentLiveModal" class="live-modal">
+  <div class="live-container">
+    <!-- Header -->
+    <div class="live-header">
+      <div>
+        <h2>📹 جلسة مباشرة مع المدرس</h2>
+        <div class="live-status" style="margin-top: 10px;">
+          <span class="status-dot"></span>
+          جلسة حية الآن
+        </div>
+      </div>
+      <button class="close-live-btn" onclick="closeStudentLive()">❌ مغادرة</button>
+    </div>
+
+    <!-- No Stream Available -->
+    <div id="noStreamMessage" class="no-stream">
+      <div style="font-size: 60px; margin-bottom: 20px;">📭</div>
+      <h3>لا توجد جلسة حالياً</h3>
+      <p>المدرس لم يفتح جلسة فيديو بعد</p>
+      <p style="font-size: 14px; color: #666;">تحقق من انضمامك للمرحلة الصحيحة أو انتظر بدء الجلسة</p>
+    </div>
+
+    <!-- Video Area (shown when session is active) -->
+    <div id="liveContent" class="hidden">
+      <!-- Video Area -->
+      <div class="live-video-area">
+        <div id="teacher-video-container">
+          📹 انتظر فيديو المدرس...
+        </div>
+        <div id="local-video-container">
+          📹 فيديوك
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="student-controls">
+        <button id="student-mic-btn" class="control-btn" onclick="toggleStudentMicrophone()">🎤 فتح الميكروفون</button>
+        <button id="student-camera-btn" class="control-btn" onclick="toggleStudentCamera()">📷 فتح الكاميرا</button>
+      </div>
+
+      <!-- Session Info -->
+      <div class="session-info">
+        <h3>📋 معلومات الجلسة</h3>
+        <p>👨‍🏫 المدرس: <strong id="teacherName">-</strong></p>
+        <p>🎓 المرحلة: <strong id="stageName">-</strong></p>
+        <p>👥 المشاركون: <strong id="participantCount">0</strong></p>
+        <p>⏱️ مدة الجلسة: <strong id="sessionDuration">00:00</strong></p>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="chat-area">
+        <h4 style="margin-bottom: 10px;">💬 الدردشة</h4>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChat()">
+          <button onclick="sendChat()">إرسال</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Live Session Indicator (in main page) -->
+<div id="liveIndicator" style="position:fixed; top:20px; left:20px; background:linear-gradient(135deg, #25d366, #128c45); color:white; padding:15px 25px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:100; cursor:pointer; display:none; transition:all 0.3s ease;" onclick="openStudentLive()">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span style="width:10px; height:10px; background:white; border-radius:50%; animation:pulse 1.5s ease-in-out infinite;"></span>
+    <span>🔴 جلسة مباشرة جاهزة</span>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+<script src="js/live-video-module.js"></script>
+<script type="module" src="js/app.js"></script>
+
+<script>
+// Student Live Session Variables
+let studentLiveState = {
+  isMicOpen: false,
+  isCameraOpen: false,
+  sessionActive: false,
+  teacherId: null,
+  studentStage: null
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async function() {
+  await window.initLiveModule();
+  
+  // Check for active live sessions periodically
+  setInterval(checkForLiveSession, 5000); // Check every 5 seconds
+});
+
+// Check if there's an active live session for this student
+async function checkForLiveSession() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser || currentUser.role !== 'student') return;
+
+  // This should check database for active live sessions
+  // For now, we'll simulate it
+  // In production: Query table for active sessions from student's teacher in student's stage
+  
+  // Example: 
+  // const { data: sessions } = await supabase
+  //   .from('live_sessions')
+  //   .select('*')
+  //   .eq('active', true)
+  //   .eq('teacher_id', currentUser.teacher_id)
+  //   .eq('stage', currentUser.stage)
+  //   .single()
+}
+
+// Open Student Live Session
+function openStudentLive() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser || currentUser.role !== 'student') {
+    alert('❌ هذه الميزة للطلاب فقط');
+    return;
+  }
+
+  studentLiveState.sessionActive = true;
+  document.getElementById('studentLiveModal').classList.add('active');
+  document.getElementById('noStreamMessage').classList.remove('hidden');
+  document.getElementById('liveContent').classList.add('hidden');
+
+  // Set student info
+  document.getElementById('teacherName').innerText = currentUser.teacher_name || 'المدرس';
+  document.getElementById('stageName').innerText = currentUser.stage || '-';
+
+  // Try to join live channel (if exists)
+  // joinStudentToTeacherChannel();
+}
+
+// Close Student Live Session
+function closeStudentLive() {
+  if (confirm('هل تريد مغادرة الجلسة؟')) {
+    studentLiveState.sessionActive = false;
+    window.leaveLiveChannel().then(() => {
+      document.getElementById('studentLiveModal').classList.remove('active');
+    });
+  }
+}
+
+// Toggle Student Microphone
+async function toggleStudentMicrophone() {
+  try {
+    if (!window.liveSessionState.localAudioTrack) return;
+
+    if (studentLiveState.isMicOpen) {
+      await window.liveSessionState.localAudioTrack.setEnabled(false);
+      studentLiveState.isMicOpen = false;
+      document.getElementById('student-mic-btn').innerText = '🎤 فتح الميكروفون';
+      document.getElementById('student-mic-btn').style.background = '#25d366';
+    } else {
+      await window.liveSessionState.localAudioTrack.setEnabled(true);
+      studentLiveState.isMicOpen = true;
+      document.getElementById('student-mic-btn').innerText = '🔇 إيقاف الميكروفون';
+      document.getElementById('student-mic-btn').style.background = '#ff5252';
+    }
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
+
+// Toggle Student Camera
+async function toggleStudentCamera() {
+  try {
+    if (!window.liveSessionState.localVideoTrack) return;
+
+    if (studentLiveState.isCameraOpen) {
+      await window.liveSessionState.localVideoTrack.setEnabled(false);
+      studentLiveState.isCameraOpen = false;
+      document.getElementById('student-camera-btn').innerText = '📷 فتح الكاميرا';
+      document.getElementById('student-camera-btn').style.background = '#4facfe';
+    } else {
+      await window.liveSessionState.localVideoTrack.setEnabled(true);
+      studentLiveState.isCameraOpen = true;
+      document.getElementById('student-camera-btn').innerText = '🚫 إيقاف الكاميرا';
+      document.getElementById('student-camera-btn').style.background = '#ff5252';
+    }
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
+
+// Join Student to Teacher Channel
+async function joinStudentToTeacherChannel() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  const channelName = `teacher-${currentUser.teacher_id}-*`; // Should get actual channel from database
+  
+  const joined = await window.joinLiveChannel(channelName, currentUser.id, 'audience');
+  
+  if (joined) {
+    document.getElementById('noStreamMessage').classList.add('hidden');
+    document.getElementById('liveContent').classList.remove('hidden');
+  }
+}
+
+// Send Chat Message
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  
+  if (!message) return;
+
+  const chatContainer = document.getElementById('chatMessages');
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'chat-message';
+  msgDiv.innerHTML = `<strong>${currentUser.name}:</strong> ${escapeHtml(message)}`;
+  chatContainer.appendChild(msgDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  
+  input.value = '';
+
+  // Send to database/broadcast
+  // await sendChatMessage(message);
+}
+
+// Helper function
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Start Session Duration Timer
+function startSessionTimer() {
+  let seconds = 0;
+  setInterval(() => {
+    if (studentLiveState.sessionActive) {
+      seconds++;
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      document.getElementById('sessionDuration').innerText = 
+        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+  }, 1000);
+}
+
+startSessionTimer();
+</script>
+
+</body>
+</html>
