@@ -15,7 +15,7 @@
       color: #fff;
     }
 
-    /* ============ خلفية متحركة حديثة ============ */
+    /* ============ خلفية متحركة تعليمية (أنيميشن مذاكرة) ============ */
     .bg-animation {
       position: fixed;
       top: 0;
@@ -41,6 +41,31 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* العناصر التعليمية المتحركة (بدل الكرات) */
+    .study-icon {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0.4;
+      animation: floatStudy 8s ease-in-out infinite;
+      filter: drop-shadow(0 0 5px rgba(102,126,234,0.5));
+    }
+
+    @keyframes floatStudy {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-20px) rotate(5deg); }
+      75% { transform: translateY(15px) rotate(-5deg); }
+    }
+
+    .study-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; font-size: 3rem; }
+    .study-icon:nth-child(2) { top: 20%; right: 8%; animation-delay: 1s; font-size: 2.5rem; }
+    .study-icon:nth-child(3) { bottom: 15%; left: 10%; animation-delay: 2s; font-size: 3.5rem; }
+    .study-icon:nth-child(4) { bottom: 25%; right: 15%; animation-delay: 1.5s; font-size: 2rem; }
+    .study-icon:nth-child(5) { top: 50%; left: 3%; animation-delay: 3s; font-size: 2.8rem; }
+    .study-icon:nth-child(6) { top: 60%; right: 5%; animation-delay: 2.5s; font-size: 2.2rem; }
+    .study-icon:nth-child(7) { top: 80%; left: 20%; animation-delay: 4s; font-size: 3rem; }
+    .study-icon:nth-child(8) { top: 15%; left: 25%; animation-delay: 0.5s; font-size: 2rem; }
+
+    /* موجات */
     .waves {
       position: absolute;
       bottom: 0;
@@ -57,22 +82,6 @@
       100% { background-position-x: 1440px; }
     }
 
-    /* جزيئات متحركة */
-    .particle {
-      position: absolute;
-      background: linear-gradient(135deg, #667eea, #f093fb);
-      border-radius: 50%;
-      opacity: 0.6;
-      animation: particleFloat linear infinite;
-    }
-
-    @keyframes particleFloat {
-      from { transform: translateY(100vh) translateX(0); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.6; }
-      to { transform: translateY(-100px) translateX(100px); opacity: 0; }
-    }
-
     /* ============ الحاوية الرئيسية ============ */
     .login-wrapper {
       position: relative;
@@ -84,12 +93,12 @@
       padding: 20px;
     }
 
-    /* ============ الكارت الرئيسي - تصميم جديد ============ */
+    /* ============ الكارت الرئيسي ============ */
     .login-card {
       position: relative;
       width: 100%;
       max-width: 480px;
-      background: rgba(15, 20, 45, 0.75);
+      background: rgba(15, 20, 45, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 48px;
@@ -104,24 +113,15 @@
     }
 
     @keyframes cardFloat {
-      from {
-        opacity: 0;
-        transform: translateY(50px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+      from { opacity: 0; transform: translateY(50px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .login-card:hover {
       transform: translateY(-5px);
-      box-shadow:
-        0 35px 60px -15px rgba(102, 126, 234, 0.4),
-        0 0 0 1px rgba(102, 126, 234, 0.2);
+      box-shadow: 0 35px 60px -15px rgba(102, 126, 234, 0.4);
     }
 
-    /* شريط علوي ملون */
     .card-accent {
       position: absolute;
       top: 0;
@@ -138,16 +138,10 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* محتوى الكارت */
-    .card-content {
-      padding: 48px 40px;
-    }
+    .card-content { padding: 48px 40px; }
 
     /* ============ الشعار ============ */
-    .logo-section {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+    .logo-section { text-align: center; margin-bottom: 32px; }
 
     .logo-icon {
       width: 80px;
@@ -165,8 +159,8 @@
     }
 
     @keyframes logoPulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3); }
-      50% { transform: scale(1.05); box-shadow: 0 25px 45px rgba(102, 126, 234, 0.5); }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
 
     .logo-section h1 {
@@ -179,16 +173,10 @@
       margin-bottom: 8px;
     }
 
-    .logo-section p {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 14px;
-    }
+    .logo-section p { color: rgba(255, 255, 255, 0.5); font-size: 14px; }
 
-    /* ============ حقول الإدخال - تصميم جديد ============ */
-    .input-field {
-      margin-bottom: 24px;
-      position: relative;
-    }
+    /* ============ حقول الإدخال ============ */
+    .input-field { margin-bottom: 24px; position: relative; }
 
     .input-field input {
       width: 100%;
@@ -209,9 +197,7 @@
       box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
     }
 
-    .input-field input::placeholder {
-      color: rgba(255, 255, 255, 0.3);
-    }
+    .input-field input::placeholder { color: rgba(255, 255, 255, 0.3); }
 
     .input-icon {
       position: absolute;
@@ -223,18 +209,10 @@
       transition: 0.3s;
     }
 
-    .input-field input:focus ~ .input-icon {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.1);
-    }
+    .input-field input:focus ~ .input-icon { opacity: 1; transform: translateY(-50%) scale(1.1); }
 
-    /* ============ نظام الأزرار الجديد ============ */
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 32px;
-    }
+    /* ============ الأزرار ============ */
+    .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
 
     .btn {
       padding: 16px 24px;
@@ -266,17 +244,9 @@
       transition: width 0.6s, height 0.6s;
     }
 
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
+    .btn:hover::before { width: 300px; height: 300px; }
+    .btn span { position: relative; z-index: 1; }
 
-    .btn span {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* زر تسجيل الدخول الرئيسي */
     .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
       background-size: 200% 200%;
@@ -290,11 +260,6 @@
       box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
     }
 
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    /* زر الرجوع الثانوي */
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
       border: 1.5px solid rgba(255, 255, 255, 0.15);
@@ -307,7 +272,6 @@
       transform: translateY(-2px);
     }
 
-    /* زر تجريبي إضافي */
     .btn-demo {
       background: transparent;
       border: 1.5px dashed rgba(255, 255, 255, 0.2);
@@ -321,14 +285,8 @@
       background: rgba(102, 126, 234, 0.1);
     }
 
-    /* حالة تعطيل الزر */
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
-    /* مؤشر التحميل داخل الزر */
     .btn-spinner {
       width: 20px;
       height: 20px;
@@ -338,9 +296,7 @@
       animation: spin 0.8s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ============ رسائل الحالة ============ */
     .status-message {
@@ -358,35 +314,14 @@
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .status-success {
-      background: rgba(37, 211, 102, 0.15);
-      border: 1px solid rgba(37, 211, 102, 0.3);
-      color: #25d366;
-    }
+    .status-success { background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.3); color: #25d366; }
+    .status-error { background: rgba(255, 77, 77, 0.15); border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; }
+    .status-info { background: rgba(102, 126, 234, 0.15); border: 1px solid rgba(102, 126, 234, 0.3); color: #667eea; }
 
-    .status-error {
-      background: rgba(255, 77, 77, 0.15);
-      border: 1px solid rgba(255, 77, 77, 0.3);
-      color: #ff4d4d;
-    }
-
-    .status-info {
-      background: rgba(102, 126, 234, 0.15);
-      border: 1px solid rgba(102, 126, 234, 0.3);
-      color: #667eea;
-    }
-
-    /* ============ روابط إضافية ============ */
     .extra-links {
       display: flex;
       justify-content: center;
@@ -396,61 +331,19 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .extra-links a {
-      color: rgba(255, 255, 255, 0.5);
-      text-decoration: none;
-      font-size: 13px;
-      transition: 0.3s;
-    }
+    .extra-links a { color: rgba(255, 255, 255, 0.5); text-decoration: none; font-size: 13px; transition: 0.3s; }
+    .extra-links a:hover { color: #667eea; }
 
-    .extra-links a:hover {
-      color: #667eea;
-    }
+    .footer-text { text-align: center; margin-top: 24px; font-size: 12px; color: rgba(255, 255, 255, 0.3); }
 
-    .footer-text {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.3);
-    }
-
-    /* ============ كلمة مرور عشوائية للاختبار ============ */
-    .demo-hint {
-      margin-top: 16px;
-      padding: 10px;
-      background: rgba(102, 126, 234, 0.1);
-      border-radius: 12px;
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .demo-hint:hover {
-      background: rgba(102, 126, 234, 0.2);
-      color: #667eea;
-    }
-
-    /* ============ RESPONSIVE ============ */
     @media (max-width: 480px) {
-      .card-content {
-        padding: 36px 24px;
-      }
-
-      .logo-icon {
-        width: 65px;
-        height: 65px;
-        font-size: 38px;
-      }
-
-      .logo-section h1 {
-        font-size: 26px;
-      }
-
-      .btn {
-        padding: 14px 20px;
-      }
+      .card-content { padding: 36px 24px; }
+      .logo-icon { width: 65px; height: 65px; font-size: 38px; }
+      .logo-section h1 { font-size: 26px; }
+      .btn { padding: 14px 20px; }
+      .study-icon { font-size: 1.5rem; }
+      .study-icon:nth-child(1) { font-size: 2rem; }
+      .study-icon:nth-child(3) { font-size: 2.2rem; }
     }
   </style>
 </head>
@@ -458,24 +351,28 @@
 
 <div class="bg-animation">
   <div class="gradient-bg"></div>
+  <!-- أيقونات تعليمية متحركة بدل الكرات -->
+  <div class="study-icon">📚</div>
+  <div class="study-icon">✏️</div>
+  <div class="study-icon">🎓</div>
+  <div class="study-icon">📖</div>
+  <div class="study-icon">📝</div>
+  <div class="study-icon">🧠</div>
+  <div class="study-icon">💡</div>
+  <div class="study-icon">📘</div>
   <div class="waves"></div>
 </div>
-
-<div id="particles"></div>
 
 <div class="login-wrapper">
   <div class="login-card">
     <div class="card-accent"></div>
-
     <div class="card-content">
-      <!-- الشعار -->
       <div class="logo-section">
         <div class="logo-icon">🎓</div>
         <h1>Al-Ma'moun</h1>
         <p>منصة التعليم الذكية</p>
       </div>
 
-      <!-- حقول الإدخال -->
       <div class="input-field">
         <input type="email" id="email" placeholder="البريد الإلكتروني" autocomplete="email">
         <span class="input-icon">📧</span>
@@ -486,33 +383,20 @@
         <span class="input-icon">🔒</span>
       </div>
 
-      <!-- مجموعة الأزرار -->
       <div class="btn-group">
-        <button class="btn btn-primary" id="loginBtn">
-          <span>✨ تسجيل الدخول</span>
-        </button>
-
-        <button class="btn btn-secondary" id="backBtn">
-          <span>🏠 الرجوع للرئيسية</span>
-        </button>
-
-        <button class="btn btn-demo" id="demoHintBtn">
-          <span>🔐 بيانات تجريبية للدخول</span>
-        </button>
+        <button class="btn btn-primary" id="loginBtn"><span>✨ تسجيل الدخول</span></button>
+        <button class="btn btn-secondary" id="backBtn"><span>🏠 الرجوع للرئيسية</span></button>
+        <button class="btn btn-demo" id="demoHintBtn"><span>🔐 بيانات تجريبية للدخول</span></button>
       </div>
 
-      <!-- رسالة الحالة -->
       <div id="loginStatus"></div>
 
-      <!-- روابط إضافية -->
       <div class="extra-links">
         <a href="#">❓ مساعدة</a>
         <a href="#">📞 تواصل مع الدعم</a>
       </div>
 
-      <div class="footer-text">
-        Developed by Eng Mohamed Hesham 👨🏻‍💻
-      </div>
+      <div class="footer-text">Developed by Eng Mohamed Hesham 👨🏻‍💻</div>
     </div>
   </div>
 </div>
@@ -524,50 +408,20 @@
   const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
   const supabase = createClient(supabaseUrl, supabaseKey)
 
-  // إظهار رسالة الحالة
   function showStatus(message, type = 'info') {
     const statusDiv = document.getElementById('loginStatus')
     if (statusDiv) {
-      statusDiv.innerHTML = `<div class="status-message status-${type}">
-        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⏳'}</span>
-        <span>${message}</span>
-      </div>`
+      statusDiv.innerHTML = `<div class="status-message status-${type}"><span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⏳'}</span><span>${message}</span></div>`
     }
   }
 
-  function hideStatus() {
-    const statusDiv = document.getElementById('loginStatus')
-    if (statusDiv) {
-      statusDiv.innerHTML = ''
-    }
-  }
+  function hideStatus() { const statusDiv = document.getElementById('loginStatus'); if (statusDiv) statusDiv.innerHTML = ''; }
+  function setButtonsEnabled(enabled) { ['loginBtn', 'backBtn', 'demoHintBtn'].forEach(id => { const btn = document.getElementById(id); if (btn) btn.disabled = !enabled; }) }
+  function setLoginButtonLoading(isLoading) { const loginBtn = document.getElementById('loginBtn'); if (loginBtn) { loginBtn.innerHTML = isLoading ? '<span class="btn-spinner"></span> <span>جاري التحقق...</span>' : '<span>✨ تسجيل الدخول</span>'; } }
 
-  // تعطيل/تفعيل الأزرار
-  function setButtonsEnabled(enabled) {
-    const btns = ['loginBtn', 'backBtn', 'demoHintBtn']
-    btns.forEach(id => {
-      const btn = document.getElementById(id)
-      if (btn) btn.disabled = !enabled
-    })
-  }
-
-  // تغيير نص زر تسجيل الدخول
-  function setLoginButtonLoading(isLoading) {
-    const loginBtn = document.getElementById('loginBtn')
-    if (loginBtn) {
-      if (isLoading) {
-        loginBtn.innerHTML = '<span class="btn-spinner"></span> <span>جاري التحقق...</span>'
-      } else {
-        loginBtn.innerHTML = '<span>✨ تسجيل الدخول</span>'
-      }
-    }
-  }
-
-  // بيانات تجريبية (للاختبار)
   function showDemoCredentials() {
     const emailInput = document.getElementById('email')
     const passInput = document.getElementById('password')
-
     if (emailInput && passInput) {
       emailInput.value = 'student@test.com'
       passInput.value = '123456'
@@ -576,76 +430,36 @@
     }
   }
 
-  // دالة تسجيل الدخول الرئيسية
   async function handleLogin() {
     const emailInput = document.getElementById('email')
     const passInput = document.getElementById('password')
-
     const email = emailInput?.value.trim()
     const pass = passInput?.value.trim()
 
-    if (!email || !pass) {
-      showStatus('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error')
-      return
-    }
-
-    if (!email.includes('@')) {
-      showStatus('البريد الإلكتروني غير صحيح', 'error')
-      return
-    }
+    if (!email || !pass) { showStatus('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error'); return; }
+    if (!email.includes('@')) { showStatus('البريد الإلكتروني غير صحيح', 'error'); return; }
 
     setButtonsEnabled(false)
     setLoginButtonLoading(true)
     showStatus('جاري التحقق من البيانات...', 'info')
 
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .eq("password", pass)
-        .single()
-
-      if (error || !data) {
-        showStatus('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error')
-        setButtonsEnabled(true)
-        setLoginButtonLoading(false)
-        return
-      }
-
-      if (data.is_active === false) {
-        showStatus('حسابك معطل. يرجى التواصل مع الإدارة', 'error')
-        setButtonsEnabled(true)
-        setLoginButtonLoading(false)
-        return
-      }
+      const { data, error } = await supabase.from("users").select("*").eq("email", email).eq("password", pass).single()
+      if (error || !data) { showStatus('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error'); setButtonsEnabled(true); setLoginButtonLoading(false); return; }
+      if (data.is_active === false) { showStatus('حسابك معطل. يرجى التواصل مع الإدارة', 'error'); setButtonsEnabled(true); setLoginButtonLoading(false); return; }
 
       showStatus('تم التحقق بنجاح! جاري التوجيه...', 'success')
-
       localStorage.setItem("currentUser", JSON.stringify(data))
 
-      // تسجيل سجل الدخول (غير متزامن)
-      try {
-        supabase.from("login_logs").insert([{
-          user_id: data.id,
-          user_name: data.name,
-          user_email: data.email,
-          user_role: data.role,
-          login_time: new Date().toISOString()
-        }]).catch(e => console.warn("Log error:", e))
-      } catch(e) {}
+      try { supabase.from("login_logs").insert([{ user_id: data.id, user_name: data.name, user_email: data.email, user_role: data.role, login_time: new Date().toISOString() }]).catch(e => console.warn("Log error:", e)) } catch(e) {}
 
-      // التحقق من وجود قائمة محفوظة للتوجيه
       const redirectPlaylistId = localStorage.getItem('redirectAfterLogin')
       if (redirectPlaylistId) {
         localStorage.removeItem('redirectAfterLogin')
-        setTimeout(() => {
-          window.location.href = `playlist-view.html?id=${redirectPlaylistId}`
-        }, 800)
+        setTimeout(() => { window.location.href = `playlist-view.html?id=${redirectPlaylistId}` }, 800)
         return
       }
 
-      // التوجيه حسب الدور
       setTimeout(() => {
         if (data.role === "admin") window.location.href = "admin.html"
         else if (data.role === "teacher") window.location.href = "teacher.html"
@@ -661,53 +475,14 @@
     }
   }
 
-  // الرجوع للصفحة الرئيسية
-  function goBack() {
-    const backBtn = document.getElementById('backBtn')
-    backBtn.disabled = true
-    backBtn.innerHTML = '<span>⏳ جاري...</span>'
-    window.location.href = "dashboard-home.html"
-  }
+  function goBack() { const backBtn = document.getElementById('backBtn'); backBtn.disabled = true; backBtn.innerHTML = '<span>⏳ جاري...</span>'; window.location.href = "dashboard-home.html"; }
 
-  // إنشاء الجزيئات
-  function createParticles() {
-    const container = document.getElementById('particles')
-    if (container) {
-      for (let i = 0; i < 50; i++) {
-        const p = document.createElement('div')
-        p.className = 'particle'
-        const size = Math.random() * 6 + 2
-        p.style.width = size + 'px'
-        p.style.height = size + 'px'
-        p.style.left = Math.random() * 100 + '%'
-        p.style.animationDuration = (5 + Math.random() * 15) + 's'
-        p.style.animationDelay = Math.random() * 10 + 's'
-        container.appendChild(p)
-      }
-    }
-  }
-
-  // ربط الأحداث
   document.addEventListener('DOMContentLoaded', () => {
-    createParticles()
-
-    const loginBtn = document.getElementById('loginBtn')
-    const backBtn = document.getElementById('backBtn')
-    const demoHintBtn = document.getElementById('demoHintBtn')
-    const emailInput = document.getElementById('email')
-    const passInput = document.getElementById('password')
-
+    const loginBtn = document.getElementById('loginBtn'); const backBtn = document.getElementById('backBtn'); const demoHintBtn = document.getElementById('demoHintBtn'); const emailInput = document.getElementById('email'); const passInput = document.getElementById('password');
     if (loginBtn) loginBtn.onclick = (e) => { e.preventDefault(); handleLogin() }
     if (backBtn) backBtn.onclick = (e) => { e.preventDefault(); goBack() }
     if (demoHintBtn) demoHintBtn.onclick = (e) => { e.preventDefault(); showDemoCredentials() }
-
-    // دعم مفتاح Enter
-    const handleEnter = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        handleLogin()
-      }
-    }
+    const handleEnter = (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin() } }
     if (emailInput) emailInput.addEventListener('keypress', handleEnter)
     if (passInput) passInput.addEventListener('keypress', handleEnter)
   })
@@ -715,6 +490,5 @@
   window.handleLogin = handleLogin
   window.goBack = goBack
 </script>
-
 </body>
 </html>
