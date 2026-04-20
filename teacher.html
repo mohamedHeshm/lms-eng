@@ -18,9 +18,57 @@
       background-attachment: fixed;
       min-height: 100vh;
       color: #333;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    /* ==================== زر القائمة للجوال ==================== */
+    /* ============ خلفية متحركة تعليمية (أنيميشن مذاكرة) ============ */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .study-bg-icon {
+      position: absolute;
+      font-size: 2.5rem;
+      opacity: 0.15;
+      animation: floatStudyBg 12s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatStudyBg {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-30px) rotate(5deg); }
+      75% { transform: translateY(20px) rotate(-5deg); }
+    }
+
+    .study-bg-icon:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; font-size: 4rem; }
+    .study-bg-icon:nth-child(2) { top: 15%; right: 5%; animation-delay: 1s; font-size: 3rem; }
+    .study-bg-icon:nth-child(3) { bottom: 10%; left: 8%; animation-delay: 2s; font-size: 5rem; }
+    .study-bg-icon:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 1.5s; font-size: 3.5rem; }
+    .study-bg-icon:nth-child(5) { top: 40%; left: 2%; animation-delay: 3s; font-size: 3rem; }
+    .study-bg-icon:nth-child(6) { top: 60%; right: 3%; animation-delay: 2.5s; font-size: 4rem; }
+    .study-bg-icon:nth-child(7) { top: 75%; left: 15%; animation-delay: 4s; font-size: 3rem; }
+    .study-bg-icon:nth-child(8) { top: 25%; left: 20%; animation-delay: 0.5s; font-size: 2.5rem; }
+    .study-bg-icon:nth-child(9) { bottom: 45%; right: 20%; animation-delay: 3.5s; font-size: 3rem; }
+
+    /* تراكب شفاف لتفتيح الخلفية */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.92);
+      z-index: 1;
+    }
+
+    /* ============ زر القائمة للجوال ============ */
     .menu-toggle {
       position: fixed;
       top: 15px;
@@ -47,6 +95,8 @@
     .layout {
       display: flex;
       min-height: 100vh;
+      position: relative;
+      z-index: 2;
     }
 
     /* ==================== SIDEBAR ==================== */
@@ -495,6 +545,20 @@
   </style>
 </head>
 <body>
+
+<!-- خلفية متحركة تعليمية للمدرس -->
+<div class="animated-bg">
+  <div class="study-bg-icon">📚</div>
+  <div class="study-bg-icon">✏️</div>
+  <div class="study-bg-icon">🎓</div>
+  <div class="study-bg-icon">📖</div>
+  <div class="study-bg-icon">📝</div>
+  <div class="study-bg-icon">🧠</div>
+  <div class="study-bg-icon">💡</div>
+  <div class="study-bg-icon">📘</div>
+  <div class="study-bg-icon">📐</div>
+</div>
+<div class="bg-overlay"></div>
 
 <div class="layout">
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -1014,7 +1078,7 @@
     loadTeacherContent()
   }
 
-  // ================== حلول الطلاب (النسخة المعدلة) ==================
+  // ================== حلول الطلاب ==================
   window.loadStudentsSolutions = async function() {
     try {
       let container = document.getElementById("studentsSolutionsContainer");
@@ -1029,7 +1093,6 @@
 
       container.innerHTML = "<p style='text-align:center; color:#999;'>⏳ جاري تحميل الحلول...</p>";
 
-      // 1. جلب جميع الطلاب التابعين لهذا المدرس
       let { data: students, error: studentsError } = await supabase
         .from("users")
         .select("id, name, email, stage")
@@ -1047,7 +1110,6 @@
         return;
       }
 
-      // تصفية الطلاب حسب المرحلة
       let filteredStudents = students;
       if (stageFilter !== "all") {
         filteredStudents = students.filter(s => s.stage === stageFilter);
@@ -1058,7 +1120,6 @@
         return;
       }
 
-      // 2. جلب حلول هؤلاء الطلاب (بدون join)
       let studentIds = filteredStudents.map(s => s.id);
       let { data: solutions, error: solutionsError } = await supabase
         .from("solutions")
@@ -1077,7 +1138,6 @@
         return;
       }
 
-      // 3. دمج بيانات الطلاب مع الحلول يدوياً
       let solutionsWithStudents = solutions.map(solution => {
         let student = filteredStudents.find(s => s.id === solution.student_id);
         return {
@@ -1088,7 +1148,6 @@
         };
       });
 
-      // 4. عرض الإحصائيات والحلول
       const statsHtml = `
         <div class="stats-badge">
           📊 إجمالي الحلول: ${solutionsWithStudents.length} |
