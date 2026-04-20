@@ -23,6 +23,7 @@
       min-height: 100vh;
       color: #fff;
       position: relative;
+        padding-top: 80px;
     }
 
     /* ==================== ANIMATED BACKGROUND ==================== */
@@ -97,22 +98,22 @@
     }
 
     /* ==================== HEADER ==================== */
-   header {
-    position: fixed;
+ header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
   padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  position: sticky;
-  top: 0;
 
   z-index: 1000;
   backdrop-filter: blur(20px);
   background: rgba(15, 15, 30, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-
     .logo {
       font-size: 28px;
       font-weight: 700;
