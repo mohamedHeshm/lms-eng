@@ -97,17 +97,20 @@
     }
 
     /* ==================== HEADER ==================== */
-    header {
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 10;
-      backdrop-filter: blur(20px);
-      background: rgba(15, 15, 30, 0.5);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
+   header {
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  background: rgba(15, 15, 30, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
     .logo {
       font-size: 28px;
