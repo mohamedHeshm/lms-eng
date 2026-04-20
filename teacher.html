@@ -585,8 +585,7 @@
 
     <div class="sidebar-section">
       <div class="sidebar-title">الخيارات</div>
-      <button class="btn btn-secondary" id="backBtn"><span>🏠 الصفحة الرئيسية</span></button>
-
+      <button class="menu-btn" onclick="goHome()">🏠 الرئيسية</button>
       <button class="menu-btn" onclick="goToChangePassword()">🔐 تغيير الباسورد</button>
     </div>
   </div>
@@ -764,11 +763,9 @@
   const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
   const supabase = createClient(supabaseUrl, supabaseKey)
 
-  function setBackLoading(isLoading) {
-    if (elements.backBtn) {
-      elements.backBtn.innerHTML = isLoading ? '<span class="btn-spinner"></span><span> جاري...</span>' : '<span>🏠 الصفحة الرئيسية</span>'
-    }
-  }
+function goHome() {
+  window.location.href = "dashboard-home.html";
+}
 
   function escapeHtml(text) {
     if (!text) return ''
