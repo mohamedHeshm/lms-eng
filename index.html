@@ -3,138 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>🎓 عزيزي المعلم • عالم المعرفة التفاعلي</title>
+  <title>🎓 المأمون • شخصية ثلاثية الأبعاد تمشي وتجري</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none; /* لمنع التحديد العرضي، لكن يمكن الكتابة طبعاً */
     }
 
-    html, body {
+    body {
       font-family: 'Cairo', sans-serif;
       min-height: 100vh;
-      background: linear-gradient(145deg, #071b2b 0%, #0a1f2a 40%, #0e2a2f 100%);
+      background: linear-gradient(145deg, #0a1f2a 0%, #0b2b33 100%);
       overflow-x: hidden;
     }
 
-    /* ========== المشهد التفاعلي الرئيسي (الخلفية الحية) ========== */
-    .interactive-scene {
+    /* حاوية canvas للشخصية 3D */
+    #canvas-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 0;
-      pointer-events: none; /* حتى لا تعيق النقر على الفورم */
+      pointer-events: none;
     }
 
-    /* الطبقة المتدرجة الخلفية */
-    .sky-glow {
-      position: absolute;
+    /* الخلفية التعليمية المتحركة (خلف الشخصية) */
+    .edu-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 20% 40%, rgba(46, 134, 222, 0.25), rgba(20, 40, 60, 0.7));
-      animation: breatheGlow 12s infinite alternate;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
     }
 
-    @keyframes breatheGlow {
-      0% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    /* العناصر التعليمية المتعددة المتحركة (كتب، أقلام، شهادات، ألغاز) */
     .edu-float {
       position: absolute;
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       filter: drop-shadow(0 5px 12px rgba(0,0,0,0.3));
-      animation: floatAround 14s infinite ease-in-out;
-      opacity: 0.55;
-      transition: transform 0.2s;
+      animation: floatAround 16s infinite ease-in-out;
+      opacity: 0.5;
     }
 
     @keyframes floatAround {
       0% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(25px, -20px) rotate(6deg); }
-      50% { transform: translate(-15px, 15px) rotate(-4deg); }
+      25% { transform: translate(25px, -25px) rotate(6deg); }
+      50% { transform: translate(-15px, 20px) rotate(-4deg); }
       75% { transform: translate(20px, 10px) rotate(3deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
-    /* حركات مختلفة لبعض العناصر */
-    .edu-float:nth-child(odd) { animation-duration: 18s; }
-    .edu-float:nth-child(3n) { animation-duration: 12s; opacity: 0.7; }
-
-    /* الشخصية الرئيسية (الطالب الذي يحمل الشنطة) */
-    .student-walker {
-      position: absolute;
-      bottom: 6%;
-      left: -10%;
-      font-size: 4.5rem;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3));
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      z-index: 12;
-      pointer-events: none;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(0,0,0,0.1);
-      border-radius: 100px;
-      padding: 0 10px 0 5px;
-      backdrop-filter: blur(3px);
-    }
-
-    .student-walker span {
-      font-size: 2.8rem;
-    }
-
-    .walker-label {
-      font-size: 0.9rem;
-      background: rgba(0,0,0,0.5);
-      padding: 2px 8px;
-      border-radius: 40px;
-      color: #ffefb9;
-      font-weight: 600;
-    }
-
-    /* موجات تعليمية في الأسفل (أوراق و رموز) */
-    .wave-edu {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 90px;
-      background: repeating-linear-gradient( transparent 0px, transparent 28px, rgba(102, 204, 255, 0.1) 28px, rgba(70, 150, 210, 0.2) 40px);
-      animation: waveShift 10s linear infinite;
-      z-index: 5;
-    }
-
-    @keyframes waveShift {
-      0% { background-position: 0 0; }
-      100% { background-position: 200px 0; }
-    }
-
-    /* نجوم صغيرة / كلمات متحركة */
     .floating-word {
       position: absolute;
       font-size: 1.2rem;
       font-weight: bold;
-      color: rgba(220, 240, 255, 0.5);
+      color: rgba(210, 235, 255, 0.4);
       white-space: nowrap;
-      animation: wordDrift 20s linear infinite;
+      animation: wordDrift 22s linear infinite;
     }
 
     @keyframes wordDrift {
       0% { transform: translateX(100vw) rotate(0deg); opacity: 0; }
       10% { opacity: 0.6; }
       90% { opacity: 0.6; }
-      100% { transform: translateX(-200px) rotate(10deg); opacity: 0; }
+      100% { transform: translateX(-200px) rotate(8deg); opacity: 0; }
     }
 
-    /* ========== بطاقة تسجيل الدخول ========== */
+    /* بطاقة تسجيل الدخول */
     .login-wrapper {
       position: relative;
       z-index: 20;
@@ -142,18 +82,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.2rem;
     }
 
     .glass-card {
       width: 100%;
       max-width: 500px;
-      background: rgba(12, 25, 45, 0.75);
-      backdrop-filter: blur(16px);
+      background: rgba(12, 25, 45, 0.85);
+      backdrop-filter: blur(18px);
       border-radius: 56px;
-      border: 1px solid rgba(110, 180, 255, 0.4);
+      border: 1px solid rgba(110, 180, 255, 0.45);
       box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-      transition: transform 0.3s ease;
       animation: cardRise 0.7s ease-out;
     }
 
@@ -180,9 +119,8 @@
       margin: 0 auto 18px;
       align-items: center;
       justify-content: center;
-      font-size: 50px;
+      font-size: 52px;
       box-shadow: 0 15px 30px rgba(0, 50, 90, 0.5);
-      transition: 0.2s;
     }
 
     .logo-area h2 {
@@ -199,7 +137,6 @@
       font-size: 14px;
     }
 
-    /* الحقول */
     .input-group {
       margin-bottom: 24px;
       position: relative;
@@ -209,7 +146,7 @@
       width: 100%;
       padding: 16px 20px 16px 55px;
       background: rgba(255, 255, 255, 0.07);
-      border: 1.5px solid rgba(90, 170, 255, 0.3);
+      border: 1.5px solid rgba(90, 170, 255, 0.4);
       border-radius: 40px;
       font-size: 16px;
       font-family: 'Cairo', sans-serif;
@@ -220,12 +157,12 @@
 
     .input-group input:focus {
       border-color: #5aaaff;
-      background: rgba(90, 170, 255, 0.1);
+      background: rgba(90, 170, 255, 0.15);
       box-shadow: 0 0 0 4px rgba(90, 170, 255, 0.2);
     }
 
     .input-group input::placeholder {
-      color: rgba(200, 220, 250, 0.5);
+      color: rgba(200, 220, 250, 0.6);
     }
 
     .input-icon {
@@ -234,10 +171,9 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 1.3rem;
-      opacity: 0.7;
+      opacity: 0.8;
     }
 
-    /* زر الدخول */
     .btn-login {
       width: 100%;
       padding: 15px;
@@ -261,7 +197,6 @@
     .btn-login:hover {
       transform: translateY(-3px);
       background: linear-gradient(95deg, #2779ae, #4b97c4);
-      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
     }
 
     .demo-badge {
@@ -270,7 +205,7 @@
       border-radius: 40px;
       padding: 12px;
       text-align: center;
-      margin-top: 25px;
+      margin-top: 20px;
       font-size: 14px;
       cursor: pointer;
       transition: 0.2s;
@@ -279,6 +214,31 @@
 
     .demo-badge:hover {
       background: rgba(255,215,130,0.4);
+    }
+
+    .support-btn {
+      width: 100%;
+      background: rgba(30, 150, 100, 0.25);
+      border: 1.5px solid #2ecc71;
+      border-radius: 44px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #c8f0dc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .support-btn:hover {
+      background: rgba(46, 204, 113, 0.35);
+      border-color: #2ecc71;
+      color: white;
     }
 
     .status-area {
@@ -293,58 +253,35 @@
       text-align: center;
       margin-top: 30px;
       font-size: 12px;
-      opacity: 0.6;
+      opacity: 0.7;
       color: #bbddff;
     }
 
-    /* استجابة */
     @media (max-width: 550px) {
       .card-inner { padding: 32px 22px; }
-      .student-walker { font-size: 3rem; bottom: 3%; }
-      .student-walker span { font-size: 2rem; }
-      .edu-float { font-size: 1.8rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- المشهد الحي + شخصية الطالب التي تمشي و تجري عند التركيز على كلمة المرور -->
-<div class="interactive-scene">
-  <div class="sky-glow"></div>
-
-  <!-- الكثير من العناصر التعليمية المتحركة (كتب, قلم, مجهر, شهادة, مسطرة, كرة أرضية) -->
+<div class="edu-bg">
   <div class="edu-float" style="top: 12%; left: 7%;">📚</div>
-  <div class="edu-float" style="top: 25%; right: 12%;">✏️</div>
-  <div class="edu-float" style="top: 45%; left: 3%;">🔬</div>
-  <div class="edu-float" style="bottom: 20%; right: 8%;">🎓</div>
-  <div class="edu-float" style="top: 70%; left: 15%;">📖</div>
-  <div class="edu-float" style="top: 15%; right: 22%;">🧪</div>
-  <div class="edu-float" style="top: 60%; left: 25%;">📏</div>
-  <div class="edu-float" style="bottom: 35%; right: 18%;">🌍</div>
-  <div class="edu-float" style="top: 82%; left: 80%;">💡</div>
-  <div class="edu-float" style="top: 8%; left: 40%;">📘</div>
-  <div class="edu-float" style="top: 33%; left: 55%;">📝</div>
-  <div class="edu-float" style="bottom: 50%; left: 70%;">🧠</div>
-  <div class="edu-float" style="top: 90%; right: 30%;">🎒</div>
-
-  <!-- كلمات عائمة (تعليمية) -->
-  <div class="floating-word" style="top: 15%; animation-duration: 24s;">✨ المعرفة نور ✨</div>
-  <div class="floating-word" style="top: 45%; animation-duration: 19s; animation-delay: 2s;">📖 اقرأ و ارتقِ 📖</div>
-  <div class="floating-word" style="top: 75%; animation-duration: 27s; animation-delay: 5s;">⭐ العلم نور ⭐</div>
-  <div class="floating-word" style="top: 60%; animation-duration: 22s; animation-delay: 1s;">🧑‍🏫 معلم المستقبل</div>
-
-  <!-- الشخصية التي تمشي (طالب مع شنطة) -->
-  <div id="studentChar" class="student-walker">
-    <span>🧑‍🎓</span>
-    <span>🎒</span>
-    <div class="walker-label">أنا أتعلم</div>
-  </div>
-
-  <!-- موجة سفلى بتأثير تعليمي -->
-  <div class="wave-edu"></div>
+  <div class="edu-float" style="top: 22%; right: 10%;">✏️</div>
+  <div class="edu-float" style="top: 48%; left: 5%;">🔬</div>
+  <div class="edu-float" style="bottom: 22%; right: 12%;">🎓</div>
+  <div class="edu-float" style="top: 68%; left: 18%;">📖</div>
+  <div class="edu-float" style="top: 15%; right: 25%;">🧪</div>
+  <div class="edu-float" style="top: 55%; left: 28%;">📏</div>
+  <div class="edu-float" style="bottom: 38%; right: 22%;">🌍</div>
+  <div class="edu-float" style="top: 82%; left: 75%;">💡</div>
+  <div class="edu-float" style="top: 35%; left: 60%;">📝</div>
+  <div class="floating-word" style="top: 12%; animation-duration: 24s;">✨ العلم نور ✨</div>
+  <div class="floating-word" style="top: 42%; animation-duration: 20s; animation-delay: 2s;">📖 اقرأ و ارتقِ 📖</div>
+  <div class="floating-word" style="top: 70%; animation-duration: 26s; animation-delay: 4s;">⭐ تعليم بلا حدود ⭐</div>
 </div>
 
-<!-- نموذج الدخول -->
+<div id="canvas-container"></div>
+
 <div class="login-wrapper">
   <div class="glass-card">
     <div class="card-inner">
@@ -359,7 +296,7 @@
         <div class="input-icon">📧</div>
       </div>
 
-      <div class="input-group" id="passwordGroup">
+      <div class="input-group">
         <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password">
         <div class="input-icon">🔑</div>
       </div>
@@ -369,7 +306,11 @@
       </button>
 
       <div id="demoCredentialsBtn" class="demo-badge">
-        ⚡ بيانات تجريبية (طالب/معلم) ⚡
+        ⚡ بيانات تجريبية ⚡
+      </div>
+
+      <div id="supportBtn" class="support-btn">
+        📞 تواصل مع الدعم الفني 📞
       </div>
 
       <div id="statusMsg" class="status-area"></div>
@@ -380,276 +321,401 @@
   </div>
 </div>
 
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+    }
+  }
+</script>
+
 <script type="module">
+  import * as THREE from 'three';
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  // إعداد Supabase
-  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
-  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co";
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN";
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // عناصر الشخصية والحركة
-  const studentElement = document.getElementById('studentChar');
+  // ========== إعداد المشهد ثلاثي الأبعاد ==========
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  scene.background = null;
+  scene.fog = new THREE.FogExp2(0x0a1f2a, 0.008);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 2, 8);
+  camera.lookAt(0, 1.2, 0);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+
+  // إضاءة
+  const ambientLight = new THREE.AmbientLight(0x404060);
+  scene.add(ambientLight);
+  const mainLight = new THREE.DirectionalLight(0xfff5e0, 1.2);
+  mainLight.position.set(5, 8, 4);
+  mainLight.castShadow = true;
+  mainLight.receiveShadow = true;
+  scene.add(mainLight);
+  const fillLight = new THREE.PointLight(0x4466cc, 0.5);
+  fillLight.position.set(-2, 3, 4);
+  scene.add(fillLight);
+  const backLight = new THREE.PointLight(0xffaa66, 0.4);
+  backLight.position.set(0, 2, -3);
+  scene.add(backLight);
+
+  // أرضية شفافة لاستقبال الظل
+  const groundPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(12, 6),
+    new THREE.ShadowMaterial({ opacity: 0.4, color: 0x000000, transparent: true, side: THREE.DoubleSide })
+  );
+  groundPlane.rotation.x = -Math.PI / 2;
+  groundPlane.position.y = -0.85;
+  groundPlane.receiveShadow = true;
+  scene.add(groundPlane);
+
+  // ========== إنشاء شخصية كاملة الجسم (رأس، جذع، يدين، رجلين) ==========
+  const characterGroup = new THREE.Group();
+
+  // الجسم (الجذع)
+  const bodyGeo = new THREE.BoxGeometry(0.7, 0.9, 0.5);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x3a6ea5, roughness: 0.4, metalness: 0.1 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 0;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  characterGroup.add(body);
+
+  // الرأس
+  const headGeo = new THREE.SphereGeometry(0.45, 32, 32);
+  const headMat = new THREE.MeshStandardMaterial({ color: 0xfdd7a8, roughness: 0.3 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 0.85;
+  head.castShadow = true;
+  characterGroup.add(head);
+
+  // العينان
+  const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+  const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  const leftEyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.12, 24, 24), eyeMat);
+  leftEyeWhite.position.set(-0.18, 0.98, 0.44);
+  const rightEyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.12, 24, 24), eyeMat);
+  rightEyeWhite.position.set(0.18, 0.98, 0.44);
+  const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(0.07, 24, 24), pupilMat);
+  leftPupil.position.set(-0.18, 0.97, 0.55);
+  const rightPupil = new THREE.Mesh(new THREE.SphereGeometry(0.07, 24, 24), pupilMat);
+  rightPupil.position.set(0.18, 0.97, 0.55);
+  characterGroup.add(leftEyeWhite, rightEyeWhite, leftPupil, rightPupil);
+
+  // قبعة/طاقية (لمسة تعليمية)
+  const hatGeo = new THREE.CylinderGeometry(0.55, 0.7, 0.2, 8);
+  const hatMat = new THREE.MeshStandardMaterial({ color: 0x2c5282 });
+  const hat = new THREE.Mesh(hatGeo, hatMat);
+  hat.position.y = 1.12;
+  hat.castShadow = true;
+  characterGroup.add(hat);
+
+  const hatTopGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.15, 8);
+  const hatTop = new THREE.Mesh(hatTopGeo, hatMat);
+  hatTop.position.y = 1.22;
+  hatTop.castShadow = true;
+  characterGroup.add(hatTop);
+
+  // الذراع الأيمن
+  const rightArmGeo = new THREE.BoxGeometry(0.28, 0.65, 0.28);
+  const armMat = new THREE.MeshStandardMaterial({ color: 0x3a6ea5 });
+  const rightArm = new THREE.Mesh(rightArmGeo, armMat);
+  rightArm.position.set(0.55, 0.35, 0);
+  rightArm.castShadow = true;
+  characterGroup.add(rightArm);
+
+  // الذراع الأيسر
+  const leftArm = new THREE.Mesh(rightArmGeo.clone(), armMat);
+  leftArm.position.set(-0.55, 0.35, 0);
+  leftArm.castShadow = true;
+  characterGroup.add(leftArm);
+
+  // اليد اليمنى (كروية)
+  const handMat = new THREE.MeshStandardMaterial({ color: 0xfdd7a8 });
+  const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), handMat);
+  rightHand.position.set(0.72, 0.02, 0);
+  rightHand.castShadow = true;
+  rightArm.add(rightHand);
+
+  const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), handMat);
+  leftHand.position.set(-0.72, 0.02, 0);
+  leftHand.castShadow = true;
+  leftArm.add(leftHand);
+
+  // الرجل اليمنى
+  const legMat = new THREE.MeshStandardMaterial({ color: 0x2c5282 });
+  const rightLegGeo = new THREE.BoxGeometry(0.28, 0.7, 0.32);
+  const rightLeg = new THREE.Mesh(rightLegGeo, legMat);
+  rightLeg.position.set(0.22, -0.55, 0);
+  rightLeg.castShadow = true;
+  characterGroup.add(rightLeg);
+
+  // الرجل اليسرى
+  const leftLeg = new THREE.Mesh(rightLegGeo.clone(), legMat);
+  leftLeg.position.set(-0.22, -0.55, 0);
+  leftLeg.castShadow = true;
+  characterGroup.add(leftLeg);
+
+  // حذاء
+  const shoeMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+  const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.2, 0.45), shoeMat);
+  rightShoe.position.set(0.22, -0.9, 0.08);
+  rightShoe.castShadow = true;
+  const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.2, 0.45), shoeMat);
+  leftShoe.position.set(-0.22, -0.9, 0.08);
+  leftShoe.castShadow = true;
+  characterGroup.add(rightShoe, leftShoe);
+
+  // شنطة على الظهر
+  const bagGeo = new THREE.BoxGeometry(0.55, 0.6, 0.25);
+  const bagMat = new THREE.MeshStandardMaterial({ color: 0xc97e3a });
+  const bag = new THREE.Mesh(bagGeo, bagMat);
+  bag.position.set(0, 0.1, -0.38);
+  bag.castShadow = true;
+  characterGroup.add(bag);
+
+  scene.add(characterGroup);
+
+  // تخزين الأجزاء المتحركة
+  const limbs = {
+    rightArm,
+    leftArm,
+    rightLeg,
+    leftLeg,
+    rightHand,
+    leftHand
+  };
+
+  // حالة المشي والجري
+  let walkTime = 0;
+  let isRunningMode = false;
+  let targetRunX = 1.2;
+  let currentX = 0;
+  let isLookingAtPassword = false;
+  let runCompleted = false;
+  let passwordFocused = false;
+
+  // متغيرات الموقع
+  let characterPosX = 0;
+  const walkRange = { min: -3.2, max: 3.2 };
+  let walkDirection = 1;
+
+  // عناصر DOM
   const passwordInput = document.getElementById('loginPassword');
   const emailInput = document.getElementById('loginEmail');
   const loginBtn = document.getElementById('loginBtnAction');
   const demoBtn = document.getElementById('demoCredentialsBtn');
+  const supportBtn = document.getElementById('supportBtn');
   const statusDiv = document.getElementById('statusMsg');
 
-  // متغيرات للتحكم في الحركة
-  let walkInterval = null;
-  let isRunning = false;
-  let currentPos = -10; // نسبة مئوية left
-  let direction = 1;    // 1 = يمين , -1 = يسار
-  let isFocusedOnPassword = false;
-  let runInterval = null;
-  let normalWalkLoop = null;
+  // حركة المشي الطبيعية (تأرجح الأيدي والأرجل)
+  function animateWalking(isRunning) {
+    const speed = isRunning ? 0.45 : 0.22;
+    walkTime += speed;
+    const swing = Math.sin(walkTime) * (isRunning ? 0.9 : 0.55);
+    const legSwing = Math.sin(walkTime) * (isRunning ? 0.7 : 0.45);
 
-  // تهيئة موقع البداية
-  function initWalkerPosition() {
-    currentPos = -8;   // تبدأ من يسار الشاشة
-    studentElement.style.left = `${currentPos}%`;
-    studentElement.style.transition = "left 0.08s linear";
+    if (limbs.rightArm) limbs.rightArm.rotation.z = -swing;
+    if (limbs.leftArm) limbs.leftArm.rotation.z = swing;
+    if (limbs.rightLeg) limbs.rightLeg.rotation.x = legSwing;
+    if (limbs.leftLeg) limbs.leftLeg.rotation.x = -legSwing;
+
+    // حركة طفيفة للرأس
+    head.rotation.z = Math.sin(walkTime * 1.5) * 0.05;
   }
 
-  // حركة المشي العادية (بطيئة)
-  function startWalking() {
-    if (normalWalkLoop) clearInterval(normalWalkLoop);
-    if (runInterval) clearInterval(runInterval);
-    normalWalkLoop = setInterval(() => {
-      if (isFocusedOnPassword) return; // لو ركضنا ما نمشي
-      let step = 0.65;   // سرعة مشي
-      currentPos += step;
-      if (currentPos >= 105) {
-        currentPos = -12;
-      }
-      studentElement.style.left = `${currentPos}%`;
-      // تغيير الوجهة: انعكاس الاتجاه بشكل بسيط (إضافة مرونة)
-      if (currentPos > 95) {
-        // يمكن قلب النص (اختياري)
-        studentElement.style.transform = "scaleX(-1)";
-      } else if (currentPos < 0) {
-        studentElement.style.transform = "scaleX(1)";
-      } else {
-        // إذا كان الاتجاه طبيعي بدون تقليب
-        if (currentPos > 40 && currentPos < 70) studentElement.style.transform = "scaleX(1)";
-      }
-    }, 180);
+  // تحديث موقع الشخصية على المسرح
+  function updatePosition() {
+    characterGroup.position.x = characterPosX;
+    // دوران بسيط حسب الاتجاه
+    if (walkDirection > 0) characterGroup.rotation.y = 0;
+    else characterGroup.rotation.y = Math.PI;
   }
 
-  // وظيفة الجري السريع (عند التركيز على كلمة المرور)
-  function startRunningTowardsPassword() {
-    if (runInterval) clearInterval(runInterval);
-    if (normalWalkLoop) clearInterval(normalWalkLoop);
+  // بدء المشي العادي
+  function startNormalWalk() {
+    isRunningMode = false;
+    passwordFocused = false;
+    runCompleted = false;
+    isLookingAtPassword = false;
+    // إعادة العيون لوضعها الطبيعي
+    leftPupil.position.z = 0.55;
+    rightPupil.position.z = 0.55;
+    leftPupil.position.x = -0.18;
+    rightPupil.position.x = 0.18;
+  }
 
-    // تغيير التعبير: نضيف sprint effect
-    studentElement.style.transition = "left 0.05s cubic-bezier(0.25, 1, 0.5, 1)";
-    // نضيف مؤقت سريع للجري إلى منتصف الشاشة تقريبًا (بالقرب من حقل الباسورد)
-    let targetPos = 42; // نسبيًا حيث يظهر حقل كلمة المرور في المنتصف
+  // الجري نحو حقل كلمة المرور
+  function runToPassword() {
+    if (runCompleted && passwordFocused) return;
+    isRunningMode = true;
+    passwordFocused = true;
+    const targetX = 1.5;
+    const step = 0.12;
 
-    runInterval = setInterval(() => {
-      if (!isFocusedOnPassword) {
-        // إذا توقف التركيز نعود للمشي تدريجياً
-        stopRunningAndResetWalk();
-        return;
-      }
-      let diff = targetPos - currentPos;
-      if (Math.abs(diff) < 2) {
-        // وصل إلى منطقة الباسورد، يبقى واقفا ويحدق
-        studentElement.style.left = `${targetPos}%`;
-        // يغير المظهر لشخص "ينظر بفضول"
-        studentElement.innerHTML = `<span>🧑‍🎓🔍</span><span>🎒</span><div class="walker-label">!ينظر إلى كلمة المرور</div>`;
+    const runInterval = setInterval(() => {
+      if (!passwordFocused) {
         clearInterval(runInterval);
-        runInterval = null;
-        // نرتعش قليلاً
-        studentElement.style.animation = "shakeHead 0.4s infinite";
-        const styleShake = document.createElement('style');
-        if (!document.querySelector('#shakeKeyframe')) {
-          styleShake.id = 'shakeKeyframe';
-          styleShake.textContent = `@keyframes shakeHead { 0% { transform: translateX(0px); } 25% { transform: translateX(4px); } 75% { transform: translateX(-4px); } 100% { transform: translateX(0); } }`;
-          document.head.appendChild(styleShake);
-        }
-        studentElement.style.animation = "shakeHead 0.2s infinite";
         return;
       }
-      // الجري السريع نحو الهدف
-      let runStep = (diff > 0) ? Math.min(4.8, diff) : Math.max(-4.8, diff);
-      currentPos += runStep;
-      studentElement.style.left = `${currentPos}%`;
-      if (currentPos > 30 && currentPos < 70) studentElement.style.transform = "scaleX(1)";
+      if (Math.abs(characterPosX - targetX) < 0.15) {
+        characterPosX = targetX;
+        updatePosition();
+        clearInterval(runInterval);
+        runCompleted = true;
+        isRunningMode = false;
+        // الشخصية تقف وتنظر إلى كلمة المرور
+        leftPupil.position.x = -0.05;
+        rightPupil.position.x = 0.05;
+        leftPupil.position.z = 0.62;
+        rightPupil.position.z = 0.62;
+        isLookingAtPassword = true;
+        // توقف الأرجل عن الحركة
+        walkTime = 0;
+        if (limbs.rightArm) limbs.rightArm.rotation.z = 0;
+        if (limbs.leftArm) limbs.leftArm.rotation.z = 0;
+        if (limbs.rightLeg) limbs.rightLeg.rotation.x = 0;
+        if (limbs.leftLeg) limbs.leftLeg.rotation.x = 0;
+        return;
+      }
+      if (characterPosX < targetX) {
+        characterPosX += step;
+        walkDirection = 1;
+      } else {
+        characterPosX -= step;
+        walkDirection = -1;
+      }
+      updatePosition();
+      animateWalking(true);
     }, 35);
+
+    window._currentRunInterval = runInterval;
   }
 
-  function stopRunningAndResetWalk() {
-    if (runInterval) { clearInterval(runInterval); runInterval = null; }
-    // إعادة تعيين الهزات
-    studentElement.style.animation = "";
-    // إعادة المحتوى الأصلي مع شارة
-    studentElement.innerHTML = `<span>🧑‍🎓</span><span>🎒</span><div class="walker-label">أنا أتعلم</div>`;
-    studentElement.style.transition = "left 0.1s linear";
-    // استئناف المشي العادي
-    if (normalWalkLoop) clearInterval(normalWalkLoop);
-    startWalking();
+  function stopRunAndWalk() {
+    passwordFocused = false;
+    runCompleted = false;
+    isLookingAtPassword = false;
+    if (window._currentRunInterval) clearInterval(window._currentRunInterval);
+    leftPupil.position.x = -0.18;
+    rightPupil.position.x = 0.18;
+    leftPupil.position.z = 0.55;
+    rightPupil.position.z = 0.55;
+    // متابعة المشي العادي
+    startNormalWalk();
   }
 
-  // عند التركيز على حقل كلمة المرور (يجري نحو الحقل ويبص)
-  function onPasswordFocus() {
-    if (isFocusedOnPassword) return;
-    isFocusedOnPassword = true;
-    // تغيير سلوك الشخصية: تجري بسرعة تجاه حقل الباسورد وتنظر إليه
-    if (normalWalkLoop) clearInterval(normalWalkLoop);
-    if (runInterval) clearInterval(runInterval);
-    startRunningTowardsPassword();
+  // ربط الأحداث مع حقل كلمة المرور
+  passwordInput.addEventListener('focus', () => {
+    if (!runCompleted) {
+      runToPassword();
+    } else {
+      // إذا كان قد ركض سابقاً لا يركض مجدداً لكن ينظر
+      isLookingAtPassword = true;
+      leftPupil.position.x = -0.05;
+      rightPupil.position.x = 0.05;
+    }
+  });
+
+  passwordInput.addEventListener('blur', () => {
+    stopRunAndWalk();
+  });
+
+  // حلقة التحريك الرئيسية
+  let lastTimestamp = 0;
+  function animateLoop() {
+    requestAnimationFrame(animateLoop);
+    // تحديث حركة المشي إذا لم يكن في وضع الجري أو النظر
+    if (!isRunningMode && !runCompleted && !isLookingAtPassword) {
+      // حركة المشي العادي مع تغيير الموقع يسار ويمين
+      if (!passwordFocused) {
+        characterPosX += 0.008 * walkDirection;
+        if (characterPosX > walkRange.max) {
+          characterPosX = walkRange.max;
+          walkDirection = -1;
+        } else if (characterPosX < walkRange.min) {
+          characterPosX = walkRange.min;
+          walkDirection = 1;
+        }
+        updatePosition();
+        animateWalking(false);
+      } else {
+        animateWalking(false);
+      }
+    } else if (isRunningMode && !runCompleted) {
+      animateWalking(true);
+    } else if (runCompleted && isLookingAtPassword) {
+      // توقف تام، فقط اهتزاز خفيف للرأس (ينظر)
+      head.rotation.x = Math.sin(Date.now() * 0.008) * 0.03;
+      head.rotation.z = Math.sin(Date.now() * 0.006) * 0.02;
+    }
+
+    // تحريك الكاميرا قليلاً مع الشخصية لمتابعتها
+    camera.position.x = characterPosX * 0.3;
+    camera.lookAt(characterPosX, 1.2, 0);
+
+    renderer.render(scene, camera);
   }
 
-  function onPasswordBlur() {
-    if (!isFocusedOnPassword) return;
-    isFocusedOnPassword = false;
-    // إعادة تشغيل المشي الطبيعي بعد توقف الركض
-    if (runInterval) { clearInterval(runInterval); runInterval = null; }
-    studentElement.style.animation = "";
-    studentElement.innerHTML = `<span>🧑‍🎓</span><span>🎒</span><div class="walker-label">أنا أتعلم</div>`;
-    currentPos = parseFloat(studentElement.style.left) || currentPos;
-    // استمرار المشي
-    if (normalWalkLoop) clearInterval(normalWalkLoop);
-    startWalking();
-  }
+  animateLoop();
 
-  // عرض رسالة
+  // تسجيل الدخول
   function showStatusMessage(msg, type = 'info') {
     statusDiv.innerHTML = `<div style="background: ${type === 'error' ? 'rgba(255,80,80,0.2)' : 'rgba(90,170,255,0.2)'}; border-radius: 60px; padding: 10px; color: ${type === 'error' ? '#ffaeae' : '#c4e6ff'}">${msg}</div>`;
-    setTimeout(() => {
-      if (statusDiv.innerHTML.includes(msg)) statusDiv.innerHTML = '';
-    }, 3500);
+    setTimeout(() => { if (statusDiv.innerHTML.includes(msg)) statusDiv.innerHTML = ''; }, 3800);
   }
 
-  // تسجيل الدخول الفعلي
   async function performLogin() {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
-    if (!email || !password) {
-      showStatusMessage('❌ يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error');
-      return;
-    }
-    if (!email.includes('@')) {
-      showStatusMessage('📧 البريد الإلكتروني غير صالح', 'error');
-      return;
-    }
+    if (!email || !password) { showStatusMessage('❌ يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error'); return; }
+    if (!email.includes('@')) { showStatusMessage('📧 البريد الإلكتروني غير صالح', 'error'); return; }
 
     loginBtn.disabled = true;
     loginBtn.innerHTML = '<span>⏳</span> جاري التحقق...';
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .eq("password", password)
-        .single();
+      const { data, error } = await supabase.from("users").select("*").eq("email", email).eq("password", password).single();
+      if (error || !data) { showStatusMessage('🔐 بيانات الدخول غير صحيحة', 'error'); loginBtn.disabled = false; loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي'; return; }
+      if (data.is_active === false) { showStatusMessage('⚠️ الحساب معطل', 'error'); loginBtn.disabled = false; loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي'; return; }
 
-      if (error || !data) {
-        showStatusMessage('🔐 بيانات الدخول غير صحيحة، تأكد من البريد وكلمة المرور', 'error');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي';
-        return;
-      }
-
-      if (data.is_active === false) {
-        showStatusMessage('⚠️ الحساب معطل، تواصل مع الإدارة', 'error');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي';
-        return;
-      }
-
-      showStatusMessage('✅ مرحباً ' + (data.name || 'عزيزي المستخدم') + '! جاري التوجيه...', 'success');
+      showStatusMessage('✅ مرحباً ' + (data.name || 'عزيزي المستخدم') + '!', 'success');
       localStorage.setItem("currentUser", JSON.stringify(data));
-
-      // تسجيل سجل الدخول
-      try {
-        await supabase.from("login_logs").insert([{
-          user_id: data.id,
-          user_name: data.name,
-          user_email: data.email,
-          user_role: data.role,
-          login_time: new Date().toISOString()
-        }]);
-      } catch(e) { console.warn(e); }
-
+      try { await supabase.from("login_logs").insert([{ user_id: data.id, user_name: data.name, user_email: data.email, user_role: data.role, login_time: new Date().toISOString() }]); } catch(e) {}
       setTimeout(() => {
         if (data.role === "admin") window.location.href = "admin.html";
         else if (data.role === "teacher") window.location.href = "teacher.html";
         else if (data.role === "student") window.location.href = "student-modern.html";
         else window.location.href = "dashboard-home.html";
       }, 1100);
-
-    } catch (err) {
-      console.error(err);
-      showStatusMessage('⚠️ خطأ في الاتصال، حاول مرة أخرى', 'error');
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي';
-    }
+    } catch (err) { showStatusMessage('⚠️ خطأ في الاتصال', 'error'); loginBtn.disabled = false; loginBtn.innerHTML = '<span>🚀</span> دخول إلى منصتي'; }
   }
 
-  // ملء بيانات تجريبية (ديناميكية)
-  function fillDemoCredentials() {
-    // بيانات تجريبية معروفة مسبقاً (حسب قاعدة البيانات)
-    emailInput.value = "student@test.com";
-    passwordInput.value = "123456";
-    showStatusMessage('📝 تم تعبئة بيانات تجريبية (student@test.com / 123456) يمكنك تعديلها', 'info');
-    // اختياري: إثارة تأثير أن الشخصية تنظر ولكن ليس بالضرورة
-  }
+  function fillDemoCredentials() { emailInput.value = "student@test.com"; passwordInput.value = "123456"; showStatusMessage('📝 تم تعبئة بيانات تجريبية', 'info'); }
+  function contactSupport() { window.open('https://wa.me/201234567890?text=مرحباً، أحتاج مساعدة في منصة المأمون التعليمية', '_blank'); showStatusMessage('📱 جاري فتح محادثة واتساب', 'info'); }
 
-  // تهيئة الأحداث
-  function initEvents() {
-    passwordInput.addEventListener('focus', onPasswordFocus);
-    passwordInput.addEventListener('blur', onPasswordBlur);
-    loginBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      performLogin();
-    });
-    demoBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      fillDemoCredentials();
-      // إذا كان الحقل فارغ يمكن أن نلفت النظر أيضاً
-    });
-    // ضغط Enter
-    const handleEnter = (e) => { if (e.key === 'Enter') performLogin(); };
-    emailInput.addEventListener('keypress', handleEnter);
-    passwordInput.addEventListener('keypress', handleEnter);
-  }
+  loginBtn.onclick = (e) => { e.preventDefault(); performLogin(); };
+  demoBtn.onclick = (e) => { e.preventDefault(); fillDemoCredentials(); };
+  supportBtn.onclick = (e) => { e.preventDefault(); contactSupport(); };
+  const handleEnter = (e) => { if (e.key === 'Enter') performLogin(); };
+  emailInput.addEventListener('keypress', handleEnter);
+  passwordInput.addEventListener('keypress', handleEnter);
 
-  // بدء الحركات والمشي
-  initWalkerPosition();
-  startWalking();
-  initEvents();
-
-  // إضافة تأثير إضافي: إذا قام المستخدم بالكتابة في الباسورد، الشخصية تظل محدقة
-  passwordInput.addEventListener('input', () => {
-    if (isFocusedOnPassword && runInterval === null && document.activeElement === passwordInput) {
-      // تأكد من أنه لا يزال يركض لكن واقف ينظر
-      if (Math.abs(parseFloat(studentElement.style.left) - 42) < 8) {
-        studentElement.innerHTML = `<span>🧑‍🎓👀</span><span>🎒</span><div class="walker-label">يبص لكلمة السر</div>`;
-      }
-    } else if (isFocusedOnPassword) {
-      if (!runInterval && normalWalkLoop) {
-        // لإعادة التأكيد
-      }
-    }
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // إضافة لمسة أن الشخصية تتفاعل مع النقر على أي حقل آخر
-  emailInput.addEventListener('focus', () => {
-    // لا تجري، فقط تتجه قليلاً نظرة
-    if (!isFocusedOnPassword) {
-      studentElement.innerHTML = `<span>🧑‍🎓🤔</span><span>🎒</span><div class="walker-label">ينظر إلى البريد</div>`;
-      setTimeout(() => {
-        if (!isFocusedOnPassword && studentElement.innerHTML.includes("ينظر إلى البريد"))
-          studentElement.innerHTML = `<span>🧑‍🎓</span><span>🎒</span><div class="walker-label">أنا أتعلم</div>`;
-      }, 1200);
-    }
-  });
-
-  // محاكاة بيئة تفاعلية تعليمية غنية
-  console.log("✅ عالم تعليمي تفاعلي جاهز | الشخصية تمشي وتجري نحو حقل الباسورد");
+  startNormalWalk();
 </script>
 </body>
 </html>
