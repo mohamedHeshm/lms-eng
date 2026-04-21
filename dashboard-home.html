@@ -579,6 +579,7 @@
       margin: 0 auto 15px auto;
       border: 3px solid rgba(255,255,255,0.2);
       object-fit: cover;
+      background: linear-gradient(135deg, #667eea, #764ba2);
     }
 
     .teacher-card h3 {
@@ -837,6 +838,16 @@
 
     .user-badge .logout-icon:hover {
       background: #ff5252;
+    }
+
+    /* Style for image upload in teacher profile */
+    .image-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 10px auto;
+      border: 3px solid #667eea;
     }
   </style>
 </head>
@@ -1172,20 +1183,27 @@
 
       container.innerHTML = ''
       for (const teacher of teachers) {
-        // تحديد صورة المدرس - أولوية للحقول المختلفة
-        let teacherImage = 'https://via.placeholder.com/120'
+        // تحديد صورة المدرس - البحث في عدة حقول
+        let teacherImage = 'https://ui-avatars.com/api/?background=667eea&color=fff&rounded=true&size=120&bold=true&name=' + encodeURIComponent(teacher.name || 'مدرس')
 
-        if (teacher.image && teacher.image.trim() !== '') {
+        // التحقق من وجود صورة في قاعدة البيانات
+        if (teacher.image && teacher.image.trim() !== '' && teacher.image !== 'null' && teacher.image !== 'undefined') {
           teacherImage = teacher.image
-        } else if (teacher.avatar_url && teacher.avatar_url.trim() !== '') {
+        } else if (teacher.avatar_url && teacher.avatar_url.trim() !== '' && teacher.avatar_url !== 'null' && teacher.avatar_url !== 'undefined') {
           teacherImage = teacher.avatar_url
-        } else if (teacher.profile_image && teacher.profile_image.trim() !== '') {
+        } else if (teacher.profile_image && teacher.profile_image.trim() !== '' && teacher.profile_image !== 'null' && teacher.profile_image !== 'undefined') {
           teacherImage = teacher.profile_image
+        } else if (teacher.photo_url && teacher.photo_url.trim() !== '' && teacher.photo_url !== 'null' && teacher.photo_url !== 'undefined') {
+          teacherImage = teacher.photo_url
         }
+
+        console.log(`صورة المدرس ${teacher.name}:`, teacherImage) // للتأكد من الرابط
 
         container.innerHTML += `
           <div class="teacher-card">
-            <img src="${escapeHtml(teacherImage)}" alt="${escapeHtml(teacher.name)}" onerror="this.src='https://via.placeholder.com/120'">
+            <img src="${escapeHtml(teacherImage)}"
+                 alt="${escapeHtml(teacher.name)}"
+                 onerror="this.src='https://ui-avatars.com/api/?background=667eea&color=fff&rounded=true&size=120&bold=true&name=${encodeURIComponent(teacher.name || 'مدرس')}'">
             <h3>${escapeHtml(teacher.name || 'مدرس')}</h3>
             <p style="margin: 10px 0; line-height: 1.6;">${escapeHtml(teacher.bio || 'معلم متميز في مجاله، يقدم محتوى تعليمي مميز للطلاب')}</p>
 
