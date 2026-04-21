@@ -574,6 +574,7 @@
       <div class="sidebar-title">القائمة الرئيسية</div>
       <button class="menu-btn active" onclick="openTab('profile', this)">👤 البروفايل الشخصي</button>
       <button class="menu-btn" onclick="openTab('social', this)">🔗 روابط التواصل</button>
+      <button class="menu-btn" onclick="openTab('sampleVideos', this)">🎬 الفيديوهات النموذجية</button>
       <button class="menu-btn" onclick="openTab('note', this)">📝 نشر ملاحظة</button>
       <button class="menu-btn" onclick="openTab('video', this)">🎥 نشر فيديو</button>
       <button class="menu-btn" onclick="openTab('pdf', this)">📁 رفع الواجبات</button>
@@ -617,6 +618,26 @@
         <input type="text" id="whatsapp" placeholder="💬 رابط واتساب">
         <input type="text" id="youtube" placeholder="▶️ رابط يوتيوب">
         <button onclick="saveSocial()">💾 حفظ الروابط</button>
+      </div>
+    </div>
+
+    <!-- SAMPLE VIDEOS TAB -->
+    <div id="sampleVideos" class="tab-content">
+      <div class="card">
+        <h3>🎬 الفيديوهات النموذجية</h3>
+        <p style="color: #666; margin-bottom: 20px;">📝 هذه الفيديوهات سيتم عرضها في بروفايلك كنماذج لشرحك</p>
+
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+          <h4 style="margin-bottom: 15px;">➕ إضافة فيديو نموذجي</h4>
+          <input type="text" id="sampleVideoTitle" placeholder="📝 عنوان الفيديو (مثال: شرح الفصل الأول)" style="margin-bottom: 10px;">
+          <input type="text" id="sampleVideoUrl" placeholder="🔗 رابط الفيديو (YouTube أو أي منصة)" style="margin-bottom: 10px;">
+          <button onclick="addSampleVideo()" style="background: linear-gradient(135deg, #667eea, #764ba2);">➕ إضافة الفيديو</button>
+        </div>
+
+        <h4 style="margin: 20px 0;">📺 الفيديوهات المضافة</h4>
+        <div id="sampleVideosList" style="display: grid; gap: 15px;">
+          <p style="text-align: center; color: #999;">⏳ جاري التحميل...</p>
+        </div>
       </div>
     </div>
 
@@ -1206,9 +1227,107 @@
   window.scrollToTop = function() { window.scrollTo({ top: 0, behavior: 'smooth' }) }
   window.scrollToBottom = function() { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) }
 
+  // ==================== SAMPLE VIDEOS ====================
+  window.addSampleVideo = async function() {
+    try {
+      const title = document.getElementById("sampleVideoTitle")?.value.trim()
+      const url = document.getElementById("sampleVideoUrl")?.value.trim()
+      const currentUser = getCurrentUser()
+
+      if (!title) return alert("❗ اكتب عنوان الفيديو")
+      if (!url) return alert("❗ أدخل رابط الفيديو")
+      if (!currentUser) return alert("❗ مش مسجل دخول")
+
+      // تحويل رابط YouTube إلى embed
+      let embedUrl = url
+      if (url.includes("watch?v=")) embedUrl = url.replace("watch?v=", "embed/")
+      if (url.includes("youtu.be/")) {
+        const id = url.split("youtu.be/")[1].split("?")[0]
+        embedUrl = "https://www.youtube.com/embed/" + id
+      }
+
+      const { error } = await supabase.from("sample_videos").insert([{
+        teacher_id: currentUser.id,
+        title: title,
+        url: embedUrl,
+        created_at: new Date().toISOString()
+      }])
+
+      if (error) return alert("❌ خطأ: " + error.message)
+
+      alert("✅ تم إضافة الفيديو النموذجي")
+      document.getElementById("sampleVideoTitle").value = ""
+      document.getElementById("sampleVideoUrl").value = ""
+      loadSampleVideosTeacher()
+    } catch (error) {
+      console.error("Add sample video error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
+  window.loadSampleVideosTeacher = async function() {
+    try {
+      const currentUser = getCurrentUser()
+      if (!currentUser) return
+
+      const { data: videos, error } = await supabase
+        .from("sample_videos")
+        .select("*")
+        .eq("teacher_id", currentUser.id)
+        .order("created_at", { ascending: false })
+
+      const container = document.getElementById("sampleVideosList")
+      if (!container) return
+
+      if (error || !videos || videos.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">📭 لا توجد فيديوهات نموذجية بعد</p>'
+        return
+      }
+
+      container.innerHTML = ''
+      videos.forEach((video, index) => {
+        const date = new Date(video.created_at).toLocaleDateString('ar-EG')
+        container.innerHTML += `
+          <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; border-right: 4px solid #667eea; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <p style="font-weight: 600; margin-bottom: 5px;">🎥 ${escapeHtml(video.title)}</p>
+              <p style="font-size: 0.9rem; color: #999;">📅 ${date}</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <a href="${escapeHtml(video.url)}" target="_blank" style="background: #667eea; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">▶️ مشاهدة</a>
+              <button onclick="window.deleteSampleVideo('${video.id}')" style="background: #ff5252; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🗑 حذف</button>
+            </div>
+          </div>
+        `
+      })
+    } catch (error) {
+      console.error("Load sample videos error:", error)
+    }
+  }
+
+  window.deleteSampleVideo = async function(videoId) {
+    if (!confirm("هل تريد حذف هذا الفيديو النموذجي؟")) return
+
+    try {
+      const { error } = await supabase
+        .from("sample_videos")
+        .delete()
+        .eq("id", videoId)
+
+      if (error) return alert("❌ خطأ: " + error.message)
+
+      alert("✅ تم الحذف")
+      loadSampleVideosTeacher()
+    } catch (error) {
+      console.error("Delete sample video error:", error)
+      alert("❌ خطأ: " + error.message)
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     loadCurrentProfile()
     loadCurrentSocial()
+    loadSampleVideosTeacher()
   })
 </script>
 </body>

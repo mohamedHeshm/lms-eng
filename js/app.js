@@ -7,6 +7,7 @@ const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ================== Helper Functions ==================
+
 function escapeHtml(text) {
   if (!text) return ''
   const div = document.createElement('div')
@@ -2189,4 +2190,65 @@ window.loadPlaylistViewer = async function() {
         </div>
       `).join("")}
     </div>`
+}
+
+// ================== تحميل المدرسين مع التقييمات والتعليقات ==================
+window.loadTeachersWithRatings = async function() {
+  const container = document.getElementById('teachersGrid')
+  if (!container) return
+
+  try {
+    let { data: teachers, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('role', 'teacher')
+
+    if (error || !teachers || teachers.length === 0) {
+      container.innerHTML = '<p style="color:rgba(255,255,255,0.7); grid-column:1/-1; text-align:center;">📭 لا يوجد مدرسين</p>'
+      return
+    }
+
+    // تحميل التعليقات للمدرسين
+    let { data: allComments } = await supabase
+      .from('teacher_comments')
+      .select('*')
+
+    container.innerHTML = ''
+    for (const teacher of teachers) {
+      const comments = (allComments || []).filter(c => c.teacher_id === teacher.id)
+      const avgRating = comments.length > 0
+        ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
+        : 0
+
+      // آخر تعليق
+      const lastComment = comments.length > 0 ? comments[0] : null
+      const commentPreview = lastComment
+        ? `💬 "${escapeHtml(lastComment.comment.substring(0, 50))}..."`
+        : '📝 لا توجد تعليقات بعد'
+
+      const ratingStars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : '📊'
+
+      container.innerHTML += `
+        <div class="teacher-card">
+          <img src="${escapeHtml(teacher.image || 'images/default-teacher.jpg')}" alt="${escapeHtml(teacher.name)}" onerror="this.src='https://via.placeholder.com/100'">
+          <h3>${escapeHtml(teacher.name || 'مدرس')}</h3>
+          <p>${escapeHtml(teacher.bio || 'معلم متميز')}</p>
+
+          <div class="teacher-rating">${ratingStars} ${avgRating || 'جديد'}</div>
+          <div class="teacher-comments-preview">${commentPreview}</div>
+
+          <div class="teacher-links" style="flex-grow: 1;">
+            ${teacher.social?.facebook ? `<a href="${escapeHtml(teacher.social.facebook)}" target="_blank">📘 فيسبوك</a>` : ''}
+            ${teacher.social?.whatsapp ? `<a href="${escapeHtml(teacher.social.whatsapp)}" target="_blank">📱 واتساب</a>` : ''}
+            ${teacher.social?.youtube ? `<a href="${escapeHtml(teacher.social.youtube)}" target="_blank">▶ يوتيوب</a>` : ''}
+          </div>
+
+          <button class="teacher-profile-btn" onclick="window.location.href='teacher-profile.html?id=${teacher.id}'">👁️ زار البروفايل</button>
+        </div>
+      `
+    }
+  } catch (error) {
+    console.error('Error loading teachers:', error)
+    container.innerHTML = '<p style="color:#ff4d4d; grid-column:1/-1; text-align:center;">❌ خطأ في التحميل</p>'
+  }
 }

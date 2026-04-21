@@ -550,7 +550,7 @@
 
     .teachers-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 30px;
     }
 
@@ -558,14 +558,16 @@
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(20px);
       border-radius: 20px;
-      padding: 30px;
+      padding: 25px;
       text-align: center;
       transition: 0.4s;
       border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     .teacher-card:hover {
-      transform: translateY(-10px) scale(1.05);
+      transform: translateY(-10px) scale(1.02);
       border-color: #667eea;
       background: rgba(102,126,234,0.1);
     }
@@ -580,11 +582,32 @@
 
     .teacher-card h3 {
       margin-bottom: 10px;
+      font-size: 1.2rem;
     }
 
     .teacher-card p {
       color: rgba(255,255,255,0.7);
       margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+
+    .teacher-rating {
+      font-size: 1.2rem;
+      margin: 12px 0;
+      color: #ffc107;
+      font-weight: 700;
+    }
+
+    .teacher-comments-preview {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 15px 0;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      max-height: 80px;
+      overflow: hidden;
+      border-right: 3px solid #667eea;
     }
 
     .teacher-links {
@@ -592,6 +615,9 @@
       justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
+      margin: 15px 0;
+      flex-grow: 1;
+      align-items: flex-end;
     }
 
     .teacher-links a {
@@ -606,6 +632,25 @@
 
     .teacher-links a:hover {
       background: #667eea;
+    }
+
+    .teacher-profile-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 600;
+      width: 100%;
+      transition: 0.3s;
+      margin-top: 15px;
+    }
+
+    .teacher-profile-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
     }
 
     /* ==================== PLAYLISTS HOME ==================== */
@@ -903,26 +948,8 @@
 <!-- TEACHERS SECTION -->
 <section class="teachers" id="teachers">
   <h2 class="section-title">👨‍🏫 المدرسين</h2>
-  <div class="teachers-grid">
-    <div class="teacher-card">
-      <img src="images/WhatsApp Image 2026-02-28 at 10.34.19 AM.jpeg" alt="teacher">
-      <h3>Eng \ mohamed hesham mohamed</h3>
-      <p>Software engineer</p>
-      <div class="teacher-links">
-        <a href="https://www.facebook.com/share/1RbCdJVMjL/" target="_blank">📘 فيسبوك</a>
-        <a href="https://wa.me/qr/FMXMGJVKOCLME1" target="_blank">📱 واتساب</a>
-      </div>
-    </div>
-    <div class="teacher-card">
-      <img src="images/abdo.jpeg" alt="teacher">
-      <h3>أ/ عبد الرحمن مأمون</h3>
-      <p>مدرس احياء وجيلوجيا وعلوم متكامله</p>
-      <div class="teacher-links">
-        <a href="https://www.facebook.com/abdalrahman.moamen.39?mibextid=ZbWKwL" target="_blank">📘 فيسبوك</a>
-        <a href="https://wa.me/qr/2IMVJVOLZDK6J1" target="_blank">📱 واتساب</a>
-        <a href="https://youtube.com/@mr-mamoun-1?si=vYphwqasHmR0BPfO" target="_blank">▶ يوتيوب</a>
-      </div>
-    </div>
+  <div class="teachers-grid" id="teachersGrid">
+    <p style="text-align:center; grid-column:1/-1; color:rgba(255,255,255,0.7);">⏳ جاري تحميل المدرسين...</p>
   </div>
 </section>
 
@@ -1160,10 +1187,72 @@ window.loadAllPlaylistsHome = async function() {
     }
   }
 
+  // تحميل المدرسين مع التقييمات والتعليقات
+  window.loadTeachersWithRatings = async function() {
+    const container = document.getElementById('teachersGrid')
+    if (!container) return
+
+    try {
+      let { data: teachers, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('role', 'teacher')
+
+      if (error || !teachers || teachers.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.7); grid-column:1/-1; text-align:center;">📭 لا يوجد مدرسين</p>'
+        return
+      }
+
+      // تحميل التعليقات للمدرسين
+      let { data: allComments } = await supabase
+        .from('teacher_comments')
+        .select('*')
+
+      container.innerHTML = ''
+      for (const teacher of teachers) {
+        const comments = (allComments || []).filter(c => c.teacher_id === teacher.id)
+        const avgRating = comments.length > 0
+          ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
+          : 0
+
+        // آخر تعليق
+        const lastComment = comments.length > 0 ? comments[0] : null
+        const commentPreview = lastComment
+          ? `💬 "${escapeHtml(lastComment.comment.substring(0, 50))}..."`
+          : '📝 لا توجد تعليقات بعد'
+
+        const ratingStars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : '📊'
+
+        container.innerHTML += `
+          <div class="teacher-card">
+            <img src="${escapeHtml(teacher.image || 'images/default-teacher.jpg')}" alt="${escapeHtml(teacher.name)}" onerror="this.src='https://via.placeholder.com/100'">
+            <h3>${escapeHtml(teacher.name || 'مدرس')}</h3>
+            <p>${escapeHtml(teacher.bio || 'معلم متميز')}</p>
+
+            <div class="teacher-rating">${ratingStars} ${avgRating || 'جديد'}</div>
+            <div class="teacher-comments-preview">${commentPreview}</div>
+
+            <div class="teacher-links" style="flex-grow: 1;">
+              ${teacher.social?.facebook ? `<a href="${escapeHtml(teacher.social.facebook)}" target="_blank">📘 فيسبوك</a>` : ''}
+              ${teacher.social?.whatsapp ? `<a href="${escapeHtml(teacher.social.whatsapp)}" target="_blank">📱 واتساب</a>` : ''}
+              ${teacher.social?.youtube ? `<a href="${escapeHtml(teacher.social.youtube)}" target="_blank">▶ يوتيوب</a>` : ''}
+            </div>
+
+            <button class="teacher-profile-btn" onclick="window.location.href='teacher-profile.html?id=${teacher.id}'">👁️ زار البروفايل</button>
+          </div>
+        `
+      }
+    } catch (error) {
+      console.error('Error loading teachers:', error)
+      container.innerHTML = '<p style="color:#ff4d4d; grid-column:1/-1; text-align:center;">❌ خطأ في التحميل</p>'
+    }
+  }
+
   // تحميل البيانات عند فتح الصفحة
   window.addEventListener('load', () => {
     updateAuthUI()
     window.loadAllPlaylistsHome()
+    window.loadTeachersWithRatings()
     checkRedirectAfterLogin()
   })
 </script>
