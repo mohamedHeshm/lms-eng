@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Al-Ma'moun LMS - المنصة التعليمية الذكية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="images/WhatsA.jpeg" type="image/x-icon">
   <style>
     * {
       margin: 0;
@@ -23,7 +24,7 @@
       min-height: 100vh;
       color: #fff;
       position: relative;
-        padding-top: 80px;
+      padding-top: 80px;
     }
 
     /* ==================== ANIMATED BACKGROUND ==================== */
@@ -98,22 +99,21 @@
     }
 
     /* ==================== HEADER ==================== */
- header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(15, 15, 30, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  z-index: 1000;
-  backdrop-filter: blur(20px);
-  background: rgba(15, 15, 30, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
     .logo {
       font-size: 28px;
       font-weight: 700;
@@ -573,41 +573,24 @@
     }
 
     .teacher-card img {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      margin-bottom: 15px;
+      margin: 0 auto 15px auto;
       border: 3px solid rgba(255,255,255,0.2);
+      object-fit: cover;
     }
 
     .teacher-card h3 {
       margin-bottom: 10px;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
 
     .teacher-card p {
       color: rgba(255,255,255,0.7);
       margin-bottom: 15px;
       font-size: 0.95rem;
-    }
-
-    .teacher-rating {
-      font-size: 1.2rem;
-      margin: 12px 0;
-      color: #ffc107;
-      font-weight: 700;
-    }
-
-    .teacher-comments-preview {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 12px;
-      margin: 15px 0;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-      max-height: 80px;
-      overflow: hidden;
-      border-right: 3px solid #667eea;
+      line-height: 1.6;
     }
 
     .teacher-links {
@@ -947,7 +930,7 @@
 
 <!-- TEACHERS SECTION -->
 <section class="teachers" id="teachers">
-  <h2 class="section-title">👨‍🏫 المدرسين</h2>
+  <h2 class="section-title">👨‍🏫 المدرسون</h2>
   <div class="teachers-grid" id="teachersGrid">
     <p style="text-align:center; grid-column:1/-1; color:rgba(255,255,255,0.7);">⏳ جاري تحميل المدرسين...</p>
   </div>
@@ -1007,16 +990,7 @@
     return div.innerHTML
   }
 
-  function convertToEmbed(url) {
-    if (url.includes("watch?v=")) return url.replace("watch?v=", "embed/")
-    if (url.includes("youtu.be/")) {
-      let id = url.split("youtu.be/")[1].split("?")[0]
-      return "https://www.youtube.com/embed/" + id
-    }
-    return url
-  }
-
-  // تحديث واجهة المستخدم بناءً على حالة تسجيل الدخول
+  // تحديث واجهة المستخدم
   function updateAuthUI() {
     const currentUser = getCurrentUser()
     const authSection = document.getElementById('authSection')
@@ -1058,75 +1032,71 @@
     }
   }
 
-  // عرض كل القوائم في الصفحة الرئيسية
- // عرض كل القوائم في الصفحة الرئيسية (مع الصور)
-window.loadAllPlaylistsHome = async function() {
-  let container = document.getElementById("playlistsHomeGrid")
-  if (!container) return
+  // عرض قوائم التشغيل
+  window.loadAllPlaylistsHome = async function() {
+    let container = document.getElementById("playlistsHomeGrid")
+    if (!container) return
 
-  container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
+    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>⏳ جاري التحميل...</p>"
 
-  let { data: playlists, error } = await supabase
-    .from("playlists")
-    .select("*")
-    .order("id", { ascending: false })
+    let { data: playlists, error } = await supabase
+      .from("playlists")
+      .select("*")
+      .order("id", { ascending: false })
 
-  if (error || !playlists) {
-    container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
-    return
-  }
-  if (playlists.length === 0) {
-    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
-    return
-  }
+    if (error || !playlists) {
+      container.innerHTML = `<p style='text-align:center; color:#f5576c; grid-column:1/-1;'>⚠️ لا يمكن تحميل القوائم. ${escapeHtml(error?.message || "")}</p>`
+      return
+    }
+    if (playlists.length === 0) {
+      container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7); grid-column:1/-1;'>📭 لا توجد قوائم تشغيل بعد</p>"
+      return
+    }
 
-  let { data: vids } = await supabase.from("playlist_videos").select("playlist_id")
+    let { data: vids } = await supabase.from("playlist_videos").select("playlist_id")
 
-  container.innerHTML = ""
-  playlists.forEach(p => {
-    let count = (vids || []).filter(v => v.playlist_id === p.id).length
+    container.innerHTML = ""
+    playlists.forEach(p => {
+      let count = (vids || []).filter(v => v.playlist_id === p.id).length
 
-    // صورة القائمة (إذا وجدت) أو أيقونة افتراضية
-    const thumbnailStyle = p.thumbnail_url
-      ? `background-image: url('${escapeHtml(p.thumbnail_url)}'); background-size: cover; background-position: center; font-size: 0;`
-      : `background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 200%; animation: thumbGrad 5s ease infinite; font-size: 70px; display: flex; align-items: center; justify-content: center;`
+      const thumbnailStyle = p.thumbnail_url
+        ? `background-image: url('${escapeHtml(p.thumbnail_url)}'); background-size: cover; background-position: center; font-size: 0;`
+        : `background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 200%; animation: thumbGrad 5s ease infinite; font-size: 70px; display: flex; align-items: center; justify-content: center;`
 
-    const thumbnailContent = p.thumbnail_url ? '' : '🎬'
+      const thumbnailContent = p.thumbnail_url ? '' : '🎬'
 
-    container.innerHTML += `
-      <div class="playlist-home-card" onclick="window.checkAccessAndOpen('${p.id}')">
-        <div class="playlist-thumb" style="${thumbnailStyle}">
-          ${thumbnailContent}
-        </div>
-        <div class="playlist-body">
-          <h3>${escapeHtml(p.name)}</h3>
-          <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
-          <div class="playlist-meta">
-            <span>📺 ${count} فيديو</span>
-            <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
+      container.innerHTML += `
+        <div class="playlist-home-card" onclick="window.checkAccessAndOpen('${p.id}')">
+          <div class="playlist-thumb" style="${thumbnailStyle}">
+            ${thumbnailContent}
           </div>
-        </div>
-      </div>`
-  })
-}
-  // التحقق من صلاحية الطالب قبل فتح القائمة
+          <div class="playlist-body">
+            <h3>${escapeHtml(p.name)}</h3>
+            <p class="teacher-name">👨‍🏫 ${escapeHtml(p.teacher_name || "مدرس")}</p>
+            <div class="playlist-meta">
+              <span>📺 ${count} فيديو</span>
+              <span class="price">${p.price > 0 ? "💰 " + p.price + " ج" : "🆓 مجاني"}</span>
+            </div>
+          </div>
+        </div>`
+    })
+  }
+
+  // التحقق من الصلاحية
   window.checkAccessAndOpen = async function(playlistId) {
     const currentUser = getCurrentUser()
 
-    // إذا لم يكن هناك مستخدم مسجل
     if (!currentUser) {
       selectedPlaylistId = playlistId
       showLoginModal()
       return
     }
 
-    // إذا كان المستخدم مدرس أو أدمن => يسمح له
     if (currentUser.role === 'teacher' || currentUser.role === 'admin') {
       window.location.href = `playlist-view.html?id=${playlistId}`
       return
     }
 
-    // إذا كان طالب => لازم يكون رفع حل على الأقل مرة
     if (currentUser.role === 'student') {
       let { data: sols } = await supabase
         .from("solutions")
@@ -1143,7 +1113,6 @@ window.loadAllPlaylistsHome = async function() {
       return
     }
 
-    // أي حالة أخرى
     showLoginModal()
   }
 
@@ -1163,14 +1132,12 @@ window.loadAllPlaylistsHome = async function() {
     window.location.href = 'index.html'
   }
 
-  // التحقق من إعادة التوجيه بعد تسجيل الدخول
   function checkRedirectAfterLogin() {
     const redirectId = localStorage.getItem('redirectAfterLogin')
     if (redirectId) {
       localStorage.removeItem('redirectAfterLogin')
       const currentUser = getCurrentUser()
       if (currentUser && currentUser.role === 'student') {
-        // التحقق من وجود حلول
         supabase.from("solutions").select("id").eq("student_id", currentUser.id).limit(1).then(({ data }) => {
           if (data && data.length > 0) {
             window.location.href = `playlist-view.html?id=${redirectId}`
@@ -1187,7 +1154,7 @@ window.loadAllPlaylistsHome = async function() {
     }
   }
 
-  // تحميل المدرسين مع التقييمات والتعليقات
+  // تحميل المدرسين مع صور خاصة بكل مدرس
   window.loadTeachersWithRatings = async function() {
     const container = document.getElementById('teachersGrid')
     if (!container) return
@@ -1203,42 +1170,32 @@ window.loadAllPlaylistsHome = async function() {
         return
       }
 
-      // تحميل التعليقات للمدرسين
-      let { data: allComments } = await supabase
-        .from('teacher_comments')
-        .select('*')
-
       container.innerHTML = ''
       for (const teacher of teachers) {
-        const comments = (allComments || []).filter(c => c.teacher_id === teacher.id)
-        const avgRating = comments.length > 0
-          ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
-          : 0
+        // تحديد صورة المدرس - أولوية للحقول المختلفة
+        let teacherImage = 'https://via.placeholder.com/120'
 
-        // آخر تعليق
-        const lastComment = comments.length > 0 ? comments[0] : null
-        const commentPreview = lastComment
-          ? `💬 "${escapeHtml(lastComment.comment.substring(0, 50))}..."`
-          : '📝 لا توجد تعليقات بعد'
-
-        const ratingStars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : '📊'
+        if (teacher.image && teacher.image.trim() !== '') {
+          teacherImage = teacher.image
+        } else if (teacher.avatar_url && teacher.avatar_url.trim() !== '') {
+          teacherImage = teacher.avatar_url
+        } else if (teacher.profile_image && teacher.profile_image.trim() !== '') {
+          teacherImage = teacher.profile_image
+        }
 
         container.innerHTML += `
           <div class="teacher-card">
-            <img src="${escapeHtml(teacher.image || 'images/default-teacher.jpg')}" alt="${escapeHtml(teacher.name)}" onerror="this.src='https://via.placeholder.com/100'">
+            <img src="${escapeHtml(teacherImage)}" alt="${escapeHtml(teacher.name)}" onerror="this.src='https://via.placeholder.com/120'">
             <h3>${escapeHtml(teacher.name || 'مدرس')}</h3>
-            <p>${escapeHtml(teacher.bio || 'معلم متميز')}</p>
+            <p style="margin: 10px 0; line-height: 1.6;">${escapeHtml(teacher.bio || 'معلم متميز في مجاله، يقدم محتوى تعليمي مميز للطلاب')}</p>
 
-            <div class="teacher-rating">${ratingStars} ${avgRating || 'جديد'}</div>
-            <div class="teacher-comments-preview">${commentPreview}</div>
-
-            <div class="teacher-links" style="flex-grow: 1;">
+            <div class="teacher-links" style="flex-grow: 1; margin: 15px 0;">
               ${teacher.social?.facebook ? `<a href="${escapeHtml(teacher.social.facebook)}" target="_blank">📘 فيسبوك</a>` : ''}
               ${teacher.social?.whatsapp ? `<a href="${escapeHtml(teacher.social.whatsapp)}" target="_blank">📱 واتساب</a>` : ''}
               ${teacher.social?.youtube ? `<a href="${escapeHtml(teacher.social.youtube)}" target="_blank">▶ يوتيوب</a>` : ''}
             </div>
 
-            <button class="teacher-profile-btn" onclick="window.location.href='teacher-profile.html?id=${teacher.id}'">👁️ زار البروفايل</button>
+            <button class="teacher-profile-btn" onclick="window.location.href='teacher-profile.html?id=${teacher.id}'">👁️ زيارة البروفايل</button>
           </div>
         `
       }
@@ -1248,7 +1205,7 @@ window.loadAllPlaylistsHome = async function() {
     }
   }
 
-  // تحميل البيانات عند فتح الصفحة
+  // تحميل البيانات
   window.addEventListener('load', () => {
     updateAuthUI()
     window.loadAllPlaylistsHome()
