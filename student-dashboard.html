@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الطالب - منصة التعليم</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: var(--space-lg);
+      transition: margin-left var(--transition-base);
+    }
+
+    .main-content.sidebar-collapsed {
+      margin-left: 0;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: var(--space-2xl);
+      border-radius: var(--border-radius-lg);
+      margin-bottom: var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .hero-text h1 {
+      color: white;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-text p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: var(--font-size-lg);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: var(--space-xl);
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .hero-stat-label {
+      font-size: var(--font-size-sm);
+      opacity: 0.9;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .action-card {
+      background: white;
+      padding: var(--space-lg);
+      border-radius: var(--border-radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      box-shadow: var(--shadow-md);
+      border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .action-icon {
+      font-size: var(--font-size-4xl);
+      margin-bottom: var(--space-md);
+    }
+
+    .action-title {
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    /* Progress Cards */
+    .progress-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .progress-card {
+      background: white;
+      padding: var(--space-lg);
+      border-radius: var(--border-radius-lg);
+      margin-bottom: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .progress-title {
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    .progress-percentage {
+      color: var(--primary);
+      font-weight: var(--font-weight-bold);
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding: var(--space-lg) 0 var(--space-lg) var(--space-xl);
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--primary), var(--success));
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: var(--space-lg);
+      padding: var(--space-md);
+      background: white;
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -var(--space-xl) - 6px;
+      top: var(--space-md);
+      width: 12px;
+      height: 12px;
+      background: var(--primary);
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+
+    .timeline-item.completed::before {
+      background: var(--success);
+    }
+
+    .timeline-date {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        padding: var(--space-md);
+      }
+
+      .hero-section {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats {
+        justify-content: space-around;
+      }
+
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">🎓</div>
+    <div class="sidebar-brand">التعليم</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">📊</span>
+      <span>لوحة التحكم</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📚</span>
+      <span>الكورسات</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">✅</span>
+      <span>الواجبات</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📊</span>
+      <span>الدرجات</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">💬</span>
+      <span>الرسائل</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>الإعدادات</span>
+    </div>
+    <div class="nav-item" style="margin-top: var(--space-2xl); color: var(--danger);">
+      <span class="nav-icon">🚪</span>
+      <span>تسجيل الخروج</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <button class="navbar-toggle" onclick="toggleSidebar()">☰</button>
+  
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="ابحث عن كورس أو درس...">
+  </div>
+
+  <div class="navbar-spacer"></div>
+
+  <div class="navbar-actions">
+    <div class="notification-badge">
+      <span style="font-size: 18px;">🔔</span>
+      <div class="notification-dot"></div>
+    </div>
+
+    <div class="user-menu">
+      <div class="user-avatar">ع</div>
+      <div style="font-size: var(--font-size-sm); color: var(--text-primary);">
+        <div style="font-weight: var(--font-weight-semibold);">علاء محمد</div>
+        <div style="color: var(--text-tertiary); font-size: var(--font-size-xs);">طالب</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-text">
+      <h1>مرحباً بعودتك، علاء 👋</h1>
+      <p>استمر في رحلة التعلم الخاصة بك وحقق أهدافك الأكاديمية</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="coursesCount">3</div>
+        <div class="hero-stat-label">كورسات</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="progressAvg">78</div>
+        <div class="hero-stat-label">%</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="tasksRemaining">2</div>
+        <div class="hero-stat-label">واجبات</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <div class="action-card" onclick="goToCourses()">
+      <div class="action-icon">📚</div>
+      <div class="action-title">استكشف الكورسات</div>
+    </div>
+    <div class="action-card" onclick="goToAssignments()">
+      <div class="action-icon">✅</div>
+      <div class="action-title">واجباتي</div>
+    </div>
+    <div class="action-card" onclick="goToGrades()">
+      <div class="action-icon">📊</div>
+      <div class="action-title">درجاتي</div>
+    </div>
+    <div class="action-card" onclick="goToMessages()">
+      <div class="action-icon">💬</div>
+      <div class="action-title">رسائلي</div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg);">
+    <!-- Left Column -->
+    <div>
+      <!-- Current Courses -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🎓 كورساتي الحالية</h3>
+        </div>
+        <div class="card-body">
+          <div id="coursesContainer" style="display: grid; gap: var(--space-md);">
+            <div class="skeleton" style="height: 120px;"></div>
+            <div class="skeleton" style="height: 120px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignments -->
+      <div class="card" style="margin-top: var(--space-lg);">
+        <div class="card-header">
+          <h3>✅ الواجبات المتبقية</h3>
+        </div>
+        <div class="card-body">
+          <div id="assignmentsContainer" style="display: grid; gap: var(--space-md);">
+            <div class="skeleton" style="height: 80px;"></div>
+            <div class="skeleton" style="height: 80px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <!-- Progress Summary -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📈 تقدمي</h3>
+        </div>
+        <div class="card-body progress-section" id="progressContainer">
+          <div class="skeleton" style="height: 40px; margin-bottom: var(--space-md);"></div>
+          <div class="skeleton" style="height: 40px; margin-bottom: var(--space-md);"></div>
+          <div class="skeleton" style="height: 40px;"></div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card" style="margin-top: var(--space-lg);">
+        <div class="card-header">
+          <h3>📅 آخر الأنشطة</h3>
+        </div>
+        <div class="card-body timeline" id="activityContainer">
+          <div class="skeleton" style="height: 60px; margin-bottom: var(--space-md);"></div>
+          <div class="skeleton" style="height: 60px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import AuthService from '../js/auth.js';
+  import { DataService } from '../js/services.js';
+  import { UI } from '../js/ui.js';
+
+  // ================= Initialize =================
+  
+  async function init() {
+    // Check authentication
+    if (!AuthService.isAuthenticated()) {
+      window.location.href = '../pages/login.html';
+      return;
+    }
+
+    const user = AuthService.getCurrentUser();
+    
+    // Check role
+    if (user.role !== 'student') {
+      window.location.href = '../pages/login.html';
+      return;
+    }
+
+    // Load data
+    await loadCourses();
+    await loadAssignments();
+    await loadProgress();
+    await loadActivity();
+  }
+
+  // ================= Load Courses =================
+
+  async function loadCourses() {
+    try {
+      const { success, data } = await DataService.getCourses();
+      
+      if (!success) {
+        UI.alert('خطأ في تحميل الكورسات', 'error');
+        return;
+      }
+
+      const container = document.getElementById('coursesContainer');
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-tertiary);">لم تسجل في أي كورس بعد</p>';
+        return;
+      }
+
+      data.slice(0, 3).forEach(course => {
+        const card = document.createElement('div');
+        card.style.cssText = `
+          background: linear-gradient(135deg, ${getRandomGradient()});
+          padding: var(--space-lg);
+          border-radius: var(--border-radius-md);
+          color: white;
+          cursor: pointer;
+          transition: all var(--transition-base);
+        `;
+        card.className = 'action-card';
+        card.innerHTML = `
+          <h4 style="margin: 0 0 var(--space-sm) 0; text-align: right;">${course.title}</h4>
+          <p style="margin: 0 0 var(--space-md) 0; opacity: 0.9; font-size: var(--font-size-sm);">${course.description || 'درس مهم'}</p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${course.progress || 0}%; background: white;"></div>
+          </div>
+          <p style="margin: var(--space-sm) 0 0 0; font-size: var(--font-size-xs); opacity: 0.8;">${course.progress || 0}% مكتمل</p>
+        `;
+        card.onclick = () => goToCourse(course.id);
+        container.appendChild(card);
+      });
+
+      // Update count
+      document.getElementById('coursesCount').textContent = data.length;
+    } catch (error) {
+      console.error('Error loading courses:', error);
+    }
+  }
+
+  // ================= Load Assignments =================
+
+  async function loadAssignments() {
+    try {
+      const { success, data } = await DataService.getAssignments();
+      
+      if (!success) return;
+
+      const container = document.getElementById('assignmentsContainer');
+      container.innerHTML = '';
+
+      const pending = data.filter(a => a.status !== 'submitted');
+      document.getElementById('tasksRemaining').textContent = pending.length;
+
+      if (data.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-tertiary);">لا توجد واجبات</p>';
+        return;
+      }
+
+      data.slice(0, 3).forEach(assignment => {
+        const dueDate = new Date(assignment.due_date);
+        const daysLeft = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.marginBottom = 'var(--space-md)';
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h4 style="margin: 0 0 var(--space-sm) 0;">${assignment.title}</h4>
+              <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-tertiary);">
+                ${daysLeft > 0 ? `متبقي: ${daysLeft} يوم` : 'انتهت المهلة'}
+              </p>
+            </div>
+            <span style="padding: 4px 12px; background: ${daysLeft > 3 ? 'var(--success)' : 'var(--warning)'}; color: white; border-radius: 20px; font-size: var(--font-size-xs);">
+              ${assignment.status}
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Error loading assignments:', error);
+    }
+  }
+
+  // ================= Load Progress =================
+
+  async function loadProgress() {
+    const container = document.getElementById('progressContainer');
+    container.innerHTML = '';
+
+    const courses = [
+      { name: 'الرياضيات', progress: 85 },
+      { name: 'اللغة العربية', progress: 72 },
+      { name: 'العلوم', progress: 90 }
+    ];
+
+    let totalProgress = 0;
+
+    courses.forEach(course => {
+      totalProgress += course.progress;
+
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-title">${course.name}</span>
+            <span class="progress-percentage">${course.progress}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${course.progress}%"></div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    const avgProgress = Math.round(totalProgress / courses.length);
+    document.getElementById('progressAvg').textContent = avgProgress;
+  }
+
+  // ================= Load Activity =================
+
+  async function loadActivity() {
+    const container = document.getElementById('activityContainer');
+    container.innerHTML = '';
+
+    const activities = [
+      { title: 'أكملت درس الرياضيات', date: 'اليوم', completed: true },
+      { title: 'سلمت واجب العلوم', date: 'أمس', completed: true },
+      { title: 'بدأت درس اللغة العربية', date: '3 أيام', completed: false }
+    ];
+
+    activities.forEach(activity => {
+      const item = document.createElement('div');
+      item.className = `timeline-item ${activity.completed ? 'completed' : ''}`;
+      item.innerHTML = `
+        <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary);">${activity.title}</div>
+        <div class="timeline-date">${activity.date}</div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  // ================= Helpers =================
+
+  function getRandomGradient() {
+    const gradients = [
+      '#667eea, #764ba2',
+      '#f093fb, #f5576c',
+      '#4facfe, #00f2fe',
+      '#43e97b, #38f9d7',
+      '#fa709a, #fee140'
+    ];
+    return 'linear-gradient(135deg, ' + gradients[Math.floor(Math.random() * gradients.length)] + ')';
+  }
+
+  window.toggleSidebar = function() {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('sidebar-collapsed');
+  };
+
+  window.goToCourses = () => window.location.href = '#';
+  window.goToAssignments = () => window.location.href = '#';
+  window.goToGrades = () => window.location.href = '#';
+  window.goToMessages = () => window.location.href = '#';
+  window.goToCourse = (id) => window.location.href = `#course/${id}`;
+
+  // Initialize
+  init();
+</script>
+
+</body>
+</html>

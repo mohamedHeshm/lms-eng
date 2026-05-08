@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الأدمن - منصة التعليم</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">👑</div>
+    <div class="sidebar-brand">الأدمن</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-item active"><span class="nav-icon">📊</span><span>لوحة التحكم</span></div>
+    <div class="nav-item"><span class="nav-icon">👥</span><span>المستخدمين</span></div>
+    <div class="nav-item"><span class="nav-icon">👨‍🏫</span><span>المدرسين</span></div>
+    <div class="nav-item"><span class="nav-icon">👨‍🎓</span><span>الطلاب</span></div>
+    <div class="nav-item"><span class="nav-icon">📚</span><span>الكورسات</span></div>
+    <div class="nav-item"><span class="nav-icon">📋</span><span>السجلات</span></div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span><span>الإعدادات</span></div>
+    <div class="nav-item" style="margin-top: auto; color: var(--danger);"><span class="nav-icon">🚪</span><span>تسجيل الخروج</span></div>
+  </div>
+</nav>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <button class="navbar-toggle">☰</button>
+  <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="ابحث..."></div>
+  <div class="navbar-spacer"></div>
+  <div class="navbar-actions">
+    <div class="notification-badge"><span style="font-size: 18px;">🔔</span></div>
+    <div class="user-menu">
+      <div class="user-avatar">أ</div>
+      <div style="font-size: 14px;"><div style="font-weight: 600;">أحمد الإدمن</div><div style="font-size: 12px; color: var(--text-tertiary);">مسؤول</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main style="margin-left: 260px; padding: var(--space-lg);">
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: var(--space-2xl); border-radius: var(--border-radius-lg); margin-bottom: var(--space-xl);">
+    <h1 style="color: white; margin: 0 0 10px 0;">🎛️ لوحة التحكم الرئيسية</h1>
+    <p style="color: rgba(255,255,255,0.9); margin: 0;">مرحباً بك في منصة التعليم الحديثة</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl);">
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">👥</div>
+      <div style="font-size: 28px; font-weight: bold; color: var(--primary);">1,234</div>
+      <div style="color: var(--text-secondary); margin-top: 10px;">إجمالي المستخدمين</div>
+    </div>
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">👨‍🏫</div>
+      <div style="font-size: 28px; font-weight: bold; color: var(--success);">45</div>
+      <div style="color: var(--text-secondary); margin-top: 10px;">مدرسين مسجلين</div>
+    </div>
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">👨‍🎓</div>
+      <div style="font-size: 28px; font-weight: bold; color: var(--warning);">1,189</div>
+      <div style="color: var(--text-secondary); margin-top: 10px;">طلاب مسجلين</div>
+    </div>
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">📚</div>
+      <div style="font-size: 28px; font-weight: bold; color: var(--info);">234</div>
+      <div style="color: var(--text-secondary); margin-top: 10px;">كورسات نشطة</div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg);">
+    <!-- Users Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3>👥 آخر المستخدمين المسجلين</h3>
+      </div>
+      <div class="card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+              <th style="padding: 12px; text-align: right;">الاسم</th>
+              <th style="padding: 12px; text-align: right;">البريد</th>
+              <th style="padding: 12px; text-align: right;">النوع</th>
+              <th style="padding: 12px; text-align: right;">التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 12px;">علاء محمد</td>
+              <td style="padding: 12px;">ala@email.com</td>
+              <td style="padding: 12px;"><span style="background: var(--info); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">طالب</span></td>
+              <td style="padding: 12px;">اليوم</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 12px;">فاطمة أحمد</td>
+              <td style="padding: 12px;">fatima@email.com</td>
+              <td style="padding: 12px;"><span style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">معلمة</span></td>
+              <td style="padding: 12px;">أمس</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px;">محمد علي</td>
+              <td style="padding: 12px;">mohammed@email.com</td>
+              <td style="padding: 12px;"><span style="background: var(--info); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">طالب</span></td>
+              <td style="padding: 12px;">أمس</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-primary" style="width: 100%;">عرض جميع المستخدمين →</button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="card">
+      <div class="card-header"><h3>📊 إحصائيات سريعة</h3></div>
+      <div class="card-body">
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>نشاط المستخدمين</span>
+            <span>85%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 85%;"></div>
+          </div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>استخدام التخزين</span>
+            <span>45%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 45%;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>رضا المستخدمين</span>
+            <span>92%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 92%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Logs -->
+  <div class="card" style="margin-top: var(--space-lg);">
+    <div class="card-header"><h3>📋 سجل النشاطات الأخيرة</h3></div>
+    <div class="card-body">
+      <div style="padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 10px;">
+        <div style="font-weight: 600;">👤 محمد علي سجل دخول</div>
+        <div style="font-size: 12px; color: var(--text-tertiary);">قبل 5 دقائق</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 10px;">
+        <div style="font-weight: 600;">➕ كورس جديد من فاطمة</div>
+        <div style="font-size: 12px; color: var(--text-tertiary);">قبل ساعة</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
+        <div style="font-weight: 600;">📊 تقرير جديد منشور</div>
+        <div style="font-size: 12px; color: var(--text-tertiary);">قبل 3 ساعات</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import AuthService from '../js/auth.js';
+  
+  if (!AuthService.isAuthenticated()) {
+    window.location.href = 'login.html';
+  }
+  
+  const user = AuthService.getCurrentUser();
+  if (user.role !== 'admin') {
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>
