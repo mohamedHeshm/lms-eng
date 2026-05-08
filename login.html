@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول - منصة التعليم</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ================= Login Page Styles ================= */
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #f093fb 100%);
+      background-attachment: fixed;
+      font-family: var(--font-family);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -80px;
+      left: -80px;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0px, 0px); }
+      25% { transform: translate(20px, -20px); }
+      50% { transform: translate(-20px, 20px); }
+      75% { transform: translate(-20px, -20px); }
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 1000px;
+      width: 90%;
+    }
+
+    .login-content {
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+
+    .login-content h1 {
+      font-size: var(--font-size-4xl);
+      margin-bottom: var(--space-md);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-content p {
+      font-size: var(--font-size-lg);
+      opacity: 0.95;
+      margin-bottom: var(--space-lg);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .login-features {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .login-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .login-feature-icon {
+      font-size: var(--font-size-2xl);
+      min-width: 40px;
+    }
+
+    .login-feature-text {
+      font-size: var(--font-size-sm);
+    }
+
+    .login-form-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: var(--space-2xl);
+      border-radius: var(--border-radius-xl);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-form-header {
+      margin-bottom: var(--space-xl);
+      text-align: center;
+    }
+
+    .login-form-header h2 {
+      color: var(--primary);
+      font-size: var(--font-size-2xl);
+      margin-bottom: var(--space-sm);
+    }
+
+    .login-form-header p {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .form-group {
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: var(--space-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-primary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: var(--space-md);
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      transition: all var(--transition-fast);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .password-toggle-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: var(--font-size-lg);
+      transition: color var(--transition-fast);
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+      font-size: var(--font-size-sm);
+    }
+
+    .remember-forgot label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .remember-forgot input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: var(--space-md);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-md);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width var(--transition-base), height var(--transition-base);
+    }
+
+    .login-button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .login-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .login-button:active {
+      transform: translateY(0);
+    }
+
+    .login-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+      color: var(--text-tertiary);
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .signup-link {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .signup-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: var(--font-weight-semibold);
+      transition: color var(--transition-fast);
+    }
+
+    .signup-link a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .status-message {
+      padding: var(--space-md);
+      border-radius: var(--border-radius-md);
+      text-align: center;
+      margin-bottom: var(--space-lg);
+      font-size: var(--font-size-sm);
+      min-height: 20px;
+    }
+
+    .status-message.error {
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .status-message.success {
+      background: rgba(37, 211, 102, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .spinner-mini {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ================= Responsive ================= */
+
+    @media (max-width: 968px) {
+      .login-wrapper {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .login-content {
+        display: none;
+      }
+
+      .login-form-container {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-form-container {
+        padding: var(--space-lg);
+      }
+
+      .login-form-header h2 {
+        font-size: var(--font-size-xl);
+      }
+
+      .remember-forgot {
+        flex-direction: column;
+        gap: var(--space-md);
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-wrapper">
+    <!-- Left Content -->
+    <div class="login-content">
+      <h1>🎓 منصة التعليم الحديثة</h1>
+      <p>اكتشف طريقة جديدة في التعليم والتعلم</p>
+
+      <div class="login-features">
+        <div class="login-feature">
+          <div class="login-feature-icon">📚</div>
+          <div class="login-feature-text">دروس متقدمة من أفضل المدرسين</div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">✅</div>
+          <div class="login-feature-text">واجبات وتقييمات شاملة</div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">📊</div>
+          <div class="login-feature-text">تتبع تقدمك وإحصائيات مفصلة</div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">💬</div>
+          <div class="login-feature-text">تواصل مباشر مع المدرسين</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form -->
+    <div class="login-form-container">
+      <div class="login-form-header">
+        <h2>تسجيل الدخول</h2>
+        <p>أهلاً وسهلاً بعودتك</p>
+      </div>
+
+      <div id="loginStatus" class="status-message"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <!-- Email Input -->
+        <div class="form-group">
+          <label for="email">📧 البريد الإلكتروني</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="أدخل بريدك الإلكتروني"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="password">🔒 كلمة المرور</label>
+          <div class="password-toggle-wrapper">
+            <input
+              type="password"
+              id="password"
+              placeholder="أدخل كلمة مرورك"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+          </div>
+        </div>
+
+        <!-- Remember & Forgot -->
+        <div class="remember-forgot">
+          <label>
+            <input type="checkbox" id="remember" name="remember">
+            تذكر حسابي
+          </label>
+          <a href="forgot-password.html" class="forgot-link">هل نسيت كلمة المرور؟</a>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="login-button" id="loginBtn">
+          <span id="btnText">دخول</span>
+        </button>
+      </form>
+
+      <!-- Signup Link -->
+      <div style="margin-top: var(--space-xl); text-align: center;">
+        <div class="signup-link">
+          لا تملك حساب؟ <a href="register.html">أنشئ حسابك الآن</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import AuthService from './js/auth.js';
+  import { UI } from './js/ui.js';
+
+  // Toggle password visibility
+  window.togglePassword = function() {
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.querySelector('.password-toggle');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleBtn.textContent = '🙈';
+    } else {
+      passwordInput.type = 'password';
+      toggleBtn.textContent = '👁️';
+    }
+  };
+
+  // Handle login
+  window.handleLogin = async function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const remember = document.getElementById('remember').checked;
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const statusDiv = document.getElementById('loginStatus');
+
+    // Validate
+    if (!email || !password) {
+      statusDiv.className = 'status-message error';
+      statusDiv.textContent = '❌ البريد الإلكتروني وكلمة المرور مطلوبان';
+      return;
+    }
+
+    // Show loading
+    loginBtn.disabled = true;
+    btnText.innerHTML = '<span class="spinner-mini"></span> جاري الدخول...';
+    statusDiv.className = 'status-message';
+    statusDiv.textContent = '';
+
+    // Attempt login
+    const result = await AuthService.login(email, password);
+
+    if (result.success) {
+      statusDiv.className = 'status-message success';
+      statusDiv.textContent = '✅ تم تسجيل الدخول بنجاح، جاري التحويل...';
+
+      // Save remember choice
+      if (remember) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+
+      // Redirect based on role
+      setTimeout(() => {
+        const role = result.user.role;
+        if (role === 'admin') {
+          window.location.href = 'pages/admin-dashboard.html';
+        } else if (role === 'teacher') {
+          window.location.href = 'pages/teacher-dashboard.html';
+        } else {
+          window.location.href = 'pages/student-dashboard.html';
+        }
+      }, 1500);
+    } else {
+      statusDiv.className = 'status-message error';
+      statusDiv.textContent = `❌ ${result.error}`;
+      loginBtn.disabled = false;
+      btnText.textContent = 'دخول';
+    }
+  };
+
+  // Load remembered email
+  const rememberedEmail = localStorage.getItem('rememberedEmail');
+  if (rememberedEmail) {
+    document.getElementById('email').value = rememberedEmail;
+    document.getElementById('remember').checked = true;
+  }
+
+  // Check if already logged in
+  if (AuthService.isAuthenticated()) {
+    const user = AuthService.getCurrentUser();
+    if (user) {
+      const role = user.role;
+      if (role === 'admin') {
+        window.location.href = 'pages/admin-dashboard.html';
+      } else if (role === 'teacher') {
+        window.location.href = 'pages/teacher-dashboard.html';
+      } else {
+        window.location.href = 'pages/student-dashboard.html';
+      }
+    }
+  }
+</script>
+
+</body>
+</html>

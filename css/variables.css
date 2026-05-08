@@ -1,0 +1,106 @@
+/* ================= CSS Variables System ================= */
+
+:root {
+  /* ========== Colors ========== */
+  --primary: #667eea;
+  --primary-dark: #764ba2;
+  --primary-light: #8b9dff;
+  --secondary: #00f2fe;
+  --accent: #ff6b6b;
+  --success: #25d366;
+  --warning: #ffc107;
+  --danger: #ff4d4d;
+  --info: #4facfe;
+
+  /* ========== Backgrounds ========== */
+  --bg-dark: #0f0f1e;
+  --bg-light: #ffffff;
+  --bg-secondary: #f5f7fb;
+  --bg-tertiary: #ededf0;
+  --bg-glass: rgba(255, 255, 255, 0.1);
+
+  /* ========== Text Colors ========== */
+  --text-primary: #1a1a2e;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --text-light: #ffffff;
+
+  /* ========== Borders ========== */
+  --border-color: #e0e0e0;
+  --border-color-light: rgba(255, 255, 255, 0.2);
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+
+  /* ========== Shadows ========== */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+  --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
+
+  /* ========== Spacing ========== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* ========== Typography ========== */
+  --font-family: 'Cairo', 'Segoe UI', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 48px;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ========== Line Heights ========== */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ========== Transitions ========== */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-slower: 0.7s ease;
+
+  /* ========== Z-Index ========== */
+  --z-dropdown: 100;
+  --z-modal: 1000;
+  --z-popover: 1100;
+  --z-tooltip: 1200;
+}
+
+/* ================= Dark Mode ================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-light: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f3460;
+    --text-primary: #ffffff;
+    --text-secondary: #ccc;
+    --text-tertiary: #999;
+    --border-color: #333;
+  }
+}
+
+/* ================= Accessibility ================= */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

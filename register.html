@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التسجيل - منصة التعليم</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #f093fb 100%); }
+    .register-container { max-width: 500px; margin: 40px auto; padding: 20px; }
+    .register-card { background: white; padding: 40px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); }
+    .form-section { margin-bottom: 30px; }
+    .form-section h3 { color: var(--primary); margin-bottom: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+
+<div class="register-container">
+  <div class="register-card">
+    <h2 style="text-align: center; color: var(--primary); margin-bottom: 30px;">إنشاء حساب جديد</h2>
+    
+    <form id="registerForm">
+      <!-- الاسم -->
+      <div class="form-group required">
+        <label for="name">الاسم الكامل</label>
+        <input type="text" id="name" placeholder="أدخل اسمك الكامل" required>
+      </div>
+
+      <!-- البريد -->
+      <div class="form-group required">
+        <label for="regEmail">البريد الإلكتروني</label>
+        <input type="email" id="regEmail" placeholder="أدخل بريدك الإلكتروني" required>
+      </div>
+
+      <!-- كلمة المرور -->
+      <div class="form-group required">
+        <label for="regPassword">كلمة المرور</label>
+        <input type="password" id="regPassword" placeholder="كلمة مرور قوية (8 أحرف على الأقل)" required>
+      </div>
+
+      <!-- تأكيد كلمة المرور -->
+      <div class="form-group required">
+        <label for="confirmPassword">تأكيد كلمة المرور</label>
+        <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور" required>
+      </div>
+
+      <!-- نوع الحساب -->
+      <div class="form-section">
+        <h3>نوع الحساب</h3>
+        <div style="display: flex; gap: 10px;">
+          <label style="flex: 1; cursor: pointer;">
+            <input type="radio" name="role" value="student" checked style="margin-right: 5px;">
+            طالب
+          </label>
+          <label style="flex: 1; cursor: pointer;">
+            <input type="radio" name="role" value="teacher" style="margin-right: 5px;">
+            معلم
+          </label>
+        </div>
+      </div>
+
+      <!-- البيانات الإضافية للطالب -->
+      <div id="studentSection" class="form-section">
+        <h3>بيانات إضافية</h3>
+        <div class="form-group">
+          <label for="stage">المرحلة الدراسية</label>
+          <select id="stage">
+            <option value="">اختر المرحلة</option>
+            <option value="primary">ابتدائي</option>
+            <option value="middle">متوسط</option>
+            <option value="secondary">ثانوي</option>
+            <option value="university">جامعي</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- الشروط والأحكام -->
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: flex; align-items: center; gap: 10px; margin: 0;">
+          <input type="checkbox" id="terms" required style="width: auto;">
+          أوافق على <a href="#" style="color: var(--primary);">الشروط والأحكام</a>
+        </label>
+      </div>
+
+      <!-- الحالة -->
+      <div id="registerStatus" style="padding: 10px; text-align: center; margin-bottom: 20px; display: none;"></div>
+
+      <!-- زر التسجيل -->
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
+        <span id="registerBtnText">إنشاء حساب</span>
+      </button>
+
+      <!-- رابط الدخول -->
+      <div style="text-align: center; color: var(--text-secondary);">
+        لديك حساب بالفعل؟ <a href="login.html" style="color: var(--primary); font-weight: bold;">تسجيل الدخول</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import AuthService from '../js/auth.js';
+  import { UI } from '../js/ui.js';
+
+  const form = document.getElementById('registerForm');
+  const statusDiv = document.getElementById('registerStatus');
+
+  // Toggle student section based on role
+  document.querySelectorAll('input[name="role"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const studentSection = document.getElementById('studentSection');
+      if (e.target.value === 'student') {
+        studentSection.style.display = 'block';
+      } else {
+        studentSection.style.display = 'none';
+      }
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const stage = document.getElementById('stage').value;
+    const terms = document.getElementById('terms').checked;
+
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = '';
+
+    // Validate
+    if (!name || !email || !password || !confirmPassword) {
+      statusDiv.className = 'alert alert-danger';
+      statusDiv.innerHTML = '<div class="alert-icon">❌</div><div class="alert-content">جميع الحقول مطلوبة</div>';
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      statusDiv.className = 'alert alert-danger';
+      statusDiv.innerHTML = '<div class="alert-icon">❌</div><div class="alert-content">كلمات المرور غير متطابقة</div>';
+      return;
+    }
+
+    if (password.length < 8) {
+      statusDiv.className = 'alert alert-warning';
+      statusDiv.innerHTML = '<div class="alert-icon">⚠️</div><div class="alert-content">كلمة المرور قصيرة جداً</div>';
+      return;
+    }
+
+    if (!terms) {
+      statusDiv.className = 'alert alert-danger';
+      statusDiv.innerHTML = '<div class="alert-icon">❌</div><div class="alert-content">يجب الموافقة على الشروط والأحكام</div>';
+      return;
+    }
+
+    // Show loading
+    document.getElementById('registerBtnText').textContent = '⏳ جاري التسجيل...';
+
+    // Register
+    const result = await AuthService.register({
+      name,
+      email,
+      password,
+      role,
+      stage: role === 'student' ? stage : null
+    });
+
+    if (result.success) {
+      statusDiv.className = 'alert alert-success';
+      statusDiv.innerHTML = '<div class="alert-icon">✅</div><div class="alert-content">تم التسجيل بنجاح! جاري التحويل...</div>';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    } else {
+      statusDiv.className = 'alert alert-danger';
+      statusDiv.innerHTML = `<div class="alert-icon">❌</div><div class="alert-content">${result.error}</div>`;
+      document.getElementById('registerBtnText').textContent = 'إنشاء حساب';
+    }
+  });
+</script>
+
+</body>
+</html>
