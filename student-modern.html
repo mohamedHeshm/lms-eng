@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Student Dashboard - لوحة الطالب المتطورة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #333;
+      transition: background-image 0.5s ease;
+    }
+
+    /* زر القائمة للجوال */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.05);
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 280px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: transform 0.3s ease;
+      transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .sidebar-header {
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .sidebar-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .sidebar-header p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .sidebar-section {
+      padding: 20px;
+    }
+
+    .sidebar-title {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .menu-btn {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(-5px);
+    }
+
+    .menu-btn.active {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-right: 280px;
+      padding: 20px;
+      transition: margin 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        margin-right: 0;
+        padding: 15px;
+        padding-top: 80px;
+      }
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    /* Tab Content - مهم جداً! */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.97);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 700;
+      border-right: 4px solid #667eea;
+      padding-right: 15px;
+    }
+
+    /* Profile */
+    .profile-card {
+      text-align: center;
+    }
+
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      border: 4px solid white;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      overflow: hidden;
+    }
+
+    .profile-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Inputs & Selects */
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Buttons */
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Cairo', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      color: white;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    /* Lists */
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 15px;
+      margin: 10px 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border-radius: 12px;
+      border-right: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    li a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      display: block;
+    }
+
+    /* Grids */
+    .content-grid, .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .content-card, .video-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 15px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .content-card:hover, .video-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+    }
+
+    iframe {
+      width: 100%;
+      height: 200px;
+      border-radius: 12px;
+      border: none;
+    }
+
+    /* Status Messages */
+    .status {
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .status.success {
+      background: rgba(37, 211, 102, 0.1);
+      color: #25d366;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+    }
+
+    .status.error {
+      background: rgba(255, 77, 77, 0.1);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 77, 77, 0.3);
+    }
+
+    .status.info {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      border: 1px solid rgba(102, 126, 234, 0.3);
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px;
+      color: #999;
+    }
+
+    .loader {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(102, 126, 234, 0.2);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Floating Button */
+    .floating-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (min-width: 769px) {
+      .sidebar-overlay {
+        display: none !important;
+      }
+    }
+
+    /* Badge */
+    .stage-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    /* Stage info */
+    .stage-info {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    /* زر الرجوع للصفحة الرئيسية - تصميم مميز */
+    .home-btn {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      border-color: rgba(255,255,255,0.6);
+    }
+    .home-btn:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 5px 15px rgba(67,233,123,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>👨‍🎓 لوحة الطالب</h2>
+      <p id="sidebarStudentName">مرحباً بك!</p>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">القائمة الرئيسية</div>
+      <!-- زر الرجوع للصفحة الرئيسية الجديدة dashboard-home.html -->
+      <button class="menu-btn home-btn" onclick="goToHomeDashboard()">🏠 الرئيسية</button>
+      <button class="menu-btn active" onclick="openTab('profile', this)">👤 المدرس</button>
+      <button class="menu-btn" onclick="openTab('videosTab', this)">🎥 الفيديوهات</button>
+      <button class="menu-btn" onclick="openTab('pdfsTab', this)">📁 الواجبات</button>
+      <button class="menu-btn" onclick="openTab('pdfs2Tab', this)">📚 المذكرات</button>
+      <button class="menu-btn" onclick="openTab('notesTab', this)">📝 التنبيهات</button>
+      <button class="menu-btn" onclick="openTab('mySolutionsTab', this)">📋 حلولي السابقة</button>
+      <button class="menu-btn" onclick="goToTeacherProfile()">⭐ تقييم المدرس</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">الخيارات</div>
+      <button class="menu-btn" onclick="goToChangePassword()">🔐 تغيير الباسورد</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>👨‍🎓 لوحة الطالب</h1>
+      <p id="studentNameHeader">مرحباً بك في منصتك التعليمية</p>
+    </div>
+
+    <!-- Profile Tab -->
+    <div id="profile" class="tab-content active">
+      <div class="card profile-card" id="teacherProfile">
+        <div class="loading"><div class="loader"></div> جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- Videos Tab -->
+    <div id="videosTab" class="tab-content">
+      <div class="card">
+        <h3>🎥 الفيديوهات التعليمية</h3>
+        <div id="videoContainer" class="video-grid">
+          <div class="loading"><div class="loader"></div> جاري التحميل...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDFs Tab (Assignments) -->
+    <div id="pdfsTab" class="tab-content">
+      <div class="card">
+        <h3>📁 الواجبات المنزلية</h3>
+        <ul id="pdfList"><li class="loading"><div class="loader"></div> جاري التحميل...</li></ul>
+      </div>
+
+      <div class="card">
+        <h3>📤 تسليم الواجب</h3>
+        <select id="assignmentSelect">
+          <option value="">-- اختر الواجب أولاً --</option>
+        </select>
+        <input type="file" id="solutionFile" accept=".pdf,.doc,.docx,.jpg,.png">
+        <button class="btn-primary" onclick="uploadSolution()">🚀 رفع الحل</button>
+        <div id="uploadStatus"></div>
+      </div>
+    </div>
+
+    <!-- PDFs2 Tab (Notes) -->
+    <div id="pdfs2Tab" class="tab-content">
+      <div class="card">
+        <h3>📚 المذكرات الدراسية</h3>
+        <ul id="pdfList2"><li class="loading"><div class="loader"></div> جاري التحميل...</li></ul>
+      </div>
+    </div>
+
+    <!-- Notes Tab -->
+    <div id="notesTab" class="tab-content">
+      <div class="card">
+        <h3>📝 التنبيهات والإعلانات</h3>
+        <ul id="noteList"><li class="loading"><div class="loader"></div> جاري التحميل...</li></ul>
+      </div>
+    </div>
+
+    <!-- My Solutions Tab -->
+    <div id="mySolutionsTab" class="tab-content">
+      <div class="card">
+        <h3>📋 حلولي السابقة</h3>
+        <ul id="mySolutionsList"><li class="loading"><div class="loader"></div> جاري التحميل...</li></ul>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+  </div>
+</div>
+
+<button class="floating-btn" onclick="goToChangePassword()" title="تغيير كلمة المرور">🔐</button>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  let currentUser = null
+  let studentStage = null
+  let teacherId = null
+  let assignmentsList = []
+
+  // Helper Functions
+  function escapeHtml(text) {
+    if (!text) return ''
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
+  function getCurrentUser() {
+    try {
+      const userJson = localStorage.getItem("currentUser")
+      return userJson ? JSON.parse(userJson) : null
+    } catch (e) {
+      return null
+    }
+  }
+
+  // Sidebar Functions
+  window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.toggle('open')
+    overlay.classList.toggle('active')
+  }
+
+  window.closeSidebar = function() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('sidebarOverlay')
+    sidebar.classList.remove('open')
+    overlay.classList.remove('active')
+  }
+
+  // Tab Functions
+  window.openTab = function(tabName, button) {
+    if (window.innerWidth <= 768) {
+      closeSidebar()
+    }
+
+    const allTabs = document.querySelectorAll('.tab-content')
+    allTabs.forEach(tab => {
+      tab.classList.remove('active')
+    })
+
+    const allButtons = document.querySelectorAll('.menu-btn')
+    allButtons.forEach(btn => {
+      btn.classList.remove('active')
+    })
+
+    const selectedTab = document.getElementById(tabName)
+    if (selectedTab) {
+      selectedTab.classList.add('active')
+    }
+
+    if (button) {
+      button.classList.add('active')
+    }
+
+    console.log('تم فتح التبويب:', tabName)
+  }
+
+  // Navigation
+  window.goToChangePassword = () => {
+    window.location.href = 'change-password.html'
+  }
+
+  window.goToHomeDashboard = () => {
+    const user = getCurrentUser();
+    if (user && user.id) {
+      console.log("الانتقال إلى الصفحة الرئيسية dashboard-home.html");
+    }
+    window.location.href = 'dashboard-home.html';
+  }
+
+  window.goToTeacherProfile = () => {
+    if (teacherId) {
+      localStorage.setItem("selectedTeacherId", teacherId)
+      window.location.href = `teacher-profile.html?id=${teacherId}`
+    } else {
+      alert("❌ لم يتم تعيين معلم لك")
+    }
+  }
+
+  window.logout = () => {
+    localStorage.removeItem("currentUser")
+    window.location.href = "index.html"
+  }
+
+  // Load Student Data
+  async function loadStudentData() {
+    currentUser = getCurrentUser()
+    if (!currentUser || currentUser.role !== 'student') {
+      alert('❌ يجب تسجيل الدخول كطالب أولاً')
+      window.location.href = 'index.html'
+      return
+    }
+
+    document.getElementById('studentNameHeader').innerHTML = `مرحباً ${escapeHtml(currentUser.name)}! 👋`
+    document.getElementById('sidebarStudentName').innerHTML = `مرحباً ${escapeHtml(currentUser.name)}`
+
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("teacher_id, stage")
+      .eq("id", currentUser.id)
+      .single()
+
+    if (userError) {
+      console.error("Error fetching user:", userError)
+      alert("❌ حدث خطأ في جلب بيانات الطالب")
+      return
+    }
+
+    teacherId = userData?.teacher_id
+    studentStage = userData?.stage || null
+
+    if (!teacherId) {
+      alert("❌ لم يتم تعيين معلم لك بعد")
+      return
+    }
+
+    if (studentStage) {
+      const headerP = document.querySelector('.header p')
+      if (headerP) {
+        headerP.innerHTML = `📚 مرحلتك الدراسية: ${studentStage} | يتم عرض المحتوى الخاص بك فقط`
+      }
+    }
+
+    await loadAllContent()
+  }
+
+  async function loadAllContent() {
+    try {
+      let notesQuery = supabase.from("notes").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        notesQuery = notesQuery.eq("stage", studentStage)
+      }
+      const { data: notes } = await notesQuery
+
+      let videosQuery = supabase.from("videos").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        videosQuery = videosQuery.eq("stage", studentStage)
+      }
+      const { data: videos } = await videosQuery
+
+      let pdfsQuery = supabase.from("pdfs").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        pdfsQuery = pdfsQuery.eq("stage", studentStage)
+      }
+      const { data: pdfs } = await pdfsQuery
+
+      let pdfs2Query = supabase.from("pdfs2").select("*").eq("teacher_id", teacherId)
+      if (studentStage) {
+        pdfs2Query = pdfs2Query.eq("stage", studentStage)
+      }
+      const { data: pdfs2 } = await pdfs2Query
+
+      const { data: profiles } = await supabase
+        .from("teacher_profile")
+        .select("*")
+        .eq("teacher_id", teacherId)
+
+      const { data: socials } = await supabase
+        .from("social_links")
+        .select("*")
+        .eq("teacher_id", teacherId)
+
+      const { data: solutions } = await supabase
+        .from("solutions")
+        .select("*")
+        .eq("student_id", currentUser.id)
+        .order("created_at", { ascending: false })
+
+      loadNotes(notes || [])
+      loadVideos(videos || [])
+      loadPDFs(pdfs || [], 'pdfList')
+      loadPDFs(pdfs2 || [], 'pdfList2')
+      loadTeacherProfile(profiles || [], socials || [])
+      loadMySolutions(solutions || [])
+      loadAssignmentsDropdown(pdfs || [])
+
+    } catch (error) {
+      console.error("Load error:", error)
+    }
+  }
+
+  function loadNotes(notes) {
+    const container = document.getElementById('noteList')
+    if (!container) return
+    container.innerHTML = ''
+    if (notes && notes.length > 0) {
+      notes.forEach(n => {
+        container.innerHTML += `<li>📌 ${escapeHtml(n.content)}</li>`
+      })
+    } else {
+      container.innerHTML = '<li style="text-align:center; color:#999;">📭 لا توجد تنبيهات حالياً</li>'
+    }
+  }
+
+  function loadVideos(videos) {
+    const container = document.getElementById('videoContainer')
+    if (!container) return
+    container.innerHTML = ''
+    if (videos && videos.length > 0) {
+      videos.forEach(v => {
+        container.innerHTML += `
+          <div class="video-card">
+            <iframe src="${escapeHtml(v.url)}" allowfullscreen></iframe>
+            ${studentStage ? `<div class="stage-badge">📚 ${escapeHtml(v.stage)}</div>` : ''}
+          </div>
+        `
+      })
+    } else {
+      container.innerHTML = '<div style="text-align:center; color:#999; padding:40px;">🎬 لا توجد فيديوهات حالياً</div>'
+    }
+  }
+
+  function loadPDFs(pdfs, elementId) {
+    const container = document.getElementById(elementId)
+    if (!container) return
+    container.innerHTML = ''
+    if (pdfs && pdfs.length > 0) {
+      pdfs.forEach(p => {
+        container.innerHTML += `
+          <li>
+            <a href="${escapeHtml(p.file_url)}" target="_blank">
+              📄 ${escapeHtml(p.file_name)}
+            </a>
+            ${studentStage ? `<div class="stage-badge">📚 ${escapeHtml(p.stage)}</div>` : ''}
+          </li>
+        `
+      })
+    } else {
+      container.innerHTML = '<li style="text-align:center; color:#999;">📂 لا توجد ملفات حالياً</li>'
+    }
+  }
+
+  function loadAssignmentsDropdown(pdfs) {
+    const select = document.getElementById('assignmentSelect')
+    if (!select) return
+    assignmentsList = pdfs || []
+    select.innerHTML = '<option value="">-- اختر الواجب --</option>'
+    assignmentsList.forEach((pdf, index) => {
+      select.innerHTML += `<option value="${index}">📁 ${escapeHtml(pdf.file_name)}</option>`
+    })
+    if (assignmentsList.length === 0) {
+      select.innerHTML = '<option value="">📭 لا توجد واجبات حالياً</option>'
+    }
+  }
+
+  function loadTeacherProfile(profiles, socials) {
+    const container = document.getElementById('teacherProfile')
+    if (!container) return
+    container.innerHTML = ''
+
+    if (profiles && profiles.length > 0) {
+      const p = profiles[0]
+      if (p.image_url) {
+        document.body.style.backgroundImage = `url('${p.image_url}')`
+        document.body.style.backgroundSize = 'cover'
+        document.body.style.backgroundAttachment = 'fixed'
+      }
+
+      let html = `
+        <div class="profile-image">
+          ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="Teacher">` : '👨‍🏫'}
+        </div>
+        <div class="profile-info">
+          <h2>👨‍🏫 المدرس</h2>
+          <p style="font-size:16px; color:#667eea; margin:15px 0;">${escapeHtml(p.bio || 'نبذة غير متوفرة')}</p>
+        </div>
+      `
+
+      if (socials && socials.length > 0) {
+        const s = socials[0]
+        html += '<div style="margin-top:25px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">'
+        if (s.facebook) html += `<a href="${escapeHtml(s.facebook)}" target="_blank" style="padding:10px 20px; background:rgba(24,119,242,0.1); color:#1877f2; border-radius:10px; text-decoration:none; font-weight:600; border:2px solid #1877f2;">📘 فيسبوك</a>`
+        if (s.whatsapp) html += `<a href="${escapeHtml(s.whatsapp)}" target="_blank" style="padding:10px 20px; background:rgba(37,211,102,0.1); color:#25d366; border-radius:10px; text-decoration:none; font-weight:600; border:2px solid #25d366;">💬 واتساب</a>`
+        if (s.youtube) html += `<a href="${escapeHtml(s.youtube)}" target="_blank" style="padding:10px 20px; background:rgba(255,0,0,0.1); color:#ff0000; border-radius:10px; text-decoration:none; font-weight:600; border:2px solid #ff0000;">▶️ يوتيوب</a>`
+        html += '</div>'
+      }
+      container.innerHTML = html
+    } else {
+      container.innerHTML = '<p style="text-align:center;">⚠️ لا توجد بيانات للمدرس</p>'
+    }
+  }
+
+  function loadMySolutions(solutions) {
+    const container = document.getElementById('mySolutionsList')
+    if (!container) return
+    container.innerHTML = ''
+    if (solutions && solutions.length > 0) {
+      solutions.forEach(s => {
+        const date = new Date(s.created_at).toLocaleDateString('ar-EG')
+        container.innerHTML += `
+          <li>
+            <a href="${escapeHtml(s.file_url)}" target="_blank">
+              📄 حل تم رفعه بتاريخ ${date}
+              ${s.pdf_name ? `<span style="display:block; font-size:12px; color:#999;">📌 ${escapeHtml(s.pdf_name)}</span>` : ''}
+            </a>
+          </li>
+        `
+      })
+    } else {
+      container.innerHTML = '<li style="text-align:center; color:#999;">📭 لم تقم برفع أي حلول بعد</li>'
+    }
+  }
+
+  // ✅ الدالة المعدلة - تم إزالة pdf_id نهائياً
+  window.uploadSolution = async function() {
+    const file = document.getElementById('solutionFile')?.files[0]
+    const assignmentIndex = document.getElementById('assignmentSelect')?.value
+    const statusDiv = document.getElementById('uploadStatus')
+    const currentUserLocal = getCurrentUser()
+
+    if (!file) {
+      showStatus('❌ يرجى اختيار ملف الحل', 'error', statusDiv)
+      return
+    }
+    if (!assignmentIndex || assignmentIndex === '') {
+      showStatus('❌ يرجى اختيار الواجب أولاً', 'error', statusDiv)
+      return
+    }
+
+    const selectedAssignment = assignmentsList[parseInt(assignmentIndex)]
+    if (!selectedAssignment) {
+      showStatus('❌ الواجب غير موجود', 'error', statusDiv)
+      return
+    }
+
+    showStatus('⏳ جاري رفع الملف...', 'info', statusDiv)
+
+    const safeName = file.name.replace(/\s+/g, "_")
+    const path = `solutions/${currentUserLocal.id}_${Date.now()}_${safeName}`
+
+    const { error: uploadError } = await supabase.storage.from("files").upload(path, file)
+    if (uploadError) {
+      showStatus('❌ خطأ في الرفع: ' + uploadError.message, 'error', statusDiv)
+      return
+    }
+
+    const { data: urlData } = supabase.storage.from("files").getPublicUrl(path)
+
+    // ✅ تم إزالة pdf_id نهائياً - الآن يرسل فقط student_id, file_url, pdf_name
+    const { error: dbError } = await supabase.from("solutions").insert([
+      {
+        student_id: currentUserLocal.id,
+        file_url: urlData.publicUrl,
+        pdf_name: selectedAssignment.file_name
+      }
+    ])
+
+    if (dbError) {
+      console.error("❌ خطأ في الحفظ:", dbError)
+      showStatus('❌ خطأ في الحفظ: ' + dbError.message, 'error', statusDiv)
+      return
+    }
+
+    showStatus('✅ تم رفع الحل بنجاح!', 'success', statusDiv)
+    document.getElementById('solutionFile').value = ''
+    document.getElementById('assignmentSelect').value = ''
+
+    // إعادة تحميل الحلول
+    const { data: newSolutions } = await supabase
+      .from("solutions")
+      .select("*")
+      .eq("student_id", currentUserLocal.id)
+      .order("created_at", { ascending: false })
+    loadMySolutions(newSolutions || [])
+
+    setTimeout(() => {
+      if (statusDiv) statusDiv.innerHTML = ''
+    }, 5000)
+  }
+
+  function showStatus(message, type, element) {
+    if (!element) return
+    element.innerHTML = `<div class="status ${type}">${message}</div>`
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    loadStudentData()
+  })
+</script>
+</body>
+</html>

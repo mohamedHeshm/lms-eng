@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بروفايل المدرس</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --accent: #f093fb;
+      --light: #f5f7fa;
+      --text: #333;
+      --border: #e0e0e0;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ==================== BACK BUTTON ==================== */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid white;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .back-btn:hover {
+      background: white;
+      color: var(--primary);
+      transform: translateX(5px);
+    }
+
+    /* ==================== HEADER ==================== */
+    .profile-header {
+      background: white;
+      border-radius: 25px;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 40px;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .teacher-image-section {
+      text-align: center;
+      position: relative;
+    }
+
+    .teacher-image {
+      width: 250px;
+      height: 250px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 8px solid var(--primary);
+      box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+      transition: all 0.4s ease;
+    }
+
+    .teacher-image:hover {
+      transform: scale(1.05);
+    }
+
+    .rating-badge {
+      position: absolute;
+      bottom: 20px;
+      right: -15px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      font-weight: 700;
+    }
+
+    .rating-number {
+      font-size: 2rem;
+    }
+
+    .rating-label {
+      font-size: 0.8rem;
+    }
+
+    /* TEACHER INFO */
+    .teacher-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .teacher-name {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin-bottom: 15px;
+      color: var(--text);
+    }
+
+    .teacher-badges {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .teacher-bio {
+      font-size: 1.1rem;
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 25px;
+    }
+
+    .teacher-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 15px;
+      background: var(--light);
+      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    /* ==================== SOCIAL LINKS ==================== */
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .social-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      background: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+    }
+
+    .social-icon img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .social-icon.facebook { border-color: #1877f2; }
+    .social-icon.whatsapp { border-color: #25d366; }
+    .social-icon.youtube { border-color: #ff0000; }
+
+    .social-icon:hover {
+      transform: translateY(-12px) scale(1.25) rotate(10deg);
+    }
+
+    .social-icon.facebook:hover { background: #1877f2; }
+    .social-icon.whatsapp:hover { background: #25d366; }
+    .social-icon.youtube:hover { background: #ff0000; }
+
+    .social-icon:hover img {
+      filter: brightness(0) invert(1);
+    }
+
+    /* ==================== COMMENTS SECTION ==================== */
+    .comments-section {
+      background: white;
+      border-radius: 25px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      margin-bottom: 40px;
+      animation: slideUp 0.6s ease-out 0.1s both;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: var(--text);
+    }
+
+    /* ADD COMMENT FORM */
+    .add-comment-form {
+      background: var(--light);
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      animation: slideUp 0.6s ease-out 0.2s both;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .rating-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .star {
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      filter: grayscale(100%);
+    }
+
+    .star:hover,
+    .star.active {
+      filter: grayscale(0%);
+      transform: scale(1.2);
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    /* COMMENTS LIST */
+    .comments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .comment-card {
+      background: var(--light);
+      padding: 20px;
+      border-radius: 15px;
+      border-left: 5px solid var(--primary);
+      animation: fadeInUp 0.4s ease-out;
+      transition: all 0.3s ease;
+    }
+
+    .comment-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .comment-rating {
+      color: #ffc107;
+      font-size: 1.1rem;
+    }
+
+    .comment-text {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .comment-date {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    .empty-comments {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    /* ==================== SAMPLE VIDEOS ==================== */
+    .sample-video-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .sample-video-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .sample-video-thumb {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .sample-video-title {
+      padding: 15px;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+    }
+
+    .sample-video-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    /* ==================== LOADING ==================== */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .profile-header {
+        grid-template-columns: 1fr;
+        padding: 30px;
+        gap: 30px;
+      }
+
+      .teacher-image {
+        width: 200px;
+        height: 200px;
+      }
+
+      .teacher-name {
+        font-size: 1.8rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .comments-section {
+        padding: 20px;
+      }
+
+      .back-btn {
+        margin-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      .profile-header { padding: 20px; }
+      .comments-section { padding: 15px; }
+
+      .teacher-image {
+        width: 150px;
+        height: 150px;
+      }
+
+      .teacher-name { font-size: 1.4rem; }
+      .section-title { font-size: 1.2rem; }
+
+      .teacher-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+    }
+
+    .status-message {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    .status-message.success {
+      background: rgba(37, 211, 102, 0.2);
+      color: #25d366;
+      border: 2px solid #25d366;
+    }
+
+    .status-message.error {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff0000;
+      border: 2px solid #ff0000;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- BACK BUTTON -->
+  <button class="back-btn" onclick="window.history.back()">
+    ← رجوع
+  </button>
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header" id="profileHeader">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <!-- SAMPLE VIDEOS SECTION -->
+  <div id="sampleVideosSection" class="comments-section" style="display: none; margin-top: 40px;">
+    <h2 class="section-title">🎬 الفيديوهات النموذجية</h2>
+    <div id="sampleVideosList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+      <p style="grid-column: 1/-1; text-align: center; color: #999;">⏳ جاري التحميل...</p>
+    </div>
+  </div>
+
+  <!-- COMMENTS SECTION -->
+  <div class="comments-section">
+    <h2 class="section-title">💬 التعليقات والتقييمات</h2>
+
+    <!-- INFO MESSAGE -->
+    <div id="infoMessage" style="background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); padding: 20px; border-radius: 15px; margin-bottom: 30px; border-right: 4px solid #667eea; display: none;">
+      <p style="margin: 0; font-weight: 600; color: #667eea;">👤 مرحباً بك أيها الزائر | يمكنك عرض جميع التعليقات والتقييمات أدناه</p>
+    </div>
+
+    <!-- ADD COMMENT FORM -->
+    <div class="add-comment-form">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+
+    <!-- COMMENTS LIST -->
+    <div id="commentsList"></div>
+  </div>
+</div>
+
+<!-- SUPABASE -->
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  let selectedRating = 0
+  let currentTeacherId = null
+
+  // تحميل البروفايل
+  async function loadTeacherProfile() {
+    try {
+      // تحقق من تسجيل دخول الطالب (اختياري)
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      const isStudent = currentUser && currentUser.role === 'student'
+
+      // احصل على معرف المدرس من الـ URL أو localStorage
+      const urlParams = new URLSearchParams(window.location.search)
+      currentTeacherId = urlParams.get('id') || localStorage.getItem('selectedTeacherId')
+
+      if (!currentTeacherId) {
+        document.getElementById('profileHeader').innerHTML = '<p style="color:white;">❌ لم يتم تحديد معلم</p>'
+        return
+      }
+
+      // تحميل بيانات المدرس
+      const [
+        { data: user },
+        { data: profile },
+        { data: social }
+      ] = await Promise.all([
+        supabase.from('users').select('*').eq('id', currentTeacherId).single(),
+        supabase.from('teacher_profile').select('*').eq('teacher_id', currentTeacherId).single(),
+        supabase.from('social_links').select('*').eq('teacher_id', currentTeacherId).single()
+      ])
+
+      // تحميل التقييم العام
+      const { data: comments } = await supabase
+        .from('teacher_comments')
+        .select('rating')
+        .eq('teacher_id', currentTeacherId)
+
+      let avgRating = 4.8
+      if (comments && comments.length > 0) {
+        avgRating = (comments.reduce((sum, c) => sum + (c.rating || 0), 0) / comments.length).toFixed(1)
+      }
+
+      // بيانات المدرس
+      const teacherData = {
+        name: user?.name || 'معلم',
+        image: profile?.image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        bio: profile?.bio || 'معلم متخصص',
+        rating: avgRating,
+        students: 0,
+        social: social || {}
+      }
+
+      // حساب عدد الطلاب
+      const { data: studentCount } = await supabase
+        .from('users')
+        .select('id')
+        .eq('teacher_id', currentTeacherId)
+
+      if (studentCount) {
+        teacherData.students = studentCount.length
+      }
+
+      // عرض البروفايل
+      displayTeacherProfile(teacherData)
+
+      // تحميل التعليقات
+      await loadComments()
+
+      // تحميل الفيديوهات النموذجية
+      await loadSampleVideos()
+
+      // إظهار أو إخفاء نموذج التعليق حسب الحالة
+      const formSection = document.querySelector('.add-comment-form')
+      const infoMessage = document.getElementById('infoMessage')
+
+      if (!isStudent) {
+        infoMessage.style.display = 'block'
+        formSection.innerHTML = `
+          <div style="background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(255,100,100,0.1)); padding: 25px; border-radius: 15px; border-right: 4px solid #ff0000; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🔐</div>
+            <h3 style="color: #ff0000; margin-bottom: 10px;">يجب تسجيل الدخول للتعليق</h3>
+            <p style="color: #666; margin-bottom: 20px;">أنت تشاهد هذا البروفايل بدون تسجيل دخول</p>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'"
+              style="max-width: 300px; margin: 0 auto; display: block;">
+              🔑 تسجيل الدخول كطالب
+            </button>
+          </div>
+        `
+      } else {
+        formSection.innerHTML = `
+          <h3 style="margin-bottom: 20px;">أضف تعليقك وتقييمك</h3>
+
+          <div id="statusMessage"></div>
+
+          <div style="background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-right: 4px solid #667eea;">
+            <p style="margin: 0; font-weight: 600; color: #667eea;" id="studentInfoDisplay">👤 جاري تحميل بيانات الطالب...</p>
+          </div>
+
+          <div class="form-group">
+            <label>⭐ التقييم</label>
+            <div class="rating-input">
+              <div id="ratingStars" class="rating-input"></div>
+              <span id="ratingText" style="margin-right: 15px; font-weight: 600;">اختر التقييم</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>💭 تعليقك</label>
+            <textarea id="commentText" placeholder="شارك تجربتك وآرائك..."></textarea>
+          </div>
+
+          <button class="btn btn-primary" onclick="submitComment()">✅ إرسال التعليق</button>
+        `
+
+        // عرض بيانات الطالب المسجل
+        const display = document.getElementById('studentInfoDisplay')
+        display.innerHTML = `👤 <strong>${currentUser.name}</strong> • 📧 ${currentUser.email}`
+
+        // إعادة إنشاء النجوم
+        createRatingStars()
+      }
+
+    } catch (error) {
+      console.error('Error:', error)
+      document.getElementById('profileHeader').innerHTML = '<p style="color:white;">❌ حصل خطأ في التحميل</p>'
+    }
+  }
+
+  // عرض البروفايل
+  function displayTeacherProfile(data) {
+    let socialLinks = ''
+    if (data.social?.facebook) {
+      socialLinks += `<a href="${data.social.facebook}" target="_blank" class="social-icon facebook" title="فيسبوك">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231877f2'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E" alt="Facebook">
+      </a>`
+    }
+    if (data.social?.whatsapp) {
+      socialLinks += `<a href="${data.social.whatsapp}" target="_blank" class="social-icon whatsapp" title="واتساب">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325d366'%3E%3Cpath d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z'/%3E%3C/svg%3E" alt="WhatsApp">
+      </a>`
+    }
+    if (data.social?.youtube) {
+      socialLinks += `<a href="${data.social.youtube}" target="_blank" class="social-icon youtube" title="يوتيوب">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff0000'%3E%3Cpath d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/%3E%3C/svg%3E" alt="YouTube">
+      </a>`
+    }
+
+    document.getElementById('profileHeader').innerHTML = `
+      <div class="teacher-image-section">
+        <img src="${data.image}" alt="${data.name}" class="teacher-image">
+        <div class="rating-badge">
+          <div class="rating-number">⭐ ${data.rating}</div>
+          <div class="rating-label">تقييم</div>
+        </div>
+      </div>
+      <div class="teacher-info">
+        <h1 class="teacher-name">${data.name}</h1>
+        <div class="teacher-badges">
+          <span class="badge">🌟 معلم متميز</span>
+          <span class="badge">👥 نشط</span>
+        </div>
+        <p class="teacher-bio">${data.bio}</p>
+        <div class="teacher-stats">
+          <div class="stat">
+            <div class="stat-number">${data.students}</div>
+            <div class="stat-label">طالب نشط</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">12</div>
+            <div class="stat-label">دورة</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">${data.rating}</div>
+            <div class="stat-label">التقييم</div>
+          </div>
+        </div>
+        <div class="social-links">
+          ${socialLinks || '<p style="color:#999;">لم يتم إضافة روابط تواصل</p>'}
+        </div>
+      </div>
+    `
+  }
+
+  // إنشاء النجوم
+  function createRatingStars() {
+    let container = document.getElementById('ratingStars')
+    container.innerHTML = ''
+    for (let i = 1; i <= 5; i++) {
+      let star = document.createElement('span')
+      star.className = 'star'
+      star.innerHTML = '⭐'
+      star.onclick = () => setRating(i)
+      container.appendChild(star)
+    }
+  }
+
+  // تعيين التقييم
+  function setRating(rating) {
+    selectedRating = rating
+    document.getElementById('ratingText').innerText = `${rating} نجوم`
+    document.querySelectorAll('.star').forEach((s, i) => {
+      if (i < rating) s.classList.add('active')
+      else s.classList.remove('active')
+    })
+  }
+
+  // إرسال التعليق
+  window.submitComment = async function() {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      const text = document.getElementById('commentText').value.trim()
+      const statusMsg = document.getElementById('statusMessage')
+
+      // التحقق من تسجيل الدخول
+      if (!currentUser) {
+        showStatus('❌ يجب أن تسجل دخول أولاً', 'error')
+        setTimeout(() => {
+          window.location.href = 'index.html'
+        }, 1500)
+        return
+      }
+
+      if (currentUser.role !== 'student') {
+        showStatus('❌ يجب أن تكون طالباً لتعليق', 'error')
+        return
+      }
+
+      if (!text) {
+        showStatus('❌ اكتب التعليق', 'error')
+        return
+      }
+
+      if (selectedRating === 0) {
+        showStatus('❌ اختر التقييم', 'error')
+        return
+      }
+
+      statusMsg.innerHTML = '<div class="status-message success">⏳ جاري الإرسال...</div>'
+
+      const { error } = await supabase.from('teacher_comments').insert([
+        {
+          teacher_id: currentTeacherId,
+          student_id: currentUser.id,
+          student_name: currentUser.name,
+          student_email: currentUser.email,
+          comment: text,
+          rating: selectedRating
+        }
+      ])
+
+      if (error) {
+        showStatus('❌ حصل خطأ: ' + error.message, 'error')
+        return
+      }
+
+      showStatus('✅ شكراً لتقييمك!', 'success')
+
+      // مسح النموذج
+      document.getElementById('commentText').value = ''
+      selectedRating = 0
+      document.getElementById('ratingText').innerText = 'اختر التقييم'
+      document.querySelectorAll('.star').forEach(s => s.classList.remove('active'))
+
+      // تحديث التعليقات والتقييم
+      await loadComments()
+
+    } catch (error) {
+      console.error('Error:', error)
+      showStatus('❌ خطأ: ' + error.message, 'error')
+    }
+  }
+
+  // عرض الرسالة
+  function showStatus(message, type) {
+    let statusMsg = document.getElementById('statusMessage')
+    statusMsg.innerHTML = `<div class="status-message ${type}">${message}</div>`
+    setTimeout(() => {
+      statusMsg.innerHTML = ''
+    }, 4000)
+  }
+
+  // تحميل التعليقات
+  async function loadComments() {
+    try {
+      const { data: comments } = await supabase
+        .from('teacher_comments')
+        .select('*')
+        .eq('teacher_id', currentTeacherId)
+        .order('created_at', { ascending: false })
+
+      let container = document.getElementById('commentsList')
+
+      if (!comments || comments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-comments">
+            <div class="empty-icon">📭</div>
+            <p>لا توجد تعليقات حالياً. كن الأول في التعليق!</p>
+          </div>
+        `
+        return
+      }
+
+      container.innerHTML = '<div class="comments-list">'
+      comments.forEach((comment, index) => {
+        let stars = '⭐'.repeat(comment.rating)
+        let date = new Date(comment.created_at).toLocaleDateString('ar-EG')
+
+        container.innerHTML += `
+          <div class="comment-card" style="animation-delay: ${index * 0.05}s;">
+            <div class="comment-header">
+              <div>
+                <div class="comment-author">${comment.student_name}</div>
+                <div style="font-size:0.85rem; color:#999;">${comment.student_email}</div>
+              </div>
+              <div class="comment-rating">${stars}</div>
+            </div>
+            <p class="comment-text">${comment.comment}</p>
+            <div class="comment-date">📅 ${date}</div>
+          </div>
+        `
+      })
+      container.innerHTML += '</div>'
+
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  // تحميل الفيديوهات النموذجية
+  async function loadSampleVideos() {
+    try {
+      const { data: videos } = await supabase
+        .from('sample_videos')
+        .select('*')
+        .eq('teacher_id', currentTeacherId)
+        .order('created_at', { ascending: false })
+
+      const section = document.getElementById('sampleVideosSection')
+      const container = document.getElementById('sampleVideosList')
+
+      if (!videos || videos.length === 0) {
+        section.style.display = 'none'
+        return
+      }
+
+      section.style.display = 'block'
+      container.innerHTML = ''
+
+      videos.forEach((video, index) => {
+        container.innerHTML += `
+          <div class="sample-video-card" style="animation-delay: ${index * 0.05}s;">
+            <div class="sample-video-thumb">
+              🎥
+            </div>
+            <div style="padding: 15px;">
+              <div class="sample-video-title">${escapeHtml(video.title || 'فيديو نموذجي')}</div>
+              <div style="font-size: 0.85rem; color: #999; text-align: center;">
+                📅 ${new Date(video.created_at).toLocaleDateString('ar-EG')}
+              </div>
+              <div style="text-align: center; margin-top: 10px;">
+                <a href="${escapeHtml(video.url)}" target="_blank" class="sample-video-badge" style="cursor: pointer;">▶️ شاهد الفيديو</a>
+              </div>
+            </div>
+          </div>
+        `
+      })
+    } catch (error) {
+      console.error('Error loading sample videos:', error)
+    }
+  }
+
+  // دالة مساعدة لـ escape HTML
+  function escapeHtml(text) {
+    if (!text) return ''
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
+  // تحميل البيانات عند فتح الصفحة
+  window.addEventListener('load', () => {
+    loadTeacherProfile()
+  })
+</script>
+</body>
+</html>

@@ -2,451 +2,663 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة التعليم - الطريقة الحديثة للتعلم</title>
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>🎓 Al-Ma'moun | تسجيل الدخول - منصة التعليم الذكية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="images/The-Beauty-of-E-Learning-Translation.jpg" type="image/x-icon">
+
   <style>
-    /* Hero Section */
-    .hero {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #f093fb 100%);
+      background: #0b0c1a;
+      /* خلفية متدرجة ديناميكية ناعمة مع تموج محسن */
+      background: radial-gradient(circle at 10% 20%, rgba(15, 25, 55, 1) 0%, rgba(8, 12, 28, 0.95) 100%);
+      color: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* خلفية رئيسية متطورة: شبكة تعليمية + حبيبات ضبابية + أنيميشن ذكي */
+    .smart-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* طبقة الشبكة الهندسية (مستوحاة من التكنولوجيا والتعليم) */
+    .grid-pattern {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(102, 126, 234, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 126, 234, 0.08) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridShift 25s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gridShift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* أضواء خلفية ناعمة متحركة (أوراق تعليمية) */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      animation: floatGlow 18s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+      100% { transform: translate(40px, -40px) scale(1.2); opacity: 0.45; }
+    }
+
+    .orb1 { width: 400px; height: 400px; background: #4a3b9e; top: -150px; left: -100px; animation-duration: 20s; }
+    .orb2 { width: 500px; height: 500px; background: #1e4a76; bottom: -200px; right: -150px; animation-duration: 25s; animation-direction: alternate-reverse; }
+    .orb3 { width: 300px; height: 300px; background: #8b5cf6; top: 40%; left: 65%; animation-duration: 17s; opacity: 0.2; }
+    .orb4 { width: 350px; height: 350px; background: #c084fc; bottom: 15%; left: 5%; animation-duration: 22s; }
+
+    /* عناصر تعليمية عائمة محسنة (أيقونات ذكية) */
+    .float-item {
+      position: absolute;
+      font-size: 2.2rem;
+      opacity: 0.2;
+      animation: floatSmart 14s infinite alternate;
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    @keyframes floatSmart {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-35px) rotate(6deg); }
+    }
+
+    .float-item:nth-child(1) { top: 12%; left: 3%; font-size: 2.8rem; animation-duration: 12s; opacity: 0.25; }
+    .float-item:nth-child(2) { top: 22%; right: 4%; font-size: 2rem; animation-duration: 15s; animation-delay: 1s; opacity: 0.2; }
+    .float-item:nth-child(3) { bottom: 18%; left: 6%; font-size: 3rem; animation-duration: 18s; opacity: 0.2; }
+    .float-item:nth-child(4) { bottom: 28%; right: 8%; font-size: 2.3rem; animation-duration: 13s; animation-delay: 2s; }
+    .float-item:nth-child(5) { top: 45%; left: 2%; font-size: 2.5rem; animation-duration: 16s; opacity: 0.2; }
+    .float-item:nth-child(6) { top: 70%; right: 3%; font-size: 2rem; animation-duration: 19s; }
+    .float-item:nth-child(7) { top: 85%; left: 15%; font-size: 2.6rem; animation-duration: 11s; opacity: 0.2; }
+    .float-item:nth-child(8) { top: 8%; left: 20%; font-size: 2rem; animation-duration: 14s; opacity: 0.2; }
+    .float-item:nth-child(9) { bottom: 8%; right: 20%; font-size: 2.7rem; animation-duration: 17s; }
+
+    /* موجة سفلي محسنة (طبقة رقيقة) */
+    .wave-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 110px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(102,126,234,0.12)" fill-opacity="0.6" d="M0,224L48,213.3C96,203,192,181,288,176C384,171,480,181,576,197.3C672,213,768,235,864,234.7C960,235,1056,213,1152,197.3C1248,181,1344,171,1392,165.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: cover;
+      animation: gentleWave 12s linear infinite;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    @keyframes gentleWave {
+      0% { background-position-x: 0; }
+      100% { background-position-x: 1440px; }
+    }
+
+    /* الحاوية الرئيسية */
+    .login-wrapper {
+      position: relative;
+      z-index: 20;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      padding: 1.5rem;
+    }
+
+    /* الكارت الرئيسي - زجاجي محسن مع إضاءة خفيفة */
+    .login-card {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(12, 18, 34, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 56px;
+      border: 1px solid rgba(102, 126, 234, 0.35);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(102, 126, 234, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: transform 0.35s ease, box-shadow 0.4s ease;
+      animation: cardRise 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    @keyframes cardRise {
+      0% { opacity: 0; transform: translateY(40px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 35px 70px -15px rgba(102, 126, 234, 0.45);
+      border-color: rgba(102, 126, 234, 0.6);
+    }
+
+    .card-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(95deg, #667eea, #b794f4, #f093fb, #667eea);
+      background-size: 250% 100%;
+      border-radius: 56px 56px 0 0;
+      animation: shimmerAccent 4s ease infinite;
+    }
+
+    @keyframes shimmerAccent {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card-content {
+      padding: 48px 42px;
+    }
+
+    /* الشعار والهوية البصرية */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .logo-icon {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 20px;
+      background: linear-gradient(145deg, #2d2f5e, #1b1c3a);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      box-shadow: 0 20px 30px -8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+      animation: gentlePulse 3s infinite ease;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 20px 30px -8px rgba(0, 0, 0, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 25px 40px -10px rgba(102, 126, 234, 0.4); }
+    }
+
+    .logo-section h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #c3b9ff, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-section p {
+      color: #a0aec0;
+      font-size: 0.9rem;
+      font-weight: 400;
+      margin-top: 5px;
+    }
+
+    /* حقول الإدخال بتصميم حديث */
+    .input-field {
+      margin-bottom: 1.6rem;
+      position: relative;
+    }
+
+    .input-field input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      background: rgba(20, 27, 45, 0.7);
+      border: 1.5px solid rgba(102, 126, 234, 0.25);
+      border-radius: 28px;
+      color: #f1f5f9;
+      font-size: 1rem;
+      font-family: 'Cairo', sans-serif;
+      transition: all 0.25s;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .input-field input:focus {
+      border-color: #8b5cf6;
+      background: rgba(30, 41, 70, 0.8);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+    }
+
+    .input-field input::placeholder {
+      color: rgba(160, 174, 192, 0.6);
+      font-weight: 400;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      opacity: 0.65;
+      transition: 0.2s;
+      pointer-events: none;
+    }
+
+    .input-field input:focus ~ .input-icon {
+      opacity: 1;
+      color: #a78bfa;
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    /* مجموعة الأزرار */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 44px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       position: relative;
       overflow: hidden;
     }
 
-    .hero::before {
+    .btn::after {
       content: '';
       position: absolute;
-      width: 400px;
-      height: 400px;
-      background: rgba(255, 255, 255, 0.1);
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
       border-radius: 50%;
-      top: -100px;
-      right: -100px;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
     }
 
-    .hero-content {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: var(--space-lg);
-      max-width: 600px;
+    .btn:active::after {
+      width: 200px;
+      height: 200px;
     }
 
-    .hero h1 {
+    .btn-primary {
+      background: linear-gradient(105deg, #5e6fe0, #8b5cf6, #c084fc);
+      background-size: 200% auto;
       color: white;
-      font-size: var(--font-size-4xl);
-      margin-bottom: var(--space-lg);
-      line-height: 1.2;
+      box-shadow: 0 10px 18px -6px rgba(91, 87, 189, 0.4);
     }
 
-    .hero p {
-      color: rgba(255, 255, 255, 0.95);
-      font-size: var(--font-size-lg);
-      margin-bottom: var(--space-xl);
+    .btn-primary:hover:not(:disabled) {
+      background-position: 100% 0;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px -8px rgba(139, 92, 246, 0.5);
     }
 
-    .hero-buttons {
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.2px solid rgba(139, 92, 246, 0.4);
+      color: #e2e8f0;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: #a78bfa;
+      transform: translateY(-2px);
+    }
+
+    .btn-demo {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px dashed rgba(167, 139, 250, 0.6);
+      color: #cbd5e1;
+      font-size: 0.85rem;
+    }
+
+    .btn-demo:hover:not(:disabled) {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: #c084fc;
+      color: #ddd6fe;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .btn-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* رسائل الحالة */
+    .status-message {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 28px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      animation: fadeSlide 0.2s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .status-info {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #c4b5fd;
+    }
+
+    .extra-links {
       display: flex;
-      gap: var(--space-md);
       justify-content: center;
-      flex-wrap: wrap;
+      gap: 28px;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
     }
 
-    .btn-hero {
-      padding: var(--space-md) var(--space-xl);
-      border-radius: var(--border-radius-md);
-      border: none;
-      cursor: pointer;
-      font-size: var(--font-size-base);
-      font-weight: var(--font-weight-semibold);
-      transition: all var(--transition-base);
+    .extra-links a {
+      color: #9ca3af;
       text-decoration: none;
-      display: inline-block;
+      font-size: 0.8rem;
+      transition: 0.2s;
+      font-weight: 500;
     }
 
-    .btn-primary-hero {
-      background: white;
-      color: var(--primary);
+    .extra-links a:hover {
+      color: #a78bfa;
+      text-decoration: underline;
     }
 
-    .btn-primary-hero:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-secondary-hero {
-      background: transparent;
-      color: white;
-      border: 2px solid white;
-    }
-
-    .btn-secondary-hero:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Features Section */
-    .features {
-      padding: var(--space-2xl);
-      background: var(--bg-secondary);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: var(--space-xl);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .feature-card {
-      background: white;
-      padding: var(--space-xl);
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-md);
+    .footer-text {
       text-align: center;
-      transition: all var(--transition-base);
+      margin-top: 26px;
+      font-size: 0.7rem;
+      color: #6b7280;
+      letter-spacing: 0.3px;
     }
 
-    .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .feature-icon {
-      font-size: var(--font-size-4xl);
-      margin-bottom: var(--space-md);
-    }
-
-    .feature-card h3 {
-      color: var(--primary);
-      margin-bottom: var(--space-md);
-    }
-
-    /* Stats Section */
-    .stats {
-      padding: var(--space-2xl);
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-xl);
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .stat-item h2 {
-      color: white;
-      font-size: var(--font-size-4xl);
-      margin-bottom: var(--space-sm);
-    }
-
-    /* Pricing Section */
-    .pricing {
-      padding: var(--space-2xl);
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: var(--space-xl);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .pricing-card {
-      background: white;
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      transition: all var(--transition-base);
-      border: 2px solid transparent;
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary);
-    }
-
-    .pricing-header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: var(--space-xl);
-      text-align: center;
-    }
-
-    .pricing-price {
-      font-size: var(--font-size-4xl);
-      font-weight: var(--font-weight-bold);
-      margin: var(--space-md) 0;
-    }
-
-    .pricing-body {
-      padding: var(--space-xl);
-    }
-
-    .pricing-features {
-      list-style: none;
-      margin-bottom: var(--space-xl);
-    }
-
-    .pricing-features li {
-      padding: var(--space-sm) 0;
-      border-bottom: 1px solid var(--border-color);
-      background: none;
-      margin: 0;
-    }
-
-    .pricing-features li::before {
-      content: '✓ ';
-      color: var(--success);
-      font-weight: bold;
-      margin-right: var(--space-sm);
-    }
-
-    /* Footer */
-    .footer {
-      background: var(--text-primary);
-      color: white;
-      padding: var(--space-2xl);
-      text-align: center;
-    }
-
-    .footer a {
-      color: var(--secondary);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: var(--font-size-2xl);
-      }
-
-      .hero-buttons {
-        flex-direction: column;
-      }
-
-      .hero-buttons a {
-        width: 100%;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 550px) {
+      .card-content { padding: 32px 24px; }
+      .logo-icon { width: 70px; height: 70px; font-size: 42px; }
+      .logo-section h1 { font-size: 1.8rem; }
+      .btn-group { gap: 12px; }
+      .input-field input { padding: 0.9rem 1rem 0.9rem 2.6rem; }
+      .float-item { font-size: 1.8rem; opacity: 0.15; }
     }
   </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav class="navbar" style="position: relative; z-index: 100; background: white;">
-  <div style="flex: 1; font-weight: var(--font-weight-bold); font-size: var(--font-size-xl); color: var(--primary);">
-    🎓 منصة التعليم
-  </div>
-  <div class="navbar-actions">
-    <a href="pages/login.html" class="btn btn-small">دخول</a>
-    <a href="pages/register.html" class="btn btn-primary btn-small">تسجيل جديد</a>
-  </div>
-</nav>
+<div class="smart-bg">
+  <div class="grid-pattern"></div>
+  <div class="glow-orb orb1"></div>
+  <div class="glow-orb orb2"></div>
+  <div class="glow-orb orb3"></div>
+  <div class="glow-orb orb4"></div>
+  <!-- أيقونات تعليمية عائمة متنوعة -->
+  <div class="float-item">📚</div>
+  <div class="float-item">✏️</div>
+  <div class="float-item">🧠</div>
+  <div class="float-item">🎓</div>
+  <div class="float-item">💡</div>
+  <div class="float-item">📖</div>
+  <div class="float-item">⚛️</div>
+  <div class="float-item">🔬</div>
+  <div class="float-item">📊</div>
+  <div class="wave-footer"></div>
+</div>
 
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>اكتشف طريقة جديدة في التعليم</h1>
-    <p>منصة تعليمية حديثة تجمع بين الجودة والأمان والسهولة</p>
-    <div class="hero-buttons">
-      <a href="pages/login.html" class="btn-hero btn-primary-hero">تسجيل الدخول</a>
-      <a href="#features" class="btn-hero btn-secondary-hero">اعرف أكثر</a>
-    </div>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section class="features" id="features">
-  <div style="max-width: 1200px; margin: 0 auto; margin-bottom: var(--space-2xl);">
-    <h2 style="text-align: center; color: var(--text-primary); margin-bottom: var(--space-2xl);">لماذا تختار منصتنا؟</h2>
-  </div>
-
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">📚</div>
-      <h3>محتوى متنوع</h3>
-      <p>آلاف الدروس والكورسات من أفضل المدرسين</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">✅</div>
-      <h3>واجبات شاملة</h3>
-      <p>نظام واجبات متقدم مع تقويم تلقائي</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>تحليلات مفصلة</h3>
-      <p>تتبع تقدمك مع إحصائيات وتقارير</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">🔐</div>
-      <h3>آمان عالي</h3>
-      <p>تشفير قوي وحماية بيانات شاملة</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">💬</div>
-      <h3>تواصل مباشر</h3>
-      <p>تفاعل مستمر مع المدرسين والطلاب</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>سرعة عالية</h3>
-      <p>أداء سريع وموثوقية عالية</p>
-    </div>
-  </div>
-</section>
-
-<!-- Stats Section -->
-<section class="stats">
-  <div class="stats-grid">
-    <div class="stat-item">
-      <h2>50K+</h2>
-      <p>طالب مسجل</p>
-    </div>
-    <div class="stat-item">
-      <h2>500+</h2>
-      <p>مدرس معتمد</p>
-    </div>
-    <div class="stat-item">
-      <h2>1K+</h2>
-      <p>كورس متاح</p>
-    </div>
-    <div class="stat-item">
-      <h2>4.9/5</h2>
-      <p>تقييم المستخدمين</p>
-    </div>
-  </div>
-</section>
-
-<!-- Pricing Section -->
-<section class="pricing">
-  <div style="max-width: 1200px; margin: 0 auto; margin-bottom: var(--space-2xl);">
-    <h2 style="text-align: center; color: var(--text-primary);">خطط مرنة</h2>
-  </div>
-
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <div class="pricing-header">
-        <h3>طالب</h3>
-        <div class="pricing-price">مجاني</div>
-        <p>للبدء</p>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="card-accent"></div>
+    <div class="card-content">
+      <div class="logo-section">
+        <div class="logo-icon">🎓</div>
+        <h1>Al-Ma'moun</h1>
+        <p>منصة التعليم الذكية • نحو مستقبل معرفي</p>
       </div>
-      <div class="pricing-body">
-        <ul class="pricing-features">
-          <li>الوصول لـ 10 كورسات</li>
-          <li>حل الواجبات</li>
-          <li>تتبع التقدم</li>
-          <li>دعم عام</li>
-        </ul>
-        <a href="pages/register.html" class="btn btn-primary" style="width: 100%;">ابدأ الآن</a>
-      </div>
-    </div>
 
-    <div class="pricing-card" style="border-color: var(--primary); transform: translateY(-10px);">
-      <div class="pricing-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
-        <span style="background: var(--warning); color: white; padding: 4px 12px; border-radius: 20px; font-size: var(--font-size-sm); display: inline-block; margin-bottom: var(--space-md);">الأكثر شهرة</span>
-        <h3>مدرس</h3>
-        <div class="pricing-price">29 ر.س</div>
-        <p>شهرياً</p>
+      <div class="input-field">
+        <input type="email" id="email" placeholder="البريد الإلكتروني" autocomplete="email" aria-label="البريد الإلكتروني">
+        <span class="input-icon">📧</span>
       </div>
-      <div class="pricing-body">
-        <ul class="pricing-features">
-          <li>إنشاء كورسات غير محدود</li>
-          <li>رفع فيديوهات</li>
-          <li>إدارة الواجبات</li>
-          <li>تقارير الطلاب</li>
-          <li>دعم الأولوية</li>
-        </ul>
-        <a href="pages/register.html" class="btn btn-primary" style="width: 100%;">ابدأ الآن</a>
-      </div>
-    </div>
 
-    <div class="pricing-card">
-      <div class="pricing-header">
-        <h3>مؤسسة</h3>
-        <div class="pricing-price">تواصل</div>
-        <p>معنا</p>
+      <div class="input-field">
+        <input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password" aria-label="كلمة المرور">
+        <span class="input-icon">🔒</span>
       </div>
-      <div class="pricing-body">
-        <ul class="pricing-features">
-          <li>خادم مخصص</li>
-          <li>تخصيص كامل</li>
-          <li>إدارة المستخدمين</li>
-          <li>تقارير متقدمة</li>
-          <li>دعم 24/7</li>
-        </ul>
-        <a href="mailto:support@platform.com" class="btn btn-primary" style="width: 100%;">تواصل معنا</a>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" id="loginBtn"><span>✨ تسجيل الدخول</span></button>
+        <button class="btn btn-secondary" id="backBtn"><span>🏠 الصفحة الرئيسية</span></button>
+        <button class="btn btn-demo" id="demoHintBtn"><span>🔐 بيانات تجريبية للدخول</span></button>
       </div>
+
+      <div id="loginStatus"></div>
+
+      <div class="extra-links">
+        <a href="#" aria-label="مساعدة">❓ مساعدة</a>
+        <a href="https://wa.me/qr/FMXMGJVKOCLME1" target="_blank" aria-label="تواصل مع الدعم">📞 تواصل مع الدعم</a>
+      </div>
+
+      <div class="footer-text">Developed by Eng Mohamed Hesham 👨🏻‍💻</div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTA Section -->
-<section style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: var(--space-2xl); text-align: center;">
-  <div style="max-width: 600px; margin: 0 auto;">
-    <h2 style="color: white;">ابدأ رحلة التعليم الآن</h2>
-    <p style="font-size: var(--font-size-lg); margin-bottom: var(--space-xl);">انضم لآلاف الطلاب والمدرسين الذين يثقون بمنصتنا</p>
-    <a href="pages/register.html" class="btn btn-small" style="background: white; color: var(--primary); border: none; padding: var(--space-md) var(--space-xl); border-radius: var(--border-radius-md); font-weight: var(--font-weight-semibold); cursor: pointer; text-decoration: none;">سجل الآن - مجاني</a>
-  </div>
-</section>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<!-- Footer -->
-<footer class="footer">
-  <div style="max-width: 1200px; margin: 0 auto; padding: var(--space-xl) 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: var(--space-xl);">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-xl); text-align: right;">
-      <div>
-        <h4 style="margin-bottom: var(--space-md);">الشركة</h4>
-        <ul style="list-style: none; padding: 0;">
-          <li><a href="#">من نحن</a></li>
-          <li><a href="#">الرؤية</a></li>
-          <li><a href="#">الوظائف</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 style="margin-bottom: var(--space-md);">الخدمات</h4>
-        <ul style="list-style: none; padding: 0;">
-          <li><a href="#">الكورسات</a></li>
-          <li><a href="#">للمدرسين</a></li>
-          <li><a href="#">للمؤسسات</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 style="margin-bottom: var(--space-md);">الدعم</h4>
-        <ul style="list-style: none; padding: 0;">
-          <li><a href="#">مساعدة</a></li>
-          <li><a href="#">الشروط</a></li>
-          <li><a href="#">الخصوصية</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+  const supabaseUrl = "https://dfxkuppxywldxsbyzfzo.supabase.co"
+  const supabaseKey = "sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN"
+  const supabase = createClient(supabaseUrl, supabaseKey)
 
-  <div style="text-align: center;">
-    <p>&copy; 2025 منصة التعليم. جميع الحقوق محفوظة.</p>
-    <p style="font-size: var(--font-size-sm); opacity: 0.8;">صُنعت بـ ❤️ من قبل فريق متخصص</p>
-  </div>
-</footer>
+  const elements = {
+    email: document.getElementById('email'),
+    password: document.getElementById('password'),
+    loginBtn: document.getElementById('loginBtn'),
+    backBtn: document.getElementById('backBtn'),
+    demoHintBtn: document.getElementById('demoHintBtn'),
+    statusDiv: document.getElementById('loginStatus')
+  }
 
+  function showStatus(message, type = 'info') {
+    if (elements.statusDiv) {
+      const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️'
+      elements.statusDiv.innerHTML = `<div class="status-message status-${type}">${icon} ${message}</div>`
+    }
+  }
+
+  function hideStatus() { if (elements.statusDiv) elements.statusDiv.innerHTML = ''; }
+
+  function setButtonsEnabled(enabled) {
+    const btns = [elements.loginBtn, elements.backBtn, elements.demoHintBtn]
+    btns.forEach(btn => { if (btn) btn.disabled = !enabled })
+  }
+
+  function setLoginLoading(isLoading) {
+    if (elements.loginBtn) {
+      elements.loginBtn.innerHTML = isLoading ? '<span class="btn-spinner"></span><span> جاري التحقق...</span>' : '<span>✨ تسجيل الدخول</span>'
+    }
+  }
+
+  function setBackLoading(isLoading) {
+    if (elements.backBtn) {
+      elements.backBtn.innerHTML = isLoading ? '<span class="btn-spinner"></span><span> جاري...</span>' : '<span>🏠 الصفحة الرئيسية</span>'
+    }
+  }
+
+  function showDemoCredentials() {
+    if (elements.email && elements.password) {
+      elements.email.value = 'student@test.com'
+      elements.password.value = '123456'
+      showStatus('📝 تم تعبئة بيانات تجريبية (student@test.com / 123456). يمكنك الدخول مباشرة.', 'info')
+      setTimeout(() => hideStatus(), 3500)
+    }
+  }
+
+  async function handleLogin() {
+    const email = elements.email?.value.trim()
+    const password = elements.password?.value.trim()
+
+    if (!email || !password) {
+      showStatus('يرجى إدخال البريد الإلكتروني وكلمة المرور', 'error')
+      return
+    }
+    if (!email.includes('@') || !email.includes('.')) {
+      showStatus('صيغة البريد الإلكتروني غير صحيحة', 'error')
+      return
+    }
+
+    setButtonsEnabled(false)
+    setLoginLoading(true)
+    showStatus('جاري التحقق من البيانات مع قاعدة البيانات ...', 'info')
+
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .eq("password", password)
+        .maybeSingle()
+
+      if (error || !data) {
+        showStatus('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error')
+        setButtonsEnabled(true)
+        setLoginLoading(false)
+        return
+      }
+
+      if (data.is_active === false) {
+        showStatus('⚠️ هذا الحساب معطل، يرجى التواصل مع الإدارة.', 'error')
+        setButtonsEnabled(true)
+        setLoginLoading(false)
+        return
+      }
+
+      // نجاح الدخول
+      showStatus(`مرحباً ${data.name || data.email}! تم التحقق بنجاح، جاري التوجيه...`, 'success')
+      localStorage.setItem("currentUser", JSON.stringify(data))
+
+      // تسجيل دخول (غير متزامن بدون تأثير على الأداء)
+      try {
+        await supabase.from("login_logs").insert([{
+          user_id: data.id,
+          user_name: data.name,
+          user_email: data.email,
+          user_role: data.role,
+          login_time: new Date().toISOString()
+        }])
+      } catch (logErr) { console.warn("Log save non-critical:", logErr) }
+
+      const redirectPlaylistId = localStorage.getItem('redirectAfterLogin')
+      if (redirectPlaylistId) {
+        localStorage.removeItem('redirectAfterLogin')
+        setTimeout(() => { window.location.href = `playlist-view.html?id=${redirectPlaylistId}` }, 900)
+        return
+      }
+
+      setTimeout(() => {
+        if (data.role === "admin") window.location.href = "admin.html"
+        else if (data.role === "teacher") window.location.href = "teacher.html"
+        else if (data.role === "student") window.location.href = "student-modern.html"
+        else window.location.href = "dashboard-home.html"
+      }, 900)
+
+    } catch (err) {
+      console.error("Login network error:", err)
+      showStatus('حدث خطأ في الاتصال بالسيرفر. تحقق من اتصالك بالإنترنت', 'error')
+      setButtonsEnabled(true)
+      setLoginLoading(false)
+    }
+  }
+
+  function goBack() {
+    setBackLoading(true)
+    setButtonsEnabled(false)
+    window.location.href = "dashboard-home.html"
+  }
+
+  // روابط Enter
+  function setupEnterHandler() {
+    const inputs = [elements.email, elements.password]
+    inputs.forEach(input => {
+      if (input) {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            handleLogin()
+          }
+        })
+      }
+    })
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (elements.loginBtn) elements.loginBtn.onclick = (e) => { e.preventDefault(); handleLogin() }
+    if (elements.backBtn) elements.backBtn.onclick = (e) => { e.preventDefault(); goBack() }
+    if (elements.demoHintBtn) elements.demoHintBtn.onclick = (e) => { e.preventDefault(); showDemoCredentials() }
+    setupEnterHandler()
+  })
+
+  // منع أي تداخل غير متوقع
+  window.handleLogin = handleLogin
+  window.goBack = goBack
+</script>
 </body>
 </html>
