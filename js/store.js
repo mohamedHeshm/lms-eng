@@ -57,7 +57,9 @@ async function initCheckout() {
   coursePrice.textContent = money(course.price);
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const legacyUser = (() => { try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch { return null; } })();
+    const user = authUser || legacyUser;
     if (!user?.id) { location.href = 'index.html'; return; }
     const fields = Object.fromEntries(new FormData(form).entries());
     if (fields.method === 'online') {
