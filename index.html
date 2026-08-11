@@ -34,10 +34,19 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault(); const submit = form.querySelector('button'); submit.disabled = true; show('جارٍ تسجيل الدخول…', '');
       const values = Object.fromEntries(new FormData(form).entries());
+      // توافق مؤقت مع الحسابات القديمة إلى أن يتم نقلها بالكامل إلى Supabase Auth.
+      const { data: legacyUser, error: legacyError } = await supabase.from('users').select('*').eq('email', values.email).eq('password', values.password).maybeSingle();
+      if (!legacyError && legacyUser) {
+        if (legacyUser.is_active === false) { submit.disabled = false; show('هذا الحساب موقوف. تواصل مع الإدارة.', 'error'); return; }
+        localStorage.setItem('currentUser', JSON.stringify(legacyUser));
+        location.href = legacyUser.role === 'admin' ? 'admin.html' : legacyUser.role === 'teacher' ? 'teacher.html' : 'student-modern.html';
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword(values);
-      if (error || !data.user) { console.error('Sign in failed', error); submit.disabled = false; show('تعذّر تسجيل الدخول. راجع بياناتك أو تواصل مع الإدارة.', 'error'); return; }
+      if (error || !data.user) { submit.disabled = false; show('تعذّر تسجيل الدخول. راجع بياناتك أو تواصل مع الإدارة.', 'error'); return; }
       const { data: profile, error: profileError } = await supabase.from('profiles').select('id, full_name, role').eq('id', data.user.id).single();
-      if (profileError || !profile) { console.error('Profile lookup failed', profileError); await supabase.auth.signOut(); submit.disabled = false; show('الحساب غير مهيأ بعد. تواصل مع إدارة المنصة.', 'error'); return; }
+      if (profileError || !profile) { await supabase.auth.signOut(); submit.disabled = false; show('الحساب غير مهيأ بعد. تواصل مع إدارة المنصة.', 'error'); return; }
       localStorage.setItem('currentUser', JSON.stringify({ id: profile.id, name: profile.full_name, role: profile.role }));
       location.href = profile.role === 'admin' ? 'admin.html' : profile.role === 'teacher' ? 'teacher.html' : 'student-modern.html';
     });
