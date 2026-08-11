@@ -8,6 +8,14 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ================== Helper Functions ==================
 
+// Keep provider and database details in the console, not in user-facing messages.
+const publicErrorMessage = 'حدث خطأ أثناء تنفيذ العملية. حاول مرة أخرى.'
+const originalAlert = window.alert.bind(window)
+window.alert = (message) => {
+  const text = String(message || '')
+  originalAlert(text.includes('error') || text.includes('Error') || text.includes('خطأ') ? publicErrorMessage : text)
+}
+
 function escapeHtml(text) {
   if (!text) return ''
   const div = document.createElement('div')
@@ -359,7 +367,7 @@ window.loadLoginLogs = async function() {
         container.innerHTML = `
           <div style="background:#fff3cd; border:2px solid #ffc107; padding:20px; border-radius:12px; color:#856404;">
             <h4>⚠️ تعذّر تحميل السجل</h4>
-            <p style="margin-top:10px;">${escapeHtml(error.message)}</p>
+            <p style="margin-top:10px;">${publicErrorMessage}</p>
             <p style="margin-top:10px; font-size:13px;">السبب الأرجح: جدول <code>login_logs</code> غير موجود في قاعدة البيانات،
             أو سياسات RLS لا تسمح بالقراءة. شغّل ملف <code>setup-database.sql</code> اللي موجود مع الملفات.</p>
           </div>`
@@ -373,7 +381,7 @@ window.loadLoginLogs = async function() {
 
   } catch (error) {
     console.error("Load login logs error:", error)
-    if (container) container.innerHTML = `<p style='color:#ff4d4d;'>❌ خطأ: ${escapeHtml(error.message)}</p>`
+    if (container) container.innerHTML = `<p style='color:#ff4d4d;'>❌ ${publicErrorMessage}</p>`
   }
 }
 
@@ -580,7 +588,7 @@ window.uploadPDF = async function() {
   } catch (error) {
     console.error("Upload PDF error:", error)
     let status = document.getElementById("status")
-    status.innerText = "❌ خطأ: " + error.message
+    status.innerText = "❌ " + publicErrorMessage
   }
 }
 
@@ -615,7 +623,7 @@ window.uploadPDF2 = async function() {
 
     let { error } = await supabase.storage.from("files").upload(path, file, { upsert: true })
     if (error) {
-      status.innerText = "❌ " + error.message
+      status.innerText = "❌ " + publicErrorMessage
       return
     }
 
@@ -638,7 +646,7 @@ window.uploadPDF2 = async function() {
   } catch (error) {
     console.error("Upload PDF2 error:", error)
     let status = document.getElementById("status2")
-    status.innerText = "❌ خطأ: " + error.message
+    status.innerText = "❌ " + publicErrorMessage
   }
 }
 
@@ -1261,7 +1269,7 @@ window.uploadSolution = async function() {
   } catch (error) {
     console.error("Upload solution error:", error)
     let status = document.getElementById("uploadStatus")
-    if (status) status.innerText = "❌ خطأ: " + error.message
+    if (status) status.innerText = "❌ " + publicErrorMessage
   }
 }
 // ================== حلول الطلاب للمدرس (حسب المرحلة) ==================
@@ -1413,7 +1421,7 @@ window.loadStudentsSolutions = async function() {
         console.error("Load students solutions error:", error);
         let container = document.getElementById("studentsSolutionsContainer");
         if (container) {
-            container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ حدث خطأ: ${escapeHtml(error.message)}</p>`;
+            container.innerHTML = `<p style='text-align:center; color:#ff4d4d;'>❌ ${publicErrorMessage}</p>`;
         }
     }
 }
@@ -1690,7 +1698,7 @@ window.addTeacherContent = async function() {
 
     if (error) {
       if (status) {
-        status.innerText = "❌ خطأ: " + error.message
+        status.innerText = "❌ " + publicErrorMessage
         status.style.color = "#ff4d4d"
       }
       console.error("Insert error:", error)
@@ -1719,7 +1727,7 @@ window.addTeacherContent = async function() {
     console.error("Add teacher content error:", error)
     let status = document.getElementById("contentStatus")
     if (status) {
-      status.innerText = "❌ خطأ: " + error.message
+      status.innerText = "❌ " + publicErrorMessage
       status.style.color = "#ff4d4d"
     }
   }
@@ -1968,7 +1976,7 @@ window.loadMyPlaylists = async function() {
   if (error) {
     container.innerHTML = `<div style="background:#fff3cd; border:2px solid #ffc107; padding:20px; border-radius:12px; color:#856404;">
       <h4>⚠️ تعذّر تحميل القوائم</h4>
-      <p>${escapeHtml(error.message)}</p>
+      <p>${publicErrorMessage}</p>
       <p style="margin-top:10px; font-size:13px;">شغّل ملف <code>setup-database.sql</code> لإنشاء الجداول المطلوبة.</p>
     </div>`
     return
@@ -2038,7 +2046,7 @@ window.addPlaylistVideo = async function(playlistId) {
 window.deletePlaylistVideo = async function(videoId, playlistId) {
   if (!confirm("حذف هذا الفيديو؟")) return
   let { error } = await supabase.from("playlist_videos").delete().eq("id", videoId)
-  if (error) return alert("❌ " + error.message)
+  if (error) return alert("❌ " + publicErrorMessage)
   loadMyPlaylists()
 }
 
@@ -2047,7 +2055,7 @@ window.deletePlaylist = async function(id) {
   if (!confirm("⚠️ سيتم حذف القائمة وكل فيديوهاتها. متأكد؟")) return
   await supabase.from("playlist_videos").delete().eq("playlist_id", id)
   let { error } = await supabase.from("playlists").delete().eq("id", id)
-  if (error) return alert("❌ " + error.message)
+  if (error) return alert("❌ " + publicErrorMessage)
   alert("✅ تم الحذف")
   loadMyPlaylists()
 }
