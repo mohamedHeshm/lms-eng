@@ -1,120 +1,29 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { supabase, message, escapeHtml, money, requireRole, logout } from './client.js';
 
-const supabase = createClient('https://dfxkuppxywldxsbyzfzo.supabase.co', 'sb_publishable_B3xVoCtEJtpStm76kM5KDw_WZgPsJXN');
-const genericError = 'حدث خطأ أثناء تحميل البيانات. حاول مرة أخرى.';
-const esc = (value = '') => { const node = document.createElement('div'); node.textContent = value; return node.innerHTML; };
-const getUser = () => { try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch { return null; } };
-const money = (value) => `${new Intl.NumberFormat('ar-EG').format(Number(value || 0))} ج.م`;
-
-function setStatus(message, type = 'error') { const node = document.querySelector('[data-portal-status]'); if (node) { node.textContent = message; node.className = `status-message is-visible ${type}`; } }
-function empty(message, action = '') { return `<div class="empty-state">${message}${action ? `<div style="margin-top:12px">${action}</div>` : ''}</div>`; }
-function userName(user) { return esc(user?.name || user?.full_name || 'بك'); }
-
-function setNavigation() {
-  const buttons = document.querySelectorAll('[data-view]');
-  const views = document.querySelectorAll('.view');
-  buttons.forEach((button) => button.addEventListener('click', () => {
-    const selected = button.dataset.view;
-    buttons.forEach((item) => item.classList.toggle('active', item.dataset.view === selected));
-    views.forEach((view) => view.classList.toggle('active', view.id === selected));
-    document.querySelector('[data-page-title]').textContent = button.dataset.title || 'لوحة التحكم';
-  }));
-  document.querySelector('[data-logout]')?.addEventListener('click', async () => { await supabase.auth.signOut(); localStorage.removeItem('currentUser'); location.href = 'index.html'; });
+const html = (rows, emptyText) => rows?.length ? rows : `<div class="empty-state">${emptyText}</div>`;
+const set = (sel, value) => { document.querySelectorAll(sel).forEach(n => n.innerHTML = value); };
+const status = (text, type='success') => { const n=document.querySelector('[data-status]'); if(n){n.textContent=text;n.className=`status-message is-visible ${type}`;} };
+const stage = profile => profile.stage || 'الثالثة الثانوية';
+function tabs(){document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===b.dataset.view));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===b.dataset.view));document.querySelector('[data-title]').textContent=b.dataset.title;}));document.querySelector('[data-logout]')?.addEventListener('click',logout);}
+function courseCard(c, student=false){return `<article class="course-card"><div class="course-cover">◒</div><div class="course-card-body"><div><div class="course-meta">${escapeHtml(c.subject)} · ${(c.target_stages||[]).map(escapeHtml).join('، ')}</div><h3>${escapeHtml(c.title)}</h3><p class="course-meta">${escapeHtml(c.description||'')}</p></div><div class="course-footer"><span class="price">${money(c.price)}</span><span class="status-badge">${student?'مفعّل':'منشور'}</span></div></div></article>`;}
+async function student(profile){
+  const {data:enrollments}=await supabase.from('enrollments').select('course:courses(*)').eq('student_id',profile.id); const courses=(enrollments||[]).map(x=>x.course).filter(Boolean); set('[data-courses]',html(courses.map(c=>courseCard(c,true)).join(''),'لا توجد كورسات مفعّلة. ادفع من متجر الكورسات أولًا.')); document.querySelector('[data-courses-count]').textContent=courses.length;
+  const [{data:content},{data:live},{data:quizzes},{data:coursePays},{data:monthlyPays},{data:subs}]=await Promise.all([supabase.from('content_items').select('*').eq('stage',stage(profile)).eq('is_published',true),supabase.from('live_sessions').select('*').eq('stage',stage(profile)).order('starts_at'),supabase.from('quizzes').select('*').eq('stage',stage(profile)).eq('is_published',true),supabase.from('course_payment_requests').select('*,course:courses(title)').eq('student_id',profile.id),supabase.from('monthly_payment_requests').select('*,teacher:profiles!monthly_payment_requests_teacher_id_fkey(full_name)').eq('student_id',profile.id),supabase.from('monthly_subscriptions').select('*').eq('student_id',profile.id)]);
+  set('[data-content]',html((content||[]).map(x=>`<div class="list-row"><div class="list-icon">▤</div><div><strong>${escapeHtml(x.title)}</strong><span>${x.kind==='worksheet'?'شيت':x.kind==='board'?'صورة سبورة':'مذكرة / ملف'}</span></div><a class="button button-secondary" target="_blank" href="${escapeHtml(x.file_url)}">فتح</a></div>`).join(''),'يلزم اشتراك شهري فعّال للوصول للمحتوى.'));
+  set('[data-live]',html((live||[]).map(x=>`<div class="list-row"><div class="list-icon">◉</div><div><strong>${escapeHtml(x.title)}</strong><span>${new Date(x.starts_at).toLocaleString('ar-EG')}</span></div><a class="button button-secondary" target="_blank" href="${escapeHtml(x.meeting_url)}">انضمام</a></div>`).join(''),'لا توجد حصص مباشرة متاحة.'));
+  set('[data-quizzes]',html((quizzes||[]).map(x=>`<div class="list-row"><div class="list-icon">?</div><div><strong>${escapeHtml(x.title)}</strong><span>اختبار أونلاين</span></div><a class="button button-secondary" href="quiz.html?id=${x.id}">ابدأ</a></div>`).join(''),'لا توجد اختبارات متاحة.'));
+  set('[data-payments]',html([...(coursePays||[]).map(x=>`<div class="list-row"><div><strong>${escapeHtml(x.course?.title||'كورس')}</strong><span>دفع كورس</span></div><span class="status-badge ${x.status==='pending'?'pending':''}">${x.status}</span></div>`),...(monthlyPays||[]).map(x=>`<div class="list-row"><div><strong>${escapeHtml(x.teacher?.full_name||'المدرس')}</strong><span>اشتراك شهري</span></div><span class="status-badge ${x.status==='pending'?'pending':''}">${x.status}</span></div>`)].join(''),'لا توجد مدفوعات حتى الآن.')); document.querySelector('[data-subscription-count]').textContent=(subs||[]).length;
+  document.querySelector('[data-monthly-form]')?.addEventListener('submit',async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.currentTarget));const {data:teachers}=await supabase.from('profiles').select('id').eq('role','teacher').limit(1);if(!teachers?.[0])return status('لا يوجد مدرس محدد حاليًا.','error');const {error}=await supabase.from('monthly_payment_requests').insert({student_id:profile.id,teacher_id:teachers[0].id,amount:Number(v.amount),method:v.method,reference_number:v.reference_number||null});status(error?message:'تم إرسال طلب الاشتراك الشهري.',''+(error?'error':'success'));});
 }
-
-function courseCard(course, student = false) {
-  const title = esc(course.title || course.name || 'كورس جديد');
-  const meta = `${esc(course.subject || 'محتوى تعليمي')} · ${course.lesson_count || 0} درس`;
-  const isPlaylist = Boolean(course.name && !course.title);
-  const link = student ? (isPlaylist ? `playlist-view.html?id=${encodeURIComponent(course.id)}` : 'courses.html') : (isPlaylist ? 'teacher-playlists.html' : `checkout.html?course=${encodeURIComponent(course.id)}`);
-  return `<article class="course-card"><div class="course-cover">◒</div><div class="course-card-body"><div><div class="course-meta">${meta}</div><h3>${title}</h3><p class="course-meta">${student ? 'يمكنك متابعة آخر درس وصلت إليه.' : `السعر: ${money(course.price)}`}</p></div>${student ? '<div class="progress"><i style="width:0%"></i></div>' : ''}<div class="course-footer"><span class="price">${student ? 'لم تبدأ بعد' : money(course.price)}</span><a class="button button-secondary" href="${link}">${student ? 'عرض الكورس' : 'إدارة الكورس'}</a></div></div></article>`;
+async function teacher(profile){
+  const {data:courses}=await supabase.from('courses').select('*').eq('teacher_id',profile.id).order('created_at',{ascending:false});set('[data-teacher-courses]',html((courses||[]).map(c=>courseCard(c)).join(''),'لم تنشئ كورسات بعد.'));document.querySelector('[data-course-count]').textContent=(courses||[]).length;
+  const [{data:monthly},{data:coursePays}]=await Promise.all([supabase.from('monthly_payment_requests').select('*,student:profiles!monthly_payment_requests_student_id_fkey(full_name)').eq('teacher_id',profile.id).eq('status','pending'),supabase.from('course_payment_requests').select('*,student:profiles!course_payment_requests_student_id_fkey(full_name),course:courses(title)').in('course_id',(courses||[]).map(c=>c.id).length?(courses||[]).map(c=>c.id):['00000000-0000-0000-0000-000000000000']).eq('status','pending')]);
+  set('[data-monthly-payments]',html((monthly||[]).map(x=>`<div class="list-row"><div><strong>${escapeHtml(x.student?.full_name||'طالب')}</strong><span>${money(x.amount)} · اشتراك شهري</span></div><button class="button button-primary" data-approve-monthly="${x.id}">قبول 30 يوم</button></div>`).join(''),'لا توجد طلبات اشتراك شهري.')); set('[data-course-payments]',html((coursePays||[]).map(x=>`<div class="list-row"><div><strong>${escapeHtml(x.student?.full_name||'طالب')}</strong><span>${escapeHtml(x.course?.title||'كورس')} · ${money(x.amount)}</span></div><span class="status-badge pending">قيد مراجعة الإدارة</span></div>`).join(''),'لا توجد طلبات دفع كورسات.'));
+  document.querySelectorAll('[data-approve-monthly]').forEach(b=>b.addEventListener('click',async()=>{const{error}=await supabase.rpc('approve_monthly_payment',{p_id:b.dataset.approveMonthly,p_days:30});if(error)return status(message,'error');status('تم تفعيل الاشتراك الشهري.');teacher(profile);}));
+  document.querySelector('[data-course-form]')?.addEventListener('submit',async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.currentTarget));const{error}=await supabase.from('courses').insert({teacher_id:profile.id,title:v.title,subject:v.subject,target_stages:[v.stage],description:v.description,price:Number(v.price),is_published:true,requires_monthly_subscription:v.requires_monthly==='on'});if(error)return status(message,'error');e.currentTarget.reset();status('تم نشر الكورس في المتجر.');teacher(profile);});
+  document.querySelector('[data-content-form]')?.addEventListener('submit',async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.currentTarget));const{error}=await supabase.from('content_items').insert({teacher_id:profile.id,title:v.title,kind:v.kind,stage:v.stage,file_url:v.file_url,is_published:true});if(error)return status(message,'error');e.currentTarget.reset();status('تم نشر المحتوى للمرحلة المحددة.');});
+  document.querySelector('[data-live-form]')?.addEventListener('submit',async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.currentTarget));const{error}=await supabase.from('live_sessions').insert({teacher_id:profile.id,course_id:v.course_id,title:v.title,stage:v.stage,starts_at:v.starts_at,meeting_url:v.meeting_url});if(error)return status(message,'error');e.currentTarget.reset();status('تمت جدولة الحصة المباشرة.');});
+  document.querySelector('[data-quiz-form]')?.addEventListener('submit',async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.currentTarget));const opts=v.options.split(/[،,]/).map(x=>x.trim()).filter(Boolean);const{data:q,error}=await supabase.from('quizzes').insert({teacher_id:profile.id,title:v.title,stage:v.stage,course_id:v.course_id||null,is_published:true}).select().single();if(error)return status(message,'error');const{error:qe}=await supabase.from('quiz_questions').insert({quiz_id:q.id,question:v.question,options:opts,correct_option:Number(v.correct_option||0),position:1});if(qe)return status(message,'error');e.currentTarget.reset();status('تم نشر الاختبار للمرحلة المحددة.');});
+  const select=document.querySelectorAll('[data-course-select]');select.forEach(s=>s.innerHTML='<option value="">بدون كورس</option>'+(courses||[]).map(c=>`<option value="${c.id}">${escapeHtml(c.title)}</option>`).join(''));
 }
-
-async function loadStudent(user) {
-  const courseTargets = document.querySelectorAll('[data-student-courses]');
-  if (!courseTargets.length) return;
-  courseTargets.forEach((target) => { target.innerHTML = '<p class="loading">جاري تحميل كورساتك…</p>'; });
-  const { data: auth } = await supabase.auth.getUser();
-  let courses = [];
-  if (auth.user) {
-    const { data, error } = await supabase.from('enrollments').select('course:courses(*)').eq('student_id', auth.user.id);
-    if (!error) courses = (data || []).map((item) => item.course).filter(Boolean);
-  }
-  // حسابات المشروع الحالية تستخدم playlists؛ نعرضها حتى تعمل المنصة قبل الترحيل الكامل.
-  if (!courses.length) {
-    const { data: playlists, error } = await supabase.from('playlists').select('*').order('id', { ascending: false });
-    if (error) { courseTargets.forEach((target) => { target.innerHTML = empty(genericError); }); return; }
-    courses = playlists || [];
-  }
-  const content = courses.length ? courses.map((course) => courseCard(course, true)).join('') : empty('لا توجد كورسات مفعّلة في حسابك حاليًا.', '<a class="button button-primary" href="courses.html">تصفح الكورسات</a>');
-  courseTargets.forEach((target) => { target.innerHTML = content; });
-  document.querySelector('[data-course-count]')?.replaceChildren(document.createTextNode(String(courses.length)));
-}
-
-async function loadStudentContent(user) {
-  const videosTarget = document.querySelector('[data-student-videos]');
-  const filesTarget = document.querySelector('[data-student-files]');
-  if (!videosTarget || !filesTarget) return;
-  if (!user.teacher_id) {
-    videosTarget.innerHTML = empty('لم يتم تعيين مدرس لهذا الحساب بعد.');
-    filesTarget.innerHTML = empty('لا توجد ملفات متاحة حاليًا.');
-    return;
-  }
-  let videosQuery = supabase.from('videos').select('*').eq('teacher_id', user.teacher_id);
-  let pdfsQuery = supabase.from('pdfs').select('*').eq('teacher_id', user.teacher_id);
-  let notesQuery = supabase.from('pdfs2').select('*').eq('teacher_id', user.teacher_id);
-  if (user.stage) { videosQuery = videosQuery.eq('stage', user.stage); pdfsQuery = pdfsQuery.eq('stage', user.stage); notesQuery = notesQuery.eq('stage', user.stage); }
-  const [{ data: videos, error: videosError }, { data: pdfs, error: pdfsError }, { data: notes, error: notesError }] = await Promise.all([videosQuery, pdfsQuery, notesQuery]);
-  if (videosError) videosTarget.innerHTML = empty(genericError);
-  else videosTarget.innerHTML = (videos || []).length ? videos.map((video, index) => `<div class="list-row"><div class="list-icon">▶</div><div><strong>فيديو ${index + 1}</strong><span>اضغط للمشاهدة</span></div><a class="button button-secondary" target="_blank" href="${esc(video.url)}">مشاهدة</a></div>`).join('') : empty('لا توجد فيديوهات متاحة حاليًا.');
-  if (pdfsError || notesError) filesTarget.innerHTML = empty(genericError);
-  else {
-    const files = [...(pdfs || []), ...(notes || [])];
-    filesTarget.innerHTML = files.length ? files.map((file) => `<div class="list-row"><div class="list-icon">▤</div><div><strong>${esc(file.file_name || 'ملف دراسي')}</strong><span>ملف متاح للتحميل</span></div><a class="button button-secondary" target="_blank" href="${esc(file.file_url)}">فتح</a></div>`).join('') : empty('لا توجد ملفات متاحة حاليًا.');
-  }
-}
-
-async function loadTeacher(user) {
-  const targets = document.querySelectorAll('[data-teacher-courses]');
-  if (!targets.length) return;
-  targets.forEach((target) => { target.innerHTML = '<p class="loading">جاري تحميل الكورسات…</p>'; });
-  const { data: auth } = await supabase.auth.getUser();
-  let courses = [];
-  if (auth.user) {
-    const { data } = await supabase.from('courses').select('*').eq('teacher_id', auth.user.id).order('created_at', { ascending: false });
-    courses = data || [];
-  }
-  if (!courses.length) {
-    const { data: playlists, error } = await supabase.from('playlists').select('*').eq('teacher_id', user.id).order('id', { ascending: false });
-    if (error) { targets.forEach((target) => { target.innerHTML = empty(genericError); }); return; }
-    courses = playlists || [];
-  }
-  const content = courses.length ? courses.map((course) => courseCard(course)).join('') : empty('لم تضف أي كورسات بعد.');
-  targets.forEach((target) => { target.innerHTML = content; });
-  document.querySelector('[data-course-count]')?.replaceChildren(document.createTextNode(String(courses.length)));
-}
-
-function setupTeacherForms(user) {
-  const form = document.querySelector('[data-create-course]');
-  if (!form) return;
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    const values = Object.fromEntries(new FormData(form).entries());
-    const { error } = authUser
-      ? await supabase.from('courses').insert({ teacher_id: authUser.id, title: values.title, subject: values.subject, stage: values.stage, price: Number(values.price || 0), description: values.description, is_published: true })
-      : await supabase.from('playlists').insert({ teacher_id: user.id, teacher_name: user.name || 'مدرس', name: values.title, price: Number(values.price || 0) });
-    if (error) { setStatus('تعذر حفظ الكورس. حاول مرة أخرى.'); return; }
-    form.reset(); setStatus('تم حفظ الكورس كمسودة. يمكنك نشره من إدارة الكورسات.', 'success'); loadTeacher(user);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const role = document.body.dataset.role;
-  const user = getUser();
-  if (!user || (role && user.role !== role)) { location.href = 'index.html'; return; }
-  document.querySelectorAll('[data-user-name]').forEach((node) => { node.textContent = userName(user); });
-  setNavigation();
-  if (role === 'student') { loadStudent(user); loadStudentContent(user); }
-  if (role === 'teacher') { loadTeacher(user); setupTeacherForms(user); }
-});
+document.addEventListener('DOMContentLoaded',async()=>{const role=document.body.dataset.role;const p=await requireRole(role);if(!p)return;document.querySelectorAll('[data-name]').forEach(x=>x.textContent=p.full_name);tabs();if(role==='student')student(p);if(role==='teacher')teacher(p);});
