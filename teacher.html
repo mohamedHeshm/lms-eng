@@ -1,1 +1,152 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة المدرس | المأمون</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/portal.css"></head><body data-role="teacher"><div class="portal"><aside class="sidebar"><a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a><p class="role-label">حساب مدرس</p><nav class="portal-nav"><button class="active" data-view="home" data-title="لوحة المدرس">الرئيسية</button><button data-view="course" data-title="الكورسات">الكورسات</button><button data-view="content" data-title="الشيتات والمذكرات">الشيتات والمذكرات</button><button data-view="live" data-title="الحصص المباشرة">الحصص المباشرة</button><button data-view="quiz" data-title="الاختبارات">الاختبارات</button><button data-view="monthly" data-title="الاشتراكات الشهرية">الاشتراكات الشهرية</button><button data-view="coursepay" data-title="دفع الكورسات">دفع الكورسات</button></nav><div class="sidebar-footer"><button class="button button-text" data-logout>تسجيل الخروج</button></div></aside><main class="portal-main"><header class="portal-header"><div><span class="breadcrumb">إدارة المدرس</span><h1 data-title>لوحة المدرس</h1></div><span class="status-badge">منشئ المحتوى</span></header><div class="portal-content"><section id="home" class="view active"><div class="welcome"><div><h2>مرحبًا أستاذ <span data-name></span></h2><p>أنشئ الكورسات والمحتوى حسب المرحلة، وراجع الاشتراكات الشهرية.</p></div></div><div class="stat-grid"><article class="portal-stat"><span>الكورسات المنشورة</span><b data-course-count>0</b></article><article class="portal-stat"><span>اشتراكات بانتظار المراجعة</span><b>—</b></article><article class="portal-stat"><span>اختبارات</span><b>—</b></article><article class="portal-stat"><span>حصص مباشرة</span><b>—</b></article></div><section class="panel"><h3>كورساتي</h3><div class="course-grid portal-courses" data-teacher-courses></div></section></section><section id="course" class="view"><div class="section-title"><div><h2>إنشاء كورس ونشره</h2><p>الكورس سيظهر في المتجر فور الحفظ.</p></div></div><form class="panel" data-course-form><div class="form-grid"><label class="field">اسم الكورس<input name="title" required></label><label class="field">المادة<input name="subject" required placeholder="فيزياء"></label><label class="field">المرحلة<select name="stage"><option>الثالثة الثانوية</option><option>الثانية الثانوية</option><option>الأولى الثانوية</option></select></label><label class="field">السعر<input name="price" type="number" min="0" required></label><label class="field">الوصف<textarea name="description"></textarea></label></div><label><input type="checkbox" name="requires_monthly"> يتطلب اشتراكًا شهريًا أيضًا</label><br><br><button class="button button-primary">نشر الكورس</button></form><div class="course-grid portal-courses" data-teacher-courses style="margin-top:18px"></div></section><section id="content" class="view"><div class="section-title"><div><h2>رفع الشيتات وصور السبورة والمذكرات</h2><p>اختر المرحلة التي سيظهر لها المحتوى.</p></div></div><form class="panel" data-content-form><div class="form-grid"><label class="field">العنوان<input name="title" required></label><label class="field">النوع<select name="kind"><option value="worksheet">شيت</option><option value="board">صورة سبورة</option><option value="note">مذكرة</option><option value="pdf">PDF</option></select></label><label class="field">المرحلة<select name="stage"><option>الثالثة الثانوية</option><option>الثانية الثانوية</option><option>الأولى الثانوية</option></select></label><label class="field">رابط الملف<input type="url" name="file_url" required placeholder="رابط Supabase Storage"></label></div><button class="button button-primary">نشر المحتوى</button></form></section><section id="live" class="view"><div class="section-title"><div><h2>جدولة حصة مباشرة</h2><p>تظهر للطالب المشترك فقط.</p></div></div><form class="panel" data-live-form><div class="form-grid"><label class="field">عنوان الحصة<input name="title" required></label><label class="field">الكورس<select name="course_id" data-course-select required></select></label><label class="field">المرحلة<select name="stage"><option>الثالثة الثانوية</option><option>الثانية الثانوية</option><option>الأولى الثانوية</option></select></label><label class="field">الموعد<input name="starts_at" type="datetime-local" required></label><label class="field">رابط الاجتماع<input name="meeting_url" type="url" required></label></div><button class="button button-primary">جدولة الحصة</button></form></section><section id="quiz" class="view"><div class="section-title"><div><h2>إنشاء اختبار أونلاين</h2><p>أدخل الاختيارات مفصولة بفاصلة.</p></div></div><form class="panel" data-quiz-form><div class="form-grid"><label class="field">عنوان الاختبار<input name="title" required></label><label class="field">الكورس<select name="course_id" data-course-select></select></label><label class="field">المرحلة<select name="stage"><option>الثالثة الثانوية</option><option>الثانية الثانوية</option><option>الأولى الثانوية</option></select></label><label class="field">السؤال<input name="question" required></label><label class="field">الاختيارات<textarea name="options" required placeholder="أ، ب، ج، د"></textarea></label><label class="field">رقم الإجابة الصحيحة (يبدأ من 0)<input name="correct_option" type="number" min="0" value="0" required></label></div><button class="button button-primary">نشر الاختبار</button></form></section><section id="monthly" class="view"><div class="section-title"><div><h2>طلبات الاشتراك الشهري</h2><p>القبول يمنح الطالب وصولًا للمحتوى والحصص والاختبارات لمدة 30 يومًا.</p></div></div><div class="panel"><div class="list" data-monthly-payments></div></div></section><section id="coursepay" class="view"><div class="section-title"><div><h2>طلبات دفع الكورسات</h2><p>هذه تعرض لك فقط؛ الاعتماد النهائي من الأدمن.</p></div></div><div class="panel"><div class="list" data-course-payments></div></div></section><div data-status class="status-message" role="status"></div></div></main></div><script type="module" src="js/portal.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المدرس | المأمون التعليمية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portal.css">
+<style>
+[data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
+[data-lesson-modal].active { display:block; }
+</style>
+</head>
+<body data-role="teacher">
+<div class="portal">
+  <aside class="sidebar">
+    <a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a>
+    <p class="role-label">حساب مدرس</p>
+    <nav class="portal-nav">
+      <button class="active" data-view="overview" data-title="لوحة المدرس">الرئيسية</button>
+      <button data-view="courses" data-title="إدارة الكورسات">الكورسات</button>
+      <button data-view="course-builder" data-title="إنشاء كورس">إنشاء كورس</button>
+      <button data-view="quizzes" data-title="الاختبارات أونلاين">الاختبارات أونلاين</button>
+      <button data-view="content" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
+      <button data-view="students" data-title="الطلاب">الطلاب</button>
+      <button data-view="subscriptions" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
+      <button data-view="reports" data-title="التقارير">التقارير</button>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="button button-text" href="change-password.html">تغيير كلمة المرور</a>
+      <button class="button button-text" data-logout>تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="portal-main">
+    <header class="portal-header">
+      <div><span class="breadcrumb">إدارة المحتوى</span><h1 data-page-title>لوحة المدرس</h1></div>
+      <div class="header-actions"><button class="icon-button" aria-label="الإشعارات">◌</button></div>
+    </header>
+
+    <div class="portal-content">
+      <!-- نظرة عامة -->
+      <section class="view active" id="overview">
+        <div class="welcome"><div><h2>مرحبًا أستاذ <span data-user-name></span></h2><p>تابع كورساتك، اختباراتك، طلابك، والاشتراك الشهري من مكان واحد.</p></div>
+          <button class="button button-primary" data-view="course-builder" data-title="إنشاء كورس">إنشاء كورس</button></div>
+        <div class="stat-grid">
+          <article class="portal-stat"><span>الكورسات المنشأة</span><b data-course-count>—</b></article>
+          <article class="portal-stat"><span>الطلاب المرتبطون</span><b data-student-count>—</b></article>
+          <article class="portal-stat"><span>طلبات اشتراك تحتاج مراجعة</span><b data-pending-subs>—</b></article>
+        </div>
+        <div class="content-grid">
+          <section class="panel"><div class="panel-head"><h3>الكورسات الأخيرة</h3><button class="button button-text" data-view="courses" data-title="إدارة الكورسات">إدارة الكورسات</button></div>
+            <div class="course-grid portal-courses" data-teacher-courses></div></section>
+          <aside class="panel"><div class="panel-head"><h3>خطوات البداية</h3></div>
+            <div class="list">
+              <div class="list-row"><div class="list-icon">1</div><div><strong>أنشئ الكورس وأضف الدروس</strong><span>فيديوهات الكورس من إدارة الكورسات.</span></div></div>
+              <div class="list-row"><div class="list-icon">2</div><div><strong>أضف اختبار أو شيت</strong><span>حدد المرحلة التي يظهر لها المحتوى.</span></div></div>
+              <div class="list-row"><div class="list-icon">3</div><div><strong>فعّل اشتراكات طلابك</strong><span>من صفحة الطلاب أو الاشتراك الشهري.</span></div></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- الكورسات -->
+      <section class="view" id="courses">
+        <div class="section-title"><div><h2>إدارة الكورسات</h2><p>أنشئ الكورسات، أضف الدروس، وانشرها عند اكتمال المحتوى.</p></div>
+          <button class="button button-primary" data-view="course-builder" data-title="إنشاء كورس">إنشاء كورس</button></div>
+        <div class="course-grid portal-courses" data-teacher-courses></div>
+      </section>
+
+      <section class="view" id="course-builder">
+        <div class="section-title"><div><h2>إنشاء كورس جديد</h2><p>احفظه كمسودة، ثم أضف الدروس وانشره عندما يصبح جاهزًا.</p></div></div>
+        <form class="panel" data-create-course>
+          <div class="form-grid">
+            <label class="field">اسم الكورس<input name="title" required></label>
+            <label class="field">المادة<input name="subject" required></label>
+            <label class="field">المرحلة<select name="stage" required><option value="">اختر المرحلة</option><option>الأولى الثانوية</option><option>الثانية الثانوية</option><option>الثالثة الثانوية</option></select></label>
+            <label class="field">سعر الاشتراك<input name="price" type="number" min="0" step="1" placeholder="0"></label>
+            <label class="field">وصف مختصر<textarea name="description" rows="4"></textarea></label>
+          </div>
+          <button class="button button-primary" type="submit">حفظ كمسودة</button>
+        </form>
+      </section>
+
+      <!-- الاختبارات -->
+      <section class="view" id="quizzes">
+        <div class="section-title"><div><h2>الاختبارات أونلاين</h2><p>الاختبار يظهر فقط للطلاب المشتركين اشتراكًا شهريًا ساريًا في المرحلة المحددة.</p></div></div>
+        <form class="panel" data-create-quiz style="margin-bottom:20px">
+          <div class="form-grid">
+            <label class="field">عنوان الاختبار<input name="title" required></label>
+            <label class="field">المرحلة<select name="stage" required></select></label>
+            <label class="field">مدة الاختبار (دقائق، اختياري)<input name="duration_minutes" type="number" min="1"></label>
+            <label class="field">وصف مختصر (اختياري)<textarea name="description" rows="2"></textarea></label>
+          </div>
+          <button class="button button-primary" type="submit">إنشاء الاختبار</button>
+        </form>
+        <div data-quizzes-list></div>
+      </section>
+
+      <!-- المواد -->
+      <section class="view" id="content">
+        <div class="section-title"><div><h2>الشيتات والسبورة والمذكرات</h2><p>ارفع الملفات وحدد المرحلة؛ تظهر فقط للمشتركين اشتراكًا شهريًا ساريًا في نفس المرحلة.</p></div></div>
+        <form class="panel" data-upload-material style="margin-bottom:20px">
+          <div class="form-grid">
+            <label class="field">النوع<select name="type" required><option value="sheet">📄 شيت</option><option value="board">🖼 سبورة</option><option value="note">📘 مذكرة</option></select></label>
+            <label class="field">المرحلة<select name="stage" required></select></label>
+            <label class="field">العنوان<input name="title" required></label>
+            <label class="field">الملف<input name="file" type="file" required></label>
+          </div>
+          <button class="button button-primary" type="submit">رفع المادة</button>
+        </form>
+        <form class="toolbar" data-material-filter>
+          <label class="field">النوع<select name="type"><option value="">الكل</option><option value="sheet">شيتات</option><option value="board">سبورة</option><option value="note">مذكرات</option></select></label>
+          <label class="field">المرحلة<select name="stage"></select></label>
+        </form>
+        <div data-materials-list></div>
+      </section>
+
+      <!-- الطلاب -->
+      <section class="view" id="students">
+        <div class="section-title"><div><h2>الطلاب</h2><p>الطلاب المرتبطون بحسابك، وحالة اشتراكهم الشهري للشهر الحالي.</p></div></div>
+        <div class="panel"><div data-students-list></div></div>
+      </section>
+
+      <!-- الاشتراك الشهري -->
+      <section class="view" id="subscriptions">
+        <div class="section-title"><div><h2>طلبات الاشتراك الشهري</h2><p>هذا القسم منفصل تمامًا عن دفع الكورسات؛ راجع طلبات الطلاب هنا واقبلها لفتح الاختبارات والمواد لهم.</p></div></div>
+        <div class="panel"><div data-subscription-requests></div></div>
+      </section>
+
+      <section class="view" id="reports">
+        <div class="section-title"><div><h2>التقارير</h2><p>ستتوفر تقارير الاشتراكات والتفاعل قريبًا.</p></div></div>
+        <div class="panel"><div class="empty-state">ستتوفر التقارير بمجرد وجود بيانات كافية.</div></div>
+      </section>
+
+      <div data-portal-status class="status-message" role="status"></div>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-nav">
+  <button class="active" data-view="overview" data-title="لوحة المدرس">الرئيسية</button>
+  <button data-view="courses" data-title="الكورسات">الكورسات</button>
+  <button data-view="quizzes" data-title="الاختبارات">اختبارات</button>
+  <button data-view="students" data-title="الطلاب">الطلاب</button>
+</nav>
+
+<div data-lesson-modal></div>
+
+<script type="module" src="js/teacher-portal.js"></script>
+</body>
+</html>

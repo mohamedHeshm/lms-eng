@@ -1,1 +1,85 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تسجيل الدخول | المأمون التعليمية</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/design-system.css"><style>.auth{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}.side{background:#1e5b4f;color:white;padding:clamp(35px,8vw,100px);display:grid;align-content:center}.side .brand-mark{background:#fff;color:#1e5b4f}.side p{color:#d8e6df;max-width:390px}.form-wrap{display:grid;place-items:center;padding:28px}.form{width:min(100%,410px)}@media(max-width:700px){.auth{grid-template-columns:1fr}.side{display:none}}</style></head><body><main class="auth"><aside class="side"><a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a><h1>كل دروسك، اختباراتك، واشتراكاتك في مكان واحد.</h1><p>منصة تعليمية منظمة للطالب والمدرس والسنتر.</p></aside><section class="form-wrap"><form class="form" data-login><a class="button button-text" href="dashboard-home.html">← العودة للرئيسية</a><h1>أهلًا بعودتك</h1><p class="lead">سجّل الدخول إلى حسابك.</p><label class="field">البريد الإلكتروني<input type="email" name="email" required autocomplete="email"></label><label class="field">كلمة المرور<input type="password" name="password" required autocomplete="current-password"></label><button class="button button-primary" type="submit">تسجيل الدخول</button><p class="course-meta">ليس لديك حساب؟ <a href="register.html">إنشاء حساب جديد</a></p><div data-status class="status-message" role="status"></div></form></section></main><script type="module" src="js/auth.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>تسجيل الدخول | المأمون التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <style>
+    .auth-page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+    .auth-aside { background: #1e5b4f; color: #fff; padding: clamp(34px, 7vw, 90px); display: grid; align-content: center; }
+    .auth-aside .brand-mark { background: #fff; color: var(--primary); }
+    .auth-aside p { max-width: 420px; color: #d9e8e2; }
+    .auth-main { display: grid; align-content: center; justify-content: center; padding: 30px; }
+    .auth-card { width: min(100%, 410px); }
+    .auth-card h1 { font-size: 2rem; margin-bottom: 6px; }
+    .auth-card > p { color: var(--muted); margin-bottom: 26px; }
+    @media (max-width: 720px) { .auth-page { grid-template-columns: 1fr; } .auth-aside { display: none; } }
+  </style>
+</head>
+<body>
+  <main class="auth-page">
+    <aside class="auth-aside">
+      <a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a>
+      <h2>كل دروسك وخطواتك في مكان واحد.</h2>
+      <p>سجّل الدخول لمتابعة الكورسات، الاختبارات، الشيتات، والاشتراك الشهري الخاص بحسابك.</p>
+    </aside>
+    <section class="auth-main">
+      <form class="auth-card" data-login-form>
+        <a class="button button-text" href="dashboard-home.html">← العودة للرئيسية</a>
+        <h1>أهلًا بعودتك</h1>
+        <p>أدخل بيانات حسابك للمتابعة.</p>
+        <label class="field">البريد الإلكتروني<input name="email" type="email" autocomplete="email" required></label>
+        <label class="field">كلمة المرور<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button button-primary" type="submit">تسجيل الدخول</button>
+        <p class="course-meta" style="margin-top:15px">ليس لديك حساب؟ <a href="register.html" style="color:var(--primary);font-weight:700">إنشاء حساب جديد</a></p>
+        <div class="status-message" data-login-status role="status"></div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
+
+    const form = document.querySelector('[data-login-form]');
+    const status = document.querySelector('[data-login-status]');
+    const show = (message, type) => { status.textContent = message; status.className = `status-message is-visible ${type}`; };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector('button');
+      submit.disabled = true;
+      show('جارٍ تسجيل الدخول…', '');
+
+      const values = Object.fromEntries(new FormData(form).entries());
+      const { data, error } = await supabase.auth.signInWithPassword(values);
+
+      if (error || !data.user) {
+        submit.disabled = false;
+        show('تعذّر تسجيل الدخول. راجع بياناتك أو تواصل مع الإدارة.', 'error');
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase.from('profiles').select('id, role, is_active').eq('id', data.user.id).single();
+      if (profileError || !profile) {
+        await supabase.auth.signOut();
+        submit.disabled = false;
+        show('الحساب غير مهيأ بعد. تواصل مع إدارة المنصة.', 'error');
+        return;
+      }
+      if (profile.is_active === false) {
+        await supabase.auth.signOut();
+        submit.disabled = false;
+        show('هذا الحساب موقوف. تواصل مع الإدارة.', 'error');
+        return;
+      }
+
+      location.href = profile.role === 'admin' ? 'admin.html' : profile.role === 'teacher' ? 'teacher.html' : 'student-modern.html';
+    });
+  </script>
+</body>
+</html>

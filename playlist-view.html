@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دروس الكورس | المأمون التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <style>
+    body { background: var(--bg); }
+    .lessons-page { max-width: 900px; margin: 0 auto; padding: 30px 20px 60px; }
+    .lesson-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
+    .lesson-item h3 { margin-bottom: 12px; }
+    .lesson-item iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 12px; }
+  </style>
+</head>
+<body>
+<div class="lessons-page">
+  <a href="student-modern.html" class="button button-secondary" style="margin-bottom:20px;display:inline-flex">← الرجوع للوحتي</a>
+  <h1 id="courseTitle" style="margin-bottom:6px">جارٍ التحميل…</h1>
+  <p class="course-meta" style="margin-bottom:24px" id="courseSubtitle"></p>
+  <div id="lessonsList"><p class="loading">جاري التحميل…</p></div>
+</div>
+
+<script type="module">
+  import { supabase, esc } from './js/supabase-client.js';
+  import { requireAuth } from './js/auth-guard.js';
+
+  const session = await requireAuth('student');
+  if (!session) throw new Error('redirecting');
+
+  const params = new URLSearchParams(location.search);
+  const courseId = params.get('course');
+  const listEl = document.getElementById('lessonsList');
+  if (!courseId) { listEl.innerHTML = '<div class="empty-state">لم يتم تحديد كورس.</div>'; throw new Error('no course'); }
+
+  const { data: enrollment } = await supabase.from('enrollments').select('id').eq('student_id', session.user.id).eq('course_id', courseId).maybeSingle();
+  if (!enrollment) { listEl.innerHTML = '<div class="empty-state">أنت غير مشترك في هذا الكورس.</div>'; throw new Error('not enrolled'); }
+
+  const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single();
+  document.getElementById('courseTitle').textContent = course?.title || 'الكورس';
+  document.getElementById('courseSubtitle').textContent = `${course?.subject || ''} · ${course?.stage || ''}`;
+
+  function toEmbed(url) {
+    if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
+    if (url.includes('youtu.be/')) return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
+    return url;
+  }
+
+  const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
+  if (error) { listEl.innerHTML = '<div class="empty-state">حدث خطأ أثناء تحميل الدروس.</div>'; }
+  else if (!lessons.length) { listEl.innerHTML = '<div class="empty-state">لا توجد دروس مضافة بعد لهذا الكورس.</div>'; }
+  else {
+    listEl.innerHTML = lessons.map((l) => `<div class="lesson-item"><h3>▶ ${esc(l.title)}</h3><iframe src="${esc(toEmbed(l.video_url))}" allowfullscreen></iframe></div>`).join('');
+  }
+</script>
+</body>
+</html>

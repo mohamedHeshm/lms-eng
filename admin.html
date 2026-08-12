@@ -1,1 +1,65 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة الإدارة | المأمون</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/portal.css"></head><body><div class="portal"><aside class="sidebar"><a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a><p class="role-label">حساب الإدارة</p><div class="sidebar-footer"><button class="button button-text" data-logout>تسجيل الخروج</button></div></aside><main class="portal-main"><header class="portal-header"><div><span class="breadcrumb">إدارة المنصة</span><h1>لوحة الإدارة</h1></div></header><div class="portal-content"><div class="welcome"><div><h2>التحكم في المنصة</h2><p>إدارة الصلاحيات واعتماد المدفوعات.</p></div></div><div class="content-grid"><section class="panel"><h3>طلبات دفع الكورسات</h3><div class="list" data-course-pays></div></section><section class="panel"><h3>طلبات الاشتراك الشهري</h3><div class="list" data-monthly-pays></div></section></div><section class="panel" style="margin-top:18px"><h3>المستخدمون والصلاحيات</h3><div class="list" data-users></div></section><div class="status-message" data-status role="status"></div></div></main></div><script type="module" src="js/admin.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الأدمن | المأمون التعليمية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body data-role="admin">
+<div class="portal">
+  <aside class="sidebar">
+    <a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a>
+    <p class="role-label">👑 حساب أدمن</p>
+    <nav class="portal-nav">
+      <button class="active" data-view="overview" data-title="لوحة الأدمن">الرئيسية</button>
+      <button data-view="users" data-title="إدارة المستخدمين">إدارة المستخدمين</button>
+      <button data-view="course-payments" data-title="طلبات دفع الكورسات">طلبات دفع الكورسات</button>
+      <button data-view="subscriptions" data-title="الاشتراكات الشهرية">الاشتراكات الشهرية</button>
+    </nav>
+    <div class="sidebar-footer"><button class="button button-text" data-logout>تسجيل الخروج</button></div>
+  </aside>
+
+  <main class="portal-main">
+    <header class="portal-header"><div><span class="breadcrumb">الإدارة</span><h1 data-page-title>لوحة الأدمن</h1></div></header>
+
+    <div class="portal-content">
+      <section class="view active" id="overview">
+        <div class="stat-grid">
+          <article class="portal-stat"><span>إجمالي المستخدمين</span><b data-total-users>—</b></article>
+          <article class="portal-stat"><span>المدرسون</span><b data-total-teachers>—</b></article>
+          <article class="portal-stat"><span>الطلاب</span><b data-total-students>—</b></article>
+        </div>
+        <div class="panel">
+          <h3>ملاحظات مهمة</h3>
+          <div class="list">
+            <div class="list-row"><div class="list-icon">💳</div><div><strong>دفع الكورسات</strong><span>يراجَع من هنا فقط.</span></div></div>
+            <div class="list-row"><div class="list-icon">📅</div><div><strong>الاشتراك الشهري</strong><span>يراجَع من كل مدرس بنفسه لطلابه، وتظهر هنا للاطّلاع فقط.</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="users">
+        <div class="section-title"><div><h2>إدارة المستخدمين</h2><p>ترقية الأدوار وحظر/تفعيل الحسابات.</p></div></div>
+        <label class="field" style="max-width:360px"><input type="search" data-user-search placeholder="🔍 ابحث بالاسم أو البريد الإلكتروني"></label>
+        <div data-users-list></div>
+      </section>
+
+      <section class="view" id="course-payments">
+        <div class="section-title"><div><h2>طلبات دفع الكورسات</h2><p>مراجعة طلبات الدفع الخاصة باشتراكات الكورسات فقط.</p></div></div>
+        <div class="panel"><div data-course-payments-list></div></div>
+      </section>
+
+      <section class="view" id="subscriptions">
+        <div class="section-title"><div><h2>الاشتراكات الشهرية</h2><p>نظرة عامة على كل طلبات الاشتراك الشهري عبر المدرسين.</p></div></div>
+        <div class="panel"><div data-subscriptions-overview></div></div>
+      </section>
+
+      <div data-portal-status class="status-message" role="status"></div>
+    </div>
+  </main>
+</div>
+<script type="module" src="js/admin-portal.js"></script>
+</body>
+</html>
