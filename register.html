@@ -1,80 +1,43 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>إنشاء حساب | المأمون التعليمية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/design-system.css">
-<style>
-.auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
-.auth-aside{background:#1e5b4f;color:#fff;padding:clamp(34px,7vw,90px);display:grid;align-content:center}
-.auth-aside .brand-mark{background:#fff;color:var(--primary)}
-.auth-aside p{color:#d9e8e2;max-width:420px}
-.auth-main{display:grid;align-content:center;justify-content:center;padding:30px}
-.auth-card{width:min(100%,410px)}
-.auth-card h1{font-size:2rem;margin-bottom:6px}
-.auth-card>p{color:var(--muted);margin-bottom:26px}
-@media(max-width:720px){.auth-page{grid-template-columns:1fr}.auth-aside{display:none}}
-</style>
-</head>
-<body>
-<main class="auth-page">
-  <aside class="auth-aside">
-    <a class="brand" href="dashboard-home.html"><span class="brand-mark">م</span>المأمون التعليمية</a>
-    <h2>ابدأ منظّمًا من أول درس.</h2>
-    <p>أنشئ حسابك للوصول للكورسات، الاختبارات أونلاين، الشيتات، والمذكرات الخاصة بمرحلتك.</p>
-  </aside>
-  <section class="auth-main">
-    <form class="auth-card" data-register-form>
-      <a class="button button-text" href="dashboard-home.html">← العودة للرئيسية</a>
-      <h1>إنشاء حساب جديد</h1>
-      <p>سجّل بياناتك، ثم ادخل مباشرة إلى حسابك.</p>
-      <label class="field">الاسم الكامل<input name="full_name" required autocomplete="name"></label>
-      <label class="field">البريد الإلكتروني<input name="email" type="email" required autocomplete="email"></label>
-      <label class="field">كلمة المرور<input name="password" type="password" minlength="6" required autocomplete="new-password"></label>
-      <label class="field">المرحلة الدراسية<select name="stage" required>
-        <option value="">اختر المرحلة</option>
-        <option>الأولى الثانوية</option>
-        <option>الثانية الثانوية</option>
-        <option>الثالثة الثانوية</option>
-      </select></label>
-      <button class="button button-primary" type="submit">إنشاء الحساب</button>
-      <p class="course-meta" style="margin-top:15px">لديك حساب بالفعل؟ <a href="index.html" style="color:var(--primary);font-weight:700">تسجيل الدخول</a></p>
-      <div class="status-message" data-register-status role="status"></div>
-    </form>
-  </section>
-</main>
-<script type="module">
-  import { supabase } from './js/supabase-client.js';
-  const form = document.querySelector('[data-register-form]');
-  const status = document.querySelector('[data-register-status]');
-  const show = (m, t) => { status.textContent = m; status.className = `status-message is-visible ${t}`; };
+// ============================================================================
+// عميل Supabase الموحّد — يُستورد من أي صفحة بدل تكرار الإعداد في كل ملف
+// ============================================================================
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const submit = form.querySelector('button');
-    submit.disabled = true;
-    show('جارٍ إنشاء الحساب…', '');
-    const values = Object.fromEntries(new FormData(form).entries());
+export const SUPABASE_URL = 'https://zmodutxckghvsscvnqya.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_7dRt2_fnP_T1WwtsbponUA__jqGWlYp';
 
-    const { data, error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: { full_name: values.full_name, role: 'student', stage: values.stage }
-      }
-    });
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    submit.disabled = false;
-    if (error || !data.user) {
-      show(error?.message?.includes('already') ? 'هذا البريد مسجل بالفعل. استخدم تسجيل الدخول.' : 'تعذر إنشاء الحساب. حاول مرة أخرى.', 'error');
-      return;
-    }
+export const genericError = 'حدث خطأ أثناء تنفيذ العملية. حاول مرة أخرى.';
 
-    show('تم إنشاء الحساب بنجاح. جارٍ فتح حسابك…', 'success');
-    setTimeout(() => location.href = 'student-modern.html', 700);
-  });
-</script>
-</body>
-</html>
+export const esc = (value = '') => {
+const node = document.createElement('div');
+node.textContent = value ?? '';
+return node.innerHTML;
+};
+
+export const money = (value) => `${new Intl.NumberFormat('ar-EG').format(Number(value || 0))} ج.م`;
+
+export function currentMonthStart(date = new Date()) {
+// مهم: نبني السلسلة النصية مباشرة من السنة/الشهر المحليين بدل استخدام
+// toISOString() (اللي بيحوّل لتوقيت UTC وبيغيّر التاريخ لو المستخدم في
+// منطقة زمنية متقدمة عن UTC، زي مصر +3، فيرجع يوم غلط "آخر يوم في الشهر
+// السابق" بدل أول يوم في الشهر الحالي).
+const year = date.getFullYear();
+const month = String(date.getMonth() + 1).padStart(2, '0');
+return `${year}-${month}-01`;
+}
+
+/** يرجع { user, profile } للمستخدم الحالي المسجل دخوله عبر Supabase Auth، أو null */
+export async function getCurrentSession() {
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) return null;
+const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+if (error || !profile) return null;
+return { user, profile };
+}
+
+export async function logout() {
+await supabase.auth.signOut();
+location.href = 'index.html';
+}
