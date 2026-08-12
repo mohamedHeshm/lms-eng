@@ -27,6 +27,7 @@ function setNavigation() {
 
 function onViewOpen(view) {
   if (view === 'quizzes') loadQuizzes();
+  if (view === 'explainer-videos') loadExplainerVideos();
   if (view === 'materials') loadMaterials();
   if (view === 'subscription') loadSubscriptionView();
   if (view === 'payments') loadCoursePayments();
@@ -35,7 +36,7 @@ function onViewOpen(view) {
 
 /* ============================== نظرة عامة + كورساتي ============================== */
 function courseCard(course) {
-  return `<article class="course-card"><div class="course-cover">◒</div><div class="course-card-body">
+  return `<article class="course-card"><div class="course-cover">${course.cover_image_url ? `<img src="${esc(course.cover_image_url)}" alt="${esc(course.title)}">` : '◒'}</div><div class="course-card-body">
     <div><div class="course-meta">${esc(course.subject || 'محتوى تعليمي')}</div><h3>${esc(course.title)}</h3><p class="course-meta">يمكنك متابعة دروس الكورس.</p></div>
     <div class="course-footer"><span class="price">مفعّل</span><a class="button button-secondary" href="playlist-view.html?course=${encodeURIComponent(course.id)}">عرض الدروس</a></div>
   </div></article>`;
@@ -128,6 +129,32 @@ async function openQuizTaker(quizId) {
     openQuizTaker(quizId);
     loadQuizzes();
   });
+}
+
+/* ============================== فيديو الشرح ============================== */
+function toEmbed(url) {
+  if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
+  if (url.includes('youtu.be/')) return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
+  return url;
+}
+
+async function loadExplainerVideos() {
+  const target = document.querySelector('[data-videos-list]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+  const sub = await getSubscriptionStatus();
+  if (!sub.hasTeacher) { target.innerHTML = lockedPanel('لازم تحدد مدرسك أولًا من صفحة "حسابي" حتى تظهر لك فيديوهات الشرح.'); return; }
+  if (!sub.active) { target.innerHTML = lockedPanel('فيديوهات الشرح متاحة فقط للمشتركين اشتراك شهري ساري عند مدرسك.', `<a class="button button-primary" data-view="subscription" data-title="الاشتراك الشهري">اذهب لصفحة الاشتراك</a>`); rebindInlineNav(target); return; }
+
+  const { data: videos, error } = await supabase.from('explainer_videos').select('*').eq('teacher_id', profile.teacher_id).eq('stage', profile.stage).order('created_at', { ascending: false });
+  if (error) { target.innerHTML = empty(genericError); return; }
+  if (!videos.length) { target.innerHTML = empty('لا توجد فيديوهات شرح متاحة حاليًا.'); return; }
+
+  target.innerHTML = videos.map((v) => `<div class="lesson-item" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px">
+    <h3 style="margin-bottom:12px">▶ ${esc(v.title)}</h3>
+    ${v.description ? `<p class="course-meta" style="margin-bottom:10px">${esc(v.description)}</p>` : ''}
+    <iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" src="${esc(toEmbed(v.video_url))}" allowfullscreen></iframe>
+  </div>`).join('');
 }
 
 /* ============================== المواد: شيتات / سبورة / مذكرات ============================== */

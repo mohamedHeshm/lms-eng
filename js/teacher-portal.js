@@ -28,6 +28,7 @@ function setNavigation() {
 
 function onViewOpen(view) {
   if (view === 'quizzes') loadQuizzes();
+  if (view === 'explainer-videos') loadExplainerVideos();
   if (view === 'content') loadMaterials();
   if (view === 'students') loadStudents();
   if (view === 'subscriptions') loadSubscriptionRequests();
@@ -50,7 +51,7 @@ async function loadOverview() {
 /* ============================== الكورسات + الدروس ============================== */
 function courseCardHtml(course) {
   return `<article class="course-card">
-    <div class="course-cover">◒</div>
+    <div class="course-cover">${course.cover_image_url ? `<img src="${esc(course.cover_image_url)}" alt="${esc(course.title)}">` : '◒'}</div>
     <div class="course-card-body">
       <div><div class="course-meta">${esc(course.subject || 'محتوى تعليمي')} · ${esc(course.stage || '')}</div><h3>${esc(course.title)}</h3>
       <p class="course-meta">${course.is_published ? '🟢 منشور' : '🟡 مسودة'}</p></div>
@@ -77,11 +78,26 @@ function setupCreateCourseForm() {
   if (!form) return;
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
     const values = Object.fromEntries(new FormData(form).entries());
+
+    let coverImageUrl = null;
+    const coverFile = form.querySelector('[name="cover_image"]')?.files?.[0];
+    if (coverFile) {
+      setStatus('جارٍ رفع صورة الكورس…', 'success');
+      const ext = coverFile.name.split('.').pop();
+      const path = `${user.id}_${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('course-covers').upload(path, coverFile);
+      if (uploadError) { submit.disabled = false; setStatus('تعذر رفع صورة الكورس: ' + uploadError.message); return; }
+      coverImageUrl = supabase.storage.from('course-covers').getPublicUrl(path).data.publicUrl;
+    }
+
     const { error } = await supabase.from('courses').insert({
       teacher_id: user.id, title: values.title, subject: values.subject, stage: values.stage,
-      price: Number(values.price || 0), description: values.description, is_published: false,
+      price: Number(values.price || 0), description: values.description, cover_image_url: coverImageUrl, is_published: false,
     });
+    submit.disabled = false;
     if (error) { setStatus('تعذر حفظ الكورس. حاول مرة أخرى.'); return; }
     form.reset();
     setStatus('تم حفظ الكورس كمسودة. أضف الدروس ثم انشره من إدارة الكورسات.', 'success');
@@ -271,6 +287,47 @@ async function openQuizManager(quizId) {
   }
 }
 
+/* ============================== فيديو الشرح ============================== */
+function videoCardHtml(video) {
+  return `<article class="quiz-card">
+    <div class="meta-col"><span class="chip chip-stage">${esc(video.stage)}</span><h4>▶ ${esc(video.title)}</h4>
+      ${video.description ? `<span class="course-meta">${esc(video.description)}</span>` : ''}</div>
+    <div class="row-actions"><button class="button button-danger" data-del-video="${video.id}">حذف</button></div>
+  </article>`;
+}
+
+async function loadExplainerVideos() {
+  const target = document.querySelector('[data-videos-list]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+  const { data: videos, error } = await supabase.from('explainer_videos').select('*').eq('teacher_id', user.id).order('created_at', { ascending: false });
+  if (error) { target.innerHTML = empty(genericError); return; }
+  target.innerHTML = videos.length ? videos.map(videoCardHtml).join('') : empty('لا توجد فيديوهات شرح بعد. أضف أول فيديو من الأعلى.');
+
+  target.querySelectorAll('[data-del-video]').forEach((btn) => btn.addEventListener('click', async () => {
+    if (!confirm('حذف هذا الفيديو؟')) return;
+    await supabase.from('explainer_videos').delete().eq('id', btn.dataset.delVideo);
+    loadExplainerVideos();
+  }));
+}
+
+function setupCreateVideoForm() {
+  const form = document.querySelector('[data-create-video]');
+  if (!form) return;
+  form.querySelector('[name="stage"]').innerHTML = `<option value="">اختر المرحلة</option>${stageOptions()}`;
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const values = Object.fromEntries(new FormData(form).entries());
+    const { error } = await supabase.from('explainer_videos').insert({
+      teacher_id: user.id, title: values.title, stage: values.stage, video_url: values.video_url, description: values.description || null,
+    });
+    if (error) { setStatus('تعذر إضافة الفيديو.'); return; }
+    form.reset();
+    setStatus('تم إضافة فيديو الشرح بنجاح.', 'success');
+    loadExplainerVideos();
+  });
+}
+
 /* ============================== المواد: شيتات / سبورة / مذكرات ============================== */
 function materialCardHtml(m) {
   const info = MATERIAL_LABELS[m.type];
@@ -392,5 +449,6 @@ loadOverview();
 loadTeacherCourses();
 setupCreateCourseForm();
 setupCreateQuizForm();
+setupCreateVideoForm();
 setupMaterialFilter();
 setupUploadMaterialForm();

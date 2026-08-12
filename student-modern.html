@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لوحة الطالب | المأمون التعليمية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/portal.css">
-<style>
-[data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
-[data-lesson-modal].active { display:block; }
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة الطالب | المأمون التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+  <style>
+    [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
+    [data-lesson-modal].active { display:block; }
+  </style>
 </head>
 <body data-role="student">
 <div class="portal">
@@ -20,6 +20,7 @@
       <button class="active" data-view="overview" data-title="لوحة الطالب">الرئيسية</button>
       <button data-view="my-courses" data-title="كورساتي">كورساتي</button>
       <button data-view="quizzes" data-title="الاختبارات أونلاين">الاختبارات أونلاين</button>
+      <button data-view="explainer-videos" data-title="فيديو الشرح">فيديو الشرح</button>
       <button data-view="materials" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
       <button data-view="payments" data-title="دفع الكورسات">دفع الكورسات</button>
       <button data-view="subscription" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
@@ -63,6 +64,12 @@
       <section class="view" id="quizzes">
         <div class="section-title"><div><h2>الاختبارات أونلاين</h2><p>اختبارات مرحلتك الدراسية عند مدرسك.</p></div></div>
         <div data-quizzes-list></div>
+      </section>
+
+      <!-- فيديو الشرح -->
+      <section class="view" id="explainer-videos">
+        <div class="section-title"><div><h2>فيديو الشرح</h2><p>فيديوهات شرح عامة لمرحلتك عند مدرسك — متاحة للمشتركين اشتراكًا شهريًا ساريًا فقط.</p></div></div>
+        <div data-videos-list></div>
       </section>
 
       <!-- المواد -->

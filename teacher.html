@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لوحة المدرس | المأمون التعليمية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/portal.css">
-<style>
-[data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
-[data-lesson-modal].active { display:block; }
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة المدرس | المأمون التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+  <style>
+    [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
+    [data-lesson-modal].active { display:block; }
+  </style>
 </head>
 <body data-role="teacher">
 <div class="portal">
@@ -21,6 +21,7 @@
       <button data-view="courses" data-title="إدارة الكورسات">الكورسات</button>
       <button data-view="course-builder" data-title="إنشاء كورس">إنشاء كورس</button>
       <button data-view="quizzes" data-title="الاختبارات أونلاين">الاختبارات أونلاين</button>
+      <button data-view="explainer-videos" data-title="فيديو الشرح">فيديو الشرح</button>
       <button data-view="content" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
       <button data-view="students" data-title="الطلاب">الطلاب</button>
       <button data-view="subscriptions" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
@@ -76,6 +77,7 @@
             <label class="field">المادة<input name="subject" required></label>
             <label class="field">المرحلة<select name="stage" required><option value="">اختر المرحلة</option><option>الأولى الثانوية</option><option>الثانية الثانوية</option><option>الثالثة الثانوية</option></select></label>
             <label class="field">سعر الاشتراك<input name="price" type="number" min="0" step="1" placeholder="0"></label>
+            <label class="field">صورة الكورس (تظهر للطلاب وفي الصفحة الرئيسية)<input name="cover_image" type="file" accept="image/*"></label>
             <label class="field">وصف مختصر<textarea name="description" rows="4"></textarea></label>
           </div>
           <button class="button button-primary" type="submit">حفظ كمسودة</button>
@@ -95,6 +97,21 @@
           <button class="button button-primary" type="submit">إنشاء الاختبار</button>
         </form>
         <div data-quizzes-list></div>
+      </section>
+
+      <!-- فيديو الشرح -->
+      <section class="view" id="explainer-videos">
+        <div class="section-title"><div><h2>فيديو الشرح</h2><p>فيديوهات شرح عامة (مش دروس كورس) تظهر فقط للطلاب المشتركين اشتراكًا شهريًا ساريًا في المرحلة المحددة.</p></div></div>
+        <form class="panel" data-create-video style="margin-bottom:20px">
+          <div class="form-grid">
+            <label class="field">عنوان الفيديو<input name="title" required></label>
+            <label class="field">المرحلة<select name="stage" required></select></label>
+            <label class="field">رابط الفيديو (يوتيوب)<input name="video_url" required placeholder="https://youtube.com/watch?v=..."></label>
+            <label class="field">وصف مختصر (اختياري)<textarea name="description" rows="2"></textarea></label>
+          </div>
+          <button class="button button-primary" type="submit">إضافة الفيديو</button>
+        </form>
+        <div data-videos-list></div>
       </section>
 
       <!-- المواد -->
