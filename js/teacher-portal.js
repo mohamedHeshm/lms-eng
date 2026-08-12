@@ -112,10 +112,11 @@ async function openLessonManager(courseId) {
   modalHost.innerHTML = `<div class="panel" style="max-width:720px;margin:30px auto;">
     <div class="panel-head"><h3>إدارة دروس الكورس</h3><button class="button button-text" data-close-modal>إغلاق ✕</button></div>
     <div class="content-grid" style="grid-template-columns:1fr;">
-      <form data-add-lesson class="form-grid" style="grid-template-columns:1fr 1fr auto;align-items:end;">
+      <form data-add-lesson class="form-grid" style="grid-template-columns:1fr 1fr;align-items:end;">
         <label class="field">عنوان الدرس<input name="title" required></label>
         <label class="field">رابط الفيديو (يوتيوب)<input name="video_url" required placeholder="https://youtube.com/watch?v=..."></label>
-        <button class="button button-primary" type="submit">إضافة</button>
+        <label class="field">شيت الدرس (اختياري، يظهر للطالب بعد ما يخلّص الفيديو)<input name="sheet" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></label>
+        <button class="button button-primary" type="submit" style="grid-column:1/-1">إضافة الدرس</button>
       </form>
       <div data-lessons-list></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:14px;">
@@ -142,7 +143,7 @@ async function openLessonManager(courseId) {
     list.innerHTML = '<p class="loading">جاري التحميل…</p>';
     const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
     if (error) { list.innerHTML = empty(genericError); return; }
-    list.innerHTML = lessons.length ? lessons.map((l) => `<div class="lesson-card"><div class="meta-col"><h4>▶ ${esc(l.title)}</h4></div><div class="row-actions"><button class="button button-danger" data-del-lesson="${l.id}">حذف</button></div></div>`).join('') : empty('لا توجد دروس بعد. أضف أول درس من الأعلى.');
+    list.innerHTML = lessons.length ? lessons.map((l) => `<div class="lesson-card"><div class="meta-col"><h4>▶ ${esc(l.title)}</h4>${l.sheet_url ? `<span class="course-meta">📄 مرفق شيت</span>` : ''}</div><div class="row-actions"><button class="button button-danger" data-del-lesson="${l.id}">حذف</button></div></div>`).join('') : empty('لا توجد دروس بعد. أضف أول درس من الأعلى.');
     list.querySelectorAll('[data-del-lesson]').forEach((btn) => btn.addEventListener('click', async () => {
       if (!confirm('حذف هذا الدرس؟')) return;
       await supabase.from('course_lessons').delete().eq('id', btn.dataset.delLesson);
@@ -154,8 +155,25 @@ async function openLessonManager(courseId) {
   modalHost.querySelector('[data-add-lesson]').addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.target;
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
     const values = Object.fromEntries(new FormData(form).entries());
-    const { error } = await supabase.from('course_lessons').insert({ course_id: courseId, title: values.title, video_url: values.video_url });
+
+    let sheetUrl = null;
+    const sheetFile = form.querySelector('[name="sheet"]')?.files?.[0];
+    if (sheetFile) {
+      const ext = sheetFile.name.split('.').pop();
+      const path = `${courseId}_${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('lesson-sheets').upload(path, sheetFile);
+      if (uploadError) { submit.disabled = false; alert('تعذر رفع الشيت: ' + uploadError.message); return; }
+      sheetUrl = supabase.storage.from('lesson-sheets').getPublicUrl(path).data.publicUrl;
+    }
+
+    const { count: existingCount } = await supabase.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', courseId);
+    const { error } = await supabase.from('course_lessons').insert({
+      course_id: courseId, title: values.title, video_url: values.video_url, sheet_url: sheetUrl, sort_order: existingCount || 0,
+    });
+    submit.disabled = false;
     if (error) { alert(genericError); return; }
     form.reset();
     renderLessons();
