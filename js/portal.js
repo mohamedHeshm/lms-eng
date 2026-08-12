@@ -102,7 +102,7 @@ function setupTeacherForms(user) {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     const values = Object.fromEntries(new FormData(form).entries());
     const { error } = authUser
-      ? await supabase.from('courses').insert({ teacher_id: authUser.id, title: values.title, subject: values.subject, stage: values.stage, price: Number(values.price || 0), description: values.description, is_published: false })
+      ? await supabase.from('courses').insert({ teacher_id: authUser.id, title: values.title, subject: values.subject, stage: values.stage, price: Number(values.price || 0), description: values.description, is_published: true })
       : await supabase.from('playlists').insert({ teacher_id: user.id, teacher_name: user.name || 'مدرس', name: values.title, price: Number(values.price || 0) });
     if (error) { setStatus('تعذر حفظ الكورس. حاول مرة أخرى.'); return; }
     form.reset(); setStatus('تم حفظ الكورس كمسودة. يمكنك نشره من إدارة الكورسات.', 'success'); loadTeacher(user);
