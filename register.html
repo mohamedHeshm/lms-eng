@@ -47,33 +47,97 @@
 </main>
 <script type="module">
   import { supabase } from './js/supabase-client.js';
+
   const form = document.querySelector('[data-register-form]');
   const status = document.querySelector('[data-register-status]');
-  const show = (m, t) => { status.textContent = m; status.className = `status-message is-visible ${t}`; };
+
+  const show = (message, type = '') => {
+    status.textContent = message;
+    status.className = `status-message is-visible ${type}`;
+  };
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const submit = form.querySelector('button');
-    submit.disabled = true;
-    show('جارٍ إنشاء الحساب…', '');
-    const values = Object.fromEntries(new FormData(form).entries());
 
-    const { data, error } = await supabase.auth.signUp({
+    const submit = form.querySelector('button[type="submit"]');
+
+    submit.disabled = true;
+    show('جارٍ إنشاء الحساب…');
+
+    const values = Object.fromEntries(
+      new FormData(form).entries()
+    );
+
+    console.log('Register data:', {
       email: values.email,
-      password: values.password,
-      options: {
-        data: { full_name: values.full_name, role: 'student', stage: values.stage }
-      }
+      stage: values.stage,
+      full_name: values.full_name
     });
 
-    submit.disabled = false;
-    if (error || !data.user) {
-      show(error?.message?.includes('already') ? 'هذا البريد مسجل بالفعل. استخدم تسجيل الدخول.' : 'تعذر إنشاء الحساب. حاول مرة أخرى.', 'error');
-      return;
-    }
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email.trim(),
+        password: values.password,
+        options: {
+          data: {
+            full_name: values.full_name.trim(),
+            role: 'student',
+            stage: values.stage
+          }
+        }
+      });
 
-    show('تم إنشاء الحساب بنجاح. جارٍ فتح حسابك…', 'success');
-    setTimeout(() => location.href = 'student-modern.html', 700);
+      console.log('SUPABASE SIGNUP DATA:', data);
+      console.error('SUPABASE SIGNUP ERROR:', error);
+
+      if (error) {
+        console.error('Error message:', error.message);
+        console.error('Error status:', error.status);
+        console.error('Error name:', error.name);
+
+        show(
+          `خطأ: ${error.message}`,
+          'error'
+        );
+
+        submit.disabled = false;
+        return;
+      }
+
+      if (!data?.user) {
+        show('لم يتم إنشاء المستخدم.', 'error');
+        submit.disabled = false;
+        return;
+      }
+
+      console.log('User created:', data.user);
+
+      if (data.session) {
+        show(
+          'تم إنشاء الحساب بنجاح. جارٍ فتح حسابك…',
+          'success'
+        );
+
+        setTimeout(() => {
+          location.href = 'student-modern.html';
+        }, 700);
+      } else {
+        show(
+          'تم إنشاء الحساب. تحقق من بريدك الإلكتروني لتفعيل الحساب.',
+          'success'
+        );
+      }
+
+    } catch (err) {
+      console.error('Unexpected signup error:', err);
+
+      show(
+        `حدث خطأ غير متوقع: ${err.message}`,
+        'error'
+      );
+    } finally {
+      submit.disabled = false;
+    }
   });
 </script>
 </body>
