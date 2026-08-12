@@ -57,7 +57,6 @@
     if (url.includes('youtu.be/')) return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
     return url;
   }
-  function isImage(url) { return /\.(png|jpe?g|gif|webp)$/i.test(url); }
 
   const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
   if (error) { layoutEl.innerHTML = '<div class="empty-state">حدث خطأ أثناء تحميل الدروس.</div>'; throw new Error('load error'); }
@@ -101,18 +100,17 @@
     }));
   }
 
-  function renderMain() {
+  async function renderMain() {
     const lesson = lessons[currentIndex];
     const done = completedSet.has(lesson.id);
-    const nextExists = currentIndex < lessons.length - 1;
 
     mainEl.innerHTML = `<div class="lesson-item">
       <h3>▶ ${esc(lesson.title)}</h3>
       <iframe src="${esc(toEmbed(lesson.video_url))}" allowfullscreen></iframe>
-      <div style="margin-top:14px">
+      <div style="margin-top:14px" data-video-action>
         ${done ? '' : `<button class="button button-primary" id="finishBtn" style="width:auto;padding:10px 20px">أنهيت مشاهدة الفيديو ✅</button>`}
       </div>
-      ${done ? renderSheetAndNext(lesson, nextExists) : ''}
+      <div data-sheet-area></div>
     </div>`;
 
     document.getElementById('finishBtn')?.addEventListener('click', async () => {
@@ -125,26 +123,77 @@
       if (error) { btn.disabled = false; alert('تعذر حفظ تقدمك، حاول مرة أخرى.'); return; }
       completedSet.add(lesson.id);
       renderNav();
-      renderMain();
+      mainEl.querySelector('[data-video-action]').innerHTML = '';
+      renderSheetArea(lesson);
     });
 
-    mainEl.querySelector('[data-next-lesson]')?.addEventListener('click', () => {
+    if (done) await renderSheetArea(lesson);
+  }
+
+  async function renderSheetArea(lesson) {
+    const area = mainEl.querySelector('[data-sheet-area]');
+    if (!area) return;
+    area.innerHTML = '<p class="loading">جاري تحميل شيت الدرس…</p>';
+
+    const { data: questions, error: qError } = await supabase.from('lesson_sheet_questions').select('*').eq('lesson_id', lesson.id).order('sort_order', { ascending: true });
+    if (qError) { area.innerHTML = ''; renderNextButton(area); return; }
+
+    if (!questions.length) { area.innerHTML = ''; renderNextButton(area); return; }
+
+    const { data: existingAttempt } = await supabase.from('lesson_sheet_attempts').select('*').eq('lesson_id', lesson.id).eq('student_id', studentId).maybeSingle();
+
+    if (existingAttempt) {
+      const answers = existingAttempt.answers || {};
+      area.innerHTML = `<div class="sheet-box">
+        <h4 style="margin-bottom:10px">📝 شيت الدرس</h4>
+        <div class="quiz-result-banner ${existingAttempt.score >= existingAttempt.total / 2 ? '' : 'fail'}">درجتك: ${existingAttempt.score} من ${existingAttempt.total}</div>
+        ${questions.map((q, i) => `<div class="quiz-take-question"><strong>س${i + 1}: ${esc(q.question_text)}</strong>
+          ${q.options.map((opt, idx) => `<div class="option-label" style="${idx === q.correct_index ? 'border-color:var(--success);background:#eaf6ee' : (answers[q.id] === idx ? 'border-color:var(--error);background:#fcefed' : '')}">${esc(opt)} ${idx === q.correct_index ? '✓ الإجابة الصحيحة' : (answers[q.id] === idx ? '✗ إجابتك' : '')}</div>`).join('')}
+        </div>`).join('')}
+      </div>`;
+      renderNextButton(area);
+      return;
+    }
+
+    area.innerHTML = `<div class="sheet-box">
+      <h4 style="margin-bottom:10px">📝 شيت الدرس — حلّه الأول قبل ما تكمل</h4>
+      <form data-sheet-form>
+        ${questions.map((q, i) => `<div class="quiz-take-question"><strong>س${i + 1}: ${esc(q.question_text)}</strong>
+          ${q.options.map((opt, idx) => `<label class="option-label"><input type="radio" name="q_${q.id}" value="${idx}" required>${esc(opt)}</label>`).join('')}
+        </div>`).join('')}
+        <button class="button button-primary" type="submit">تسليم الإجابات</button>
+      </form>
+    </div>`;
+
+    area.querySelector('[data-sheet-form]').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const answers = {};
+      let score = 0;
+      questions.forEach((q) => {
+        const chosen = Number(formData.get(`q_${q.id}`));
+        answers[q.id] = chosen;
+        if (chosen === q.correct_index) score += 1;
+      });
+      const { error } = await supabase.from('lesson_sheet_attempts').insert({ lesson_id: lesson.id, student_id: studentId, answers, score, total: questions.length });
+      if (error) { alert('تعذر تسليم الشيت، حاول مرة أخرى.'); return; }
+      renderSheetArea(lesson);
+    });
+  }
+
+  function renderNextButton(area) {
+    const nextExists = currentIndex < lessons.length - 1;
+    const wrap = document.createElement('div');
+    wrap.style.marginTop = '16px';
+    wrap.innerHTML = nextExists
+      ? `<button class="button button-primary" data-next-lesson style="width:auto;padding:10px 20px">الدرس التالي ▶</button>`
+      : `<p class="course-meta">🎉 خلصت كل دروس الكورس.</p>`;
+    area.appendChild(wrap);
+    wrap.querySelector('[data-next-lesson]')?.addEventListener('click', () => {
       currentIndex += 1;
       renderNav();
       renderMain();
     });
-  }
-
-  function renderSheetAndNext(lesson, nextExists) {
-    const sheetHtml = lesson.sheet_url ? `<div class="sheet-box">
-        <h4 style="margin-bottom:10px">📄 شيت الدرس — حلّه الأول</h4>
-        ${isImage(lesson.sheet_url) ? `<img src="${esc(lesson.sheet_url)}" alt="شيت الدرس" style="max-width:100%;border-radius:10px;margin-bottom:10px">` : ''}
-        <a class="button button-secondary" href="${esc(lesson.sheet_url)}" target="_blank" style="width:auto;display:inline-flex;padding:9px 16px">فتح / تحميل الشيت</a>
-      </div>` : '';
-    const nextHtml = nextExists
-      ? `<div style="margin-top:16px"><button class="button button-primary" data-next-lesson style="width:auto;padding:10px 20px">الدرس التالي ▶</button></div>`
-      : `<p class="course-meta" style="margin-top:16px">🎉 خلصت كل دروس الكورس.</p>`;
-    return sheetHtml + nextHtml;
   }
 
   renderNav();
