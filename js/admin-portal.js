@@ -1,6 +1,8 @@
 import { supabase, esc, money, genericError } from './supabase-client.js';
 import { requireAuth } from './auth-guard.js';
 
+const STAGES = ['الأولى الثانوية', 'الثانية الثانوية', 'الثالثة الثانوية'];
+
 const session = await requireAuth('admin');
 if (!session) throw new Error('redirecting');
 
@@ -53,6 +55,12 @@ async function loadUsers() {
     <h4>${esc(u.full_name)} ${u.is_active === false ? '<span class="status-badge rejected">موقوف</span>' : ''}</h4>
     <p>📧 ${esc(u.email || '—')}</p>
     <p>الدور الحالي: <strong>${{ admin: 'أدمن', teacher: 'مدرس', student: 'طالب' }[u.role] || u.role}</strong>${u.stage ? ' · ' + esc(u.stage) : ''}</p>
+    ${u.role === 'student' ? `<label class="field" style="margin-top:8px">المرحلة الدراسية
+      <select data-set-stage="${u.id}">
+        <option value="">— بدون مرحلة —</option>
+        ${STAGES.map((s) => `<option value="${esc(s)}" ${u.stage === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}
+      </select>
+    </label>` : ''}
     <div class="row-actions">
       ${u.role !== 'teacher' ? `<button class="button button-secondary" data-set-role="${u.id}|teacher">ترقية لمدرس</button>` : ''}
       ${u.role !== 'student' ? `<button class="button button-secondary" data-set-role="${u.id}|student">تحويل لطالب</button>` : ''}
@@ -67,6 +75,15 @@ async function loadUsers() {
     const { error } = await supabase.from('profiles').update({ role }).eq('id', id);
     if (error) { alert(genericError); return; }
     loadUsers();
+  }));
+  target.querySelectorAll('[data-set-stage]').forEach((select) => select.addEventListener('change', async () => {
+    const id = select.dataset.setStage;
+    const stage = select.value || null;
+    select.disabled = true;
+    const { error } = await supabase.from('profiles').update({ stage }).eq('id', id);
+    select.disabled = false;
+    if (error) { alert(genericError); loadUsers(); return; }
+    setStatus(stage ? `تم نقل الطالب إلى "${stage}".` : 'تم إلغاء تحديد مرحلة الطالب.', 'success');
   }));
   target.querySelectorAll('[data-toggle-active]').forEach((btn) => btn.addEventListener('click', async () => {
     const [id, wasInactiveStr] = btn.dataset.toggleActive.split('|');
