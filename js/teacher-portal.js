@@ -26,6 +26,16 @@ function setNavigation() {
   document.querySelector('[data-logout]')?.addEventListener('click', async () => { await supabase.auth.signOut(); location.href = 'index.html'; });
 }
 
+function setMobileMenu() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.querySelector('[data-sidebar-backdrop]');
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const closeMenu = () => { sidebar?.classList.remove('open'); backdrop?.classList.remove('active'); };
+  toggle?.addEventListener('click', () => { sidebar?.classList.add('open'); backdrop?.classList.add('active'); });
+  backdrop?.addEventListener('click', closeMenu);
+  sidebar?.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', closeMenu));
+}
+
 function onViewOpen(view) {
   if (view === 'quizzes') loadQuizzes();
   if (view === 'explainer-videos') loadExplainerVideos();
@@ -525,6 +535,7 @@ async function loadSubscriptionRequests() {
 
 /* ============================== تشغيل ============================== */
 setNavigation();
+setMobileMenu();
 loadOverview();
 loadTeacherCourses();
 setupCreateCourseForm();
