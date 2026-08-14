@@ -107,6 +107,10 @@
     mainEl.innerHTML = `<div class="lesson-item">
       <h3>▶ ${esc(lesson.title)}</h3>
       <iframe src="${esc(toEmbed(lesson.video_url))}" allowfullscreen></iframe>
+      ${(lesson.board_pdf_url || lesson.explanation_pdf_url) ? `<div class="row-actions" style="margin-top:14px">
+        ${lesson.board_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.board_pdf_url)}" target="_blank">🖼 سبورة الدرس</a>` : ''}
+        ${lesson.explanation_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.explanation_pdf_url)}" target="_blank">📘 شرح كتابي PDF</a>` : ''}
+      </div>` : ''}
       <div style="margin-top:14px" data-video-action>
         ${done ? '' : `<button class="button button-primary" id="finishBtn" style="width:auto;padding:10px 20px">أنهيت مشاهدة الفيديو ✅</button>`}
       </div>

@@ -122,10 +122,12 @@ async function openLessonManager(courseId) {
   modalHost.innerHTML = `<div class="panel" style="max-width:720px;margin:30px auto;">
     <div class="panel-head"><h3>إدارة دروس الكورس</h3><button class="button button-text" data-close-modal>إغلاق ✕</button></div>
     <div class="content-grid" style="grid-template-columns:1fr;">
-      <form data-add-lesson class="form-grid" style="grid-template-columns:1fr 1fr auto;align-items:end;">
+      <form data-add-lesson class="form-grid">
         <label class="field">عنوان الدرس<input name="title" required></label>
         <label class="field">رابط الفيديو (يوتيوب)<input name="video_url" required placeholder="https://youtube.com/watch?v=..."></label>
-        <button class="button button-primary" type="submit">إضافة</button>
+        <label class="field">سبورة الدرس PDF (اختياري)<input type="file" name="board_pdf" accept="application/pdf"></label>
+        <label class="field">شرح كتابي PDF (اختياري)<input type="file" name="explanation_pdf" accept="application/pdf"></label>
+        <button class="button button-primary" type="submit" style="grid-column:1/-1">إضافة الدرس</button>
       </form>
       <div data-lessons-list></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:14px;">
@@ -152,7 +154,19 @@ async function openLessonManager(courseId) {
     list.innerHTML = '<p class="loading">جاري التحميل…</p>';
     const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
     if (error) { list.innerHTML = empty(genericError); return; }
-    list.innerHTML = lessons.length ? lessons.map((l) => `<div class="lesson-card"><div class="meta-col"><h4>▶ ${esc(l.title)}</h4></div><div class="row-actions"><button class="button button-secondary" data-manage-sheet="${l.id}" data-lesson-title="${esc(l.title)}">📝 شيت الدرس</button><button class="button button-danger" data-del-lesson="${l.id}">حذف</button></div></div>`).join('') : empty('لا توجد دروس بعد. أضف أول درس من الأعلى.');
+    list.innerHTML = lessons.length ? lessons.map((l) => `<div class="lesson-card">
+      <div class="meta-col">
+        <h4>▶ ${esc(l.title)}</h4>
+        <div class="row-actions" style="margin-top:8px">
+          ${l.board_pdf_url ? `<a class="button button-secondary" style="width:auto;padding:6px 12px" href="${esc(l.board_pdf_url)}" target="_blank">🖼 سبورة الدرس</a>` : `<span class="course-meta">لا توجد سبورة</span>`}
+          ${l.explanation_pdf_url ? `<a class="button button-secondary" style="width:auto;padding:6px 12px" href="${esc(l.explanation_pdf_url)}" target="_blank">📘 شرح كتابي</a>` : `<span class="course-meta">لا يوجد شرح كتابي</span>`}
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="button button-secondary" data-manage-sheet="${l.id}" data-lesson-title="${esc(l.title)}">📝 شيت الدرس</button>
+        <button class="button button-danger" data-del-lesson="${l.id}">حذف</button>
+      </div>
+    </div>`).join('') : empty('لا توجد دروس بعد. أضف أول درس من الأعلى.');
     list.querySelectorAll('[data-manage-sheet]').forEach((btn) => btn.addEventListener('click', () => openLessonSheetManager(btn.dataset.manageSheet, btn.dataset.lessonTitle)));
     list.querySelectorAll('[data-del-lesson]').forEach((btn) => btn.addEventListener('click', async () => {
       if (!confirm('حذف هذا الدرس؟')) return;
@@ -168,9 +182,33 @@ async function openLessonManager(courseId) {
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     const values = Object.fromEntries(new FormData(form).entries());
+
+    const boardFile = form.querySelector('[name="board_pdf"]')?.files?.[0];
+    const explanationFile = form.querySelector('[name="explanation_pdf"]')?.files?.[0];
+
+    async function uploadLessonPdf(file, kind) {
+      if (!file) return null;
+      const path = `${kind}/${user.id}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.pdf`;
+      const { error: uploadError } = await supabase.storage.from('lesson-files').upload(path, file);
+      if (uploadError) throw uploadError;
+      return supabase.storage.from('lesson-files').getPublicUrl(path).data.publicUrl;
+    }
+
+    let boardPdfUrl = null;
+    let explanationPdfUrl = null;
+    try {
+      boardPdfUrl = await uploadLessonPdf(boardFile, 'board');
+      explanationPdfUrl = await uploadLessonPdf(explanationFile, 'explanation');
+    } catch (uploadError) {
+      submit.disabled = false;
+      alert('تعذر رفع أحد ملفات الـ PDF: ' + uploadError.message);
+      return;
+    }
+
     const { count: existingCount } = await supabase.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', courseId);
     const { error } = await supabase.from('course_lessons').insert({
-      course_id: courseId, title: values.title, video_url: values.video_url, sort_order: existingCount || 0,
+      course_id: courseId, title: values.title, video_url: values.video_url,
+      board_pdf_url: boardPdfUrl, explanation_pdf_url: explanationPdfUrl, sort_order: existingCount || 0,
     });
     submit.disabled = false;
     if (error) { alert(genericError); return; }

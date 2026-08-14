@@ -57,6 +57,18 @@ async function initCheckout() {
   courseName.textContent = course.title;
   coursePrice.textContent = money(course.price);
 
+  // رقم العملية إجباري لو طريقة الدفع "محفظة إلكترونية"
+  const referenceInput = form.querySelector('[name="reference_number"]');
+  const referenceLabel = form.querySelector('[data-reference-label]');
+  function updateReferenceRequirement() {
+    const method = form.querySelector('input[name="method"]:checked')?.value;
+    const isWallet = method === 'wallet';
+    referenceInput.required = isWallet;
+    if (referenceLabel) referenceLabel.firstChild.textContent = isWallet ? 'رقم العملية اللي حوّلت بيه (إجباري)' : 'رقم العملية أو مرجع الدفع (اختياري)';
+  }
+  form.querySelectorAll('input[name="method"]').forEach((radio) => radio.addEventListener('change', updateReferenceRequirement));
+  updateReferenceRequirement();
+
   // إظهار حالة الاشتراك الحالية إن وُجدت
   const session = await getCurrentSession();
   if (session) {
@@ -72,6 +84,11 @@ async function initCheckout() {
     const fields = Object.fromEntries(new FormData(form).entries());
     if (fields.method === 'online') {
       showStatus('الدفع أونلاين غير متاح حاليًا. اختر الدفع داخل السنتر أو التحويل، أو تواصل مع الإدارة.', 'error');
+      return;
+    }
+    if (fields.method === 'wallet' && !fields.reference_number?.trim()) {
+      showStatus('من فضلك اكتب رقم العملية اللي حوّلت بيها عن طريق المحفظة الإلكترونية.', 'error');
+      referenceInput.focus();
       return;
     }
 
