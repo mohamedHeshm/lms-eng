@@ -260,9 +260,76 @@ function setupTeacherSelectForm() {
   });
 }
 
+/* ==================== إضافات واجهة: إحصائيات سريعة + آخر نشاط + قائمة الإشعارات ====================
+   كل الدوال هنا إضافية فقط ولا تُغيّر أي دالة أو استعلام موجود من قبل.
+   البيانات المعروضة حقيقية بالكامل من نفس الجداول المستخدمة في باقي الصفحة
+   (لا يوجد جدول إشعارات حاليًا، لذلك قائمة الإشعارات تعرض حالة فارغة فقط). */
+
+function setNotifDropdown() {
+  const toggle = document.querySelector('[data-notif-toggle]');
+  const dropdown = document.querySelector('[data-notif-dropdown]');
+  if (!toggle || !dropdown) return;
+  toggle.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('open'); });
+  document.addEventListener('click', (event) => { if (!dropdown.contains(event.target) && event.target !== toggle) dropdown.classList.remove('open'); });
+}
+
+async function loadDashboardStats() {
+  const quizzesEl = document.querySelector('[data-stat-quizzes]');
+  const materialsEl = document.querySelector('[data-stat-materials]');
+  const subEl = document.querySelector('[data-stat-subscription]');
+  const subSubEl = document.querySelector('[data-stat-subscription-sub]');
+  const subSubEl2 = document.querySelector('[data-stat-subscription-sub-2]');
+  const subBadgeEl = document.querySelector('[data-stat-subscription-badge]');
+  if (!quizzesEl && !materialsEl && !subEl) return;
+
+  const sub = await getSubscriptionStatus();
+  const subText = sub.active ? 'نشط' : (sub.hasTeacher ? 'غير نشط' : '—');
+  const subSubText = !sub.hasTeacher ? 'حدد مدرسك أولًا من صفحة حسابي' : sub.active ? 'ساري هذا الشهر ✓' : sub.pendingStatus === 'pending' ? 'بانتظار مراجعة المدرس' : 'لم يتم الدفع بعد لهذا الشهر';
+  if (subEl) subEl.textContent = subText;
+  if (subSubEl) subSubEl.textContent = subSubText;
+  if (subSubEl2) subSubEl2.textContent = subSubText;
+  if (subBadgeEl) { subBadgeEl.textContent = subText; subBadgeEl.className = `status-badge ${sub.active ? 'approved' : sub.pendingStatus === 'pending' ? 'pending' : 'rejected'}`; }
+
+  if (!sub.hasTeacher || !sub.active) {
+    if (quizzesEl) quizzesEl.textContent = '🔒';
+    if (materialsEl) materialsEl.textContent = '🔒';
+    return;
+  }
+
+  const [{ count: quizzesCount }, { count: materialsCount }] = await Promise.all([
+    supabase.from('quizzes').select('id', { count: 'exact', head: true }).eq('teacher_id', profile.teacher_id).eq('stage', profile.stage).eq('is_published', true),
+    supabase.from('materials').select('id', { count: 'exact', head: true }).eq('teacher_id', profile.teacher_id).eq('stage', profile.stage),
+  ]);
+  if (quizzesEl) quizzesEl.textContent = quizzesCount ?? 0;
+  if (materialsEl) materialsEl.textContent = materialsCount ?? 0;
+}
+
+async function loadActivityFeed() {
+  const target = document.querySelector('[data-activity-list]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+
+  const [{ data: enrollments }, { data: attempts }] = await Promise.all([
+    supabase.from('enrollments').select('created_at, course:courses(title)').eq('student_id', user.id).order('created_at', { ascending: false }).limit(5),
+    supabase.from('quiz_attempts').select('created_at, score, total, quiz:quizzes(title)').eq('student_id', user.id).order('created_at', { ascending: false }).limit(5),
+  ]);
+
+  const items = [
+    ...((enrollments || []).map((e) => ({ date: e.created_at, icon: '📚', text: `انضممت إلى كورس "${esc(e.course?.title || '—')}"` }))),
+    ...((attempts || []).map((a) => ({ date: a.created_at, icon: '📝', text: `قدمت اختبار "${esc(a.quiz?.title || '—')}" وحصلت على ${a.score}/${a.total}` }))),
+  ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+
+  target.innerHTML = items.length
+    ? items.map((i) => `<div class="activity-row"><span class="activity-icon">${i.icon}</span><div><p>${i.text}</p><span class="activity-date">${new Date(i.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' })}</span></div></div>`).join('')
+    : empty('لا يوجد نشاط بعد. ابدأ رحلتك التعليمية!');
+}
+
 /* ============================== تشغيل ============================== */
 document.querySelectorAll('[data-user-name]').forEach((n) => { n.textContent = esc(profile.full_name); });
 setNavigation();
 setMobileMenu();
 loadMyCourses();
 setupTeacherSelectForm();
+setNotifDropdown();
+loadDashboardStats();
+loadActivityFeed();

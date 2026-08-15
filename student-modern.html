@@ -4,10 +4,11 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>لوحة الطالب | المأمون التعليمية</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/student-dashboard.css">
   <style>
-    [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
+    [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(9,20,17,.6); z-index:50; padding:20px; overflow:auto; backdrop-filter: blur(2px); }
     [data-lesson-modal].active { display:block; }
   </style>
 </head>
@@ -16,46 +17,148 @@
   <aside class="sidebar">
     <a class="brand" href="dashboard-home.html">
       <img src="images/logo.jpeg" class="brand-image" alt="شعار المأمون التعليمية">
-      <span>المأمون التعليمية</span>
-    </a>    <p class="role-label">حساب طالب</p>
+      <span class="brand-text">
+        <strong>المأمون التعليمية</strong>
+        <em class="role-label">حساب طالب</em>
+      </span>
+    </a>
     <nav class="portal-nav">
-      <button class="active" data-view="overview" data-title="لوحة الطالب">الرئيسية</button>
-      <button data-view="my-courses" data-title="كورساتي">كورساتي</button>
-      <button data-view="quizzes" data-title="الاختبارات أونلاين">الاختبارات أونلاين</button>
-      <button data-view="explainer-videos" data-title="فيديو الشرح">فيديو الشرح</button>
-      <button data-view="materials" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
-      <button data-view="payments" data-title="دفع الكورسات">دفع الكورسات</button>
-      <button data-view="subscription" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
-      <button data-view="profile" data-title="حسابي">حسابي</button>
+      <button class="active" data-view="overview" data-title="لوحة الطالب">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
+        <span>الرئيسية</span>
+      </button>
+      <button data-view="my-courses" data-title="كورساتي">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19"/></svg>
+        <span>كورساتي</span>
+      </button>
+      <button data-view="quizzes" data-title="الاختبارات أونلاين">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/><path d="M8 17l1.5 1.5L13 15"/></svg>
+        <span>الاختبارات أونلاين</span>
+      </button>
+      <button data-view="explainer-videos" data-title="فيديو الشرح">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9l6 3-6 3z" fill="currentColor" stroke="none"/></svg>
+        <span>فيديو الشرح</span>
+      </button>
+      <button data-view="materials" data-title="الشيتات والسبورة والمذكرات">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 13h5M9.5 16.5h5"/></svg>
+        <span>الشيتات والسبورة والمذكرات</span>
+      </button>
+      <button data-view="payments" data-title="دفع الكورسات">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><path d="M6.5 15h4"/></svg>
+        <span>دفع الكورسات</span>
+      </button>
+      <button data-view="subscription" data-title="الاشتراك الشهري">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>
+        <span>الاشتراك الشهري</span>
+      </button>
+      <button data-view="profile" data-title="حسابي">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
+        <span>حسابي</span>
+      </button>
     </nav>
     <div class="sidebar-footer">
-      <button class="button button-text" data-logout>تسجيل الخروج</button>
+      <button class="logout-btn" data-logout>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/></svg>
+        <span>تسجيل الخروج</span>
+      </button>
     </div>
   </aside>
 
   <main class="portal-main">
     <header class="portal-header">
       <div class="header-start">
-        <button class="icon-button menu-toggle" data-menu-toggle aria-label="فتح القائمة">☰</button>
-        <div><span class="breadcrumb">حساب الطالب</span><h1 data-page-title>لوحة الطالب</h1></div>
+        <button class="icon-button menu-toggle" data-menu-toggle aria-label="فتح القائمة">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <span class="breadcrumb">حساب الطالب</span>
+          <h1 data-page-title>لوحة الطالب</h1>
+          <p class="header-sub">تابع دراستك وتقدمك من مكان واحد</p>
+        </div>
       </div>
-      <div class="header-actions"><button class="icon-button" aria-label="الإشعارات">◌</button><a class="button button-secondary" href="courses.html">تصفح الكورسات</a></div>
+      <div class="header-actions">
+        <a class="button button-secondary browse-btn" href="courses.html">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          تصفح الكورسات
+        </a>
+        <div class="notif-wrap">
+          <button class="icon-button" data-notif-toggle aria-label="الإشعارات">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z"/><path d="M10 18.5a2 2 0 0 0 4 0"/></svg>
+          </button>
+          <div class="notif-dropdown" data-notif-dropdown>
+            <div class="notif-head">الإشعارات</div>
+            <div class="notif-empty">لا توجد إشعارات جديدة حاليًا.</div>
+          </div>
+        </div>
+        <button class="header-user" data-view="profile" data-title="حسابي">
+          <span class="header-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
+          </span>
+          <span class="header-username" data-user-name>—</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
     </header>
 
     <div class="portal-content">
       <!-- نظرة عامة -->
       <section class="view active" id="overview">
-        <div class="welcome"><div><h2>أهلًا يا <span data-user-name></span> 👋</h2><p>هذه نظرة سريعة على دراستك اليوم.</p></div>
-          <a class="button button-primary" href="courses.html">استكشف كورسًا جديدًا</a></div>
-        <div class="stat-grid">
-          <article class="portal-stat"><span>الكورسات الحالية</span><b data-course-count>—</b></article>
-          <article class="portal-stat"><span>اختبارات وشيتات</span><b>حسب مرحلتك</b></article>
+        <div class="welcome-card" data-reveal>
+          <div class="welcome-decor" aria-hidden="true"></div>
+          <div class="welcome-text">
+            <span class="welcome-eyebrow">مرحبًا بعودتك</span>
+            <h2>أهلًا يا <span data-user-name>—</span> 👋</h2>
+            <p>هذه نظرة سريعة على دراستك اليوم.</p>
+            <a class="button button-primary" href="courses.html">استكشف كورسات جديدة</a>
+          </div>
+          <div class="welcome-illustration" aria-hidden="true">
+            <svg viewBox="0 0 100 90" width="130" height="118">
+              <path d="M50 12 94 30 50 48 6 30Z" fill="#fff" opacity=".95"/>
+              <path d="M24 37v17c0 8.5 11.5 15.5 26 15.5s26-7 26-15.5V37" fill="none" stroke="#fff" stroke-width="3" opacity=".85"/>
+              <path d="M94 30v21" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+              <circle cx="94" cy="55" r="3" fill="#fff" opacity=".85"/>
+            </svg>
+          </div>
         </div>
+
+        <div class="stat-grid premium-stats" data-reveal>
+          <article class="portal-stat stat-card">
+            <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19"/></svg></span>
+            <div class="stat-info"><span>الكورسات الحالية</span><b data-course-count>—</b><small>كورس مفعّل في حسابك</small></div>
+          </article>
+          <article class="portal-stat stat-card">
+            <span class="stat-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/><path d="M8 17l1.5 1.5L13 15"/></svg></span>
+            <div class="stat-info"><span>الاختبارات المتاحة</span><b data-stat-quizzes>—</b><small>حسب مرحلتك ومدرسك</small></div>
+          </article>
+          <article class="portal-stat stat-card">
+            <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 13h5M9.5 16.5h5"/></svg></span>
+            <div class="stat-info"><span>الشيتات والمذكرات</span><b data-stat-materials>—</b><small>متاحة عند مدرسك</small></div>
+          </article>
+          <article class="portal-stat stat-card">
+            <span class="stat-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg></span>
+            <div class="stat-info"><span>الاشتراك الشهري</span><b data-stat-subscription>—</b><small data-stat-subscription-sub>—</small></div>
+          </article>
+        </div>
+
         <div class="content-grid">
-          <section class="panel"><div class="panel-head"><h3>تابع من حيث توقفت</h3><button class="button button-text" data-view="my-courses" data-title="كورساتي">عرض الكورسات</button></div>
-            <div class="course-grid portal-courses" data-student-courses></div></section>
-          <aside class="panel"><div class="panel-head"><h3>الاشتراك الشهري</h3><button class="button button-text" data-view="subscription" data-title="الاشتراك الشهري">التفاصيل</button></div>
-            <p class="course-meta">الاشتراك الشهري عند مدرسك يفتح لك الاختبارات والشيتات والسبورة والمذكرات — وهو منفصل عن دفع الكورسات.</p></aside>
+          <section class="panel" data-reveal>
+            <div class="panel-head"><h3>تابع من حيث توقفت</h3><button class="button button-text" data-view="my-courses" data-title="كورساتي">عرض كل الكورسات</button></div>
+            <div class="course-grid portal-courses continue-learning" data-student-courses></div>
+          </section>
+          <aside class="side-stack" data-reveal>
+            <div class="panel subscription-mini">
+              <div class="panel-head"><h3>الاشتراك الشهري</h3><button class="button button-text" data-view="subscription" data-title="الاشتراك الشهري">التفاصيل</button></div>
+              <p class="course-meta">الاشتراك الشهري عند مدرسك يفتح لك الاختبارات والشيتات والسبورة والمذكرات — وهو منفصل عن دفع الكورسات.</p>
+              <div class="subscription-mini-status">
+                <span class="status-badge" data-stat-subscription-badge>—</span>
+                <span data-stat-subscription-sub-2>—</span>
+              </div>
+            </div>
+            <div class="panel activity-panel">
+              <div class="panel-head"><h3>آخر نشاط</h3></div>
+              <div data-activity-list><p class="loading">جاري التحميل…</p></div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -98,8 +201,11 @@
       <!-- حسابي -->
       <section class="view" id="profile">
         <div class="section-title"><div><h2>حسابي</h2><p>بيانات حسابك وإعداداتك الأساسية.</p></div></div>
-        <div class="panel" style="margin-bottom:16px">
-          <div class="list-row"><div class="list-icon">◌</div><div><strong data-user-name></strong><span>حساب طالب</span></div></div>
+        <div class="panel profile-card" style="margin-bottom:16px">
+          <div class="list-row">
+            <div class="list-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg></div>
+            <div><strong data-user-name>—</strong><span>حساب طالب</span></div>
+          </div>
           <a class="button button-secondary" href="change-password.html">تغيير كلمة المرور</a>
         </div>
         <div class="panel" data-teacher-select-wrap>
@@ -120,10 +226,22 @@
 <div class="sidebar-backdrop" data-sidebar-backdrop></div>
 
 <nav class="mobile-nav">
-  <button class="active" data-view="overview" data-title="لوحة الطالب">الرئيسية</button>
-  <button data-view="my-courses" data-title="كورساتي">كورساتي</button>
-  <button data-view="quizzes" data-title="اختبارات">اختبارات</button>
-  <button data-view="subscription" data-title="الاشتراك">الاشتراك</button>
+  <button class="active" data-view="overview" data-title="لوحة الطالب">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
+    <span>الرئيسية</span>
+  </button>
+  <button data-view="my-courses" data-title="كورساتي">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19"/></svg>
+    <span>كورساتي</span>
+  </button>
+  <button data-view="quizzes" data-title="اختبارات">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/><path d="M8 17l1.5 1.5L13 15"/></svg>
+    <span>اختبارات</span>
+  </button>
+  <button data-view="subscription" data-title="الاشتراك">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>
+    <span>الاشتراك</span>
+  </button>
 </nav>
 
 <div data-lesson-modal></div>
