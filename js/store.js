@@ -76,7 +76,6 @@ async function initCheckout() {
   const { data: course, error } = await supabase.from('courses').select('*, profiles!teacher_id(full_name)').eq('id', courseId).single();
   summaryCard?.classList.remove('is-loading');
   if (error || !course) { showStatus(genericError, 'error'); return; }
-
   courseName.textContent = course.title;
   coursePrice.textContent = money(course.price);
   if (courseSubtotal) courseSubtotal.textContent = money(course.price);
