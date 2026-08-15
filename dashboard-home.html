@@ -8,61 +8,247 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/png" href="images/logo.jpeg">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
-<body>
-<header class="site-header">
-  <nav class="container nav" aria-label="التنقل الرئيسي">
-    <a class="brand" href="dashboard-home.html">
-      <img src="images/logo.jpeg" class="brand-image" alt="شعار المأمون التعليمية">
-      <span>المأمون التعليمية</span>
-    </a>      <div class="nav-links"><a href="#about">عن المنصة</a><a href="courses.html">الكورسات</a><a href="#how">طريقة الدراسة</a><a href="#contact">تواصل معنا</a></div>
-    <div class="nav-actions"><a class="button button-secondary" href="index.html">تسجيل الدخول</a><a class="button button-primary" href="courses.html">تصفح الكورسات</a></div>
-  </nav>
-</header>
+<body class="mh">
+
+<div class="mh-nav-wrap" data-nav>
+  <div class="mh-container">
+    <nav class="mh-nav" aria-label="التنقل الرئيسي">
+      <a class="mh-brand" href="dashboard-home.html">
+        <img src="images/logo.jpeg" class="mh-brand-img" alt="شعار المأمون التعليمية">
+        <span class="mh-logo-text">المأمون التعليمية</span>
+      </a>
+      <div class="mh-nav-links">
+        <a href="#about">عن المنصة</a>
+        <a href="courses.html">الكورسات</a>
+        <a href="#how">طريقة الدراسة</a>
+        <a href="#contact">تواصل معنا</a>
+      </div>
+      <div class="mh-nav-actions">
+        <a class="mh-btn mh-btn-ghost" href="index.html">تسجيل الدخول</a>
+        <a class="mh-btn mh-btn-primary" href="courses.html">تصفح الكورسات</a>
+      </div>
+      <button class="mh-menu-toggle" type="button" aria-label="فتح القائمة" data-menu-toggle>
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <div class="mh-mobile-panel" data-mobile-panel>
+      <a href="#about">عن المنصة</a>
+      <a href="courses.html">الكورسات</a>
+      <a href="#how">طريقة الدراسة</a>
+      <a href="#contact">تواصل معنا</a>
+      <div class="mh-mobile-actions">
+        <a class="mh-btn mh-btn-ghost" href="index.html">تسجيل الدخول</a>
+        <a class="mh-btn mh-btn-primary" href="courses.html">تصفح الكورسات</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main>
-  <section class="hero">
-    <div class="container hero-grid">
-      <div>
-        <span class="eyebrow">تعليم واضح، متابعة مستمرة</span>
-        <h1>مكان واحد تذاكر فيه، تتابع تقدمك، وتوصل لهدفك.</h1>
-        <p class="lead">منصة المأمون تجمع شرح الدروس، الواجبات، الاختبارات، ومتابعة المدرس في تجربة بسيطة ومريحة للطالب وولي الأمر.</p>
-        <div class="hero-actions"><a class="button button-primary" href="courses.html">تصفح الكورسات</a><a class="button button-secondary" href="index.html">إنشاء حساب أو دخول</a></div>
-        <p class="trust-line">الدفع متاح أونلاين أو من داخل السنتر بعد تأكيد الإدارة.</p>
+  <!-- ============================== Hero ============================== -->
+  <section class="mh-hero">
+    <div class="mh-hero-bg" aria-hidden="true">
+      <svg width="520" height="520" style="top:-160px; right:-140px; opacity:.5">
+        <circle cx="260" cy="260" r="260" fill="none" stroke="#c8ddd3" stroke-width="1.5"></circle>
+      </svg>
+      <svg width="360" height="360" style="bottom:-120px; left:-90px; opacity:.6">
+        <circle cx="180" cy="180" r="180" fill="#e8f3ef"></circle>
+      </svg>
+      <svg width="220" height="220" style="top:120px; left:6%; opacity:.55">
+        <path d="M10 190 C 60 100, 140 60, 210 20" fill="none" stroke="#d9a928" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"></path>
+      </svg>
+      <svg width="140" height="140" style="top:60px; left:38%; opacity:.5">
+        <g fill="#145c4a">
+          <circle cx="8" cy="8" r="3"></circle>
+          <circle cx="30" cy="8" r="3"></circle>
+          <circle cx="52" cy="8" r="3"></circle>
+          <circle cx="8" cy="30" r="3"></circle>
+          <circle cx="30" cy="30" r="3"></circle>
+        </g>
+      </svg>
+      <svg width="90" height="90" style="bottom:90px; right:8%; opacity:.5">
+        <rect x="10" y="10" width="60" height="60" rx="16" fill="none" stroke="#0d3028" stroke-width="1.5" transform="rotate(18 40 40)"></rect>
+      </svg>
+    </div>
+
+    <div class="mh-container mh-hero-grid">
+      <div data-reveal>
+        <span class="mh-badge">تعليم واضح، متابعة مستمرة</span>
+        <h1>مكان واحد <span class="mh-em">تذاكر</span> فيه،<br>تتابع تقدمك، وتوصل <span class="mh-underline">لهدفك
+          <svg viewBox="0 0 140 12" preserveAspectRatio="none"><path d="M2 9 C 35 2, 105 2, 138 9" fill="none" stroke="#d9a928" stroke-width="3" stroke-linecap="round"></path></svg>
+        </span>.</h1>
+        <p class="mh-lead">منصة المأمون تجمع شرح الدروس، الواجبات، الاختبارات، ومتابعة المدرس في تجربة بسيطة ومريحة للطالب وولي الأمر.</p>
+        <div class="mh-hero-actions">
+          <a class="mh-btn mh-btn-primary mh-btn-lg" href="courses.html">تصفح الكورسات</a>
+          <a class="mh-btn mh-btn-ghost mh-btn-lg" href="index.html">إنشاء حساب أو دخول</a>
+        </div>
+        <p class="mh-trust">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3.5 8.5-7 11-3.5-2.5-7-6-7-11V5l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          الدفع متاح أونلاين أو من داخل السنتر بعد تأكيد الإدارة.
+        </p>
       </div>
-      <div class="teacher-photo"><img src="images/abdo.jpeg" alt="صورة المدرس" onerror="this.remove()"><div class="teacher-caption"><strong>معك خطوة بخطوة</strong><span>دروس، واجبات، واختبارات في مكان واحد</span></div></div>
+
+      <div class="mh-hero-visual" data-reveal>
+        <div class="mh-hero-card">
+          <span class="mh-play-badge"><span class="mh-play-dot">▶</span> شاهد الفيديو التعريفي</span>
+          <img src="images/abdo.jpeg" alt="صورة المدرس" onerror="this.closest('.mh-hero-card').style.background='linear-gradient(160deg,#dceae3,#c8ddd3)'; this.remove()">
+        </div>
+        <div class="mh-float-card">
+          <div class="mh-float-item"><span class="mh-float-icon">▤</span> محتوى شامل</div>
+          <div class="mh-float-item"><span class="mh-float-icon">◎</span> مدرسين متخصصين</div>
+          <div class="mh-float-item"><span class="mh-float-icon">↻</span> متابعة مستمرة</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section id="about" class="section section-soft"><div class="container"><div class="section-heading"><h2>كل ما يحتاجه الطالب للدراسة المنظمة</h2><p>نركّز على الأساسيات التي تساعد الطالب على الاستمرار والفهم، بدل ازدحام الخصائص غير الضرورية.</p></div><div class="feature-grid">
-    <article class="feature"><div class="feature-icon">▶</div><h3>دروس مرتبة</h3><p>كل كورس مقسّم إلى دروس وملفات ومراجعات يسهل الرجوع لها.</p></article>
-    <article class="feature"><div class="feature-icon">✓</div><h3>متابعة للتقدم</h3><p>يعرف الطالب ما أنجزه وما الدرس التالي دون تشتت.</p></article>
-    <article class="feature"><div class="feature-icon">◌</div><h3>دعم قريب</h3><p>تواصل واضح مع الإدارة وتأكيد للمدفوعات والاشتراكات.</p></article>
-  </div></div></section>
+  <!-- ============================== المميزات ============================== -->
+  <section id="about" class="mh-section mh-section-soft">
+    <div class="mh-container">
+      <div class="mh-section-head" data-reveal>
+        <span class="mh-eyebrow">لماذا المأمون</span>
+        <h2>كل ما يحتاجه الطالب للدراسة المنظمة</h2>
+        <p>نركّز على الأساسيات التي تساعد الطالب على الاستمرار والفهم، بدل ازدحام الخصائص غير الضرورية.</p>
+      </div>
+      <div class="mh-feature-grid">
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></div>
+          <h3>محتوى منظم</h3>
+          <p>كل المواد مرتبة حسب المادة والمرحلة.</p>
+        </article>
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-8.5 8.5H4l1.8-4.1A8.38 8.38 0 1121 11.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg></div>
+          <h3>تواصل مباشر</h3>
+          <p>تواصل سهل مع المدرس عند وجود سؤال.</p>
+        </article>
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V9m6.5 10V4M17 19v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></div>
+          <h3>متابعة الأداء</h3>
+          <p>تقارير توضح نقاط القوة ومجالات التحسين.</p>
+        </article>
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v14l-7-3-7 3V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg></div>
+          <h3>واجبات وتقييم</h3>
+          <p>حل، رفع، وتقييم من المدرس.</p>
+        </article>
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M2 12a10 10 0 1010-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+          <h3>اختبارات دورية</h3>
+          <p>اختبر نفسك وتابع تقدمك أولًا بأول.</p>
+        </article>
+        <article class="mh-feature" data-reveal>
+          <div class="mh-feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle><path d="M10 9l5 3-5 3V9z" fill="currentColor"></path></svg></div>
+          <h3>شرح مبسط</h3>
+          <p>دروس تفاعلية بأسلوب بسيط وسهل الفهم.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
-  <section class="section"><div class="container"><div class="section-heading"><h2>الكورسات المتاحة</h2><p>تظهر الكورسات المنشورة من لوحة الإدارة هنا تلقائيًا.</p></div><div class="course-grid" data-course-list></div><div style="margin-top:22px"><a class="button button-secondary" href="courses.html">عرض كل الكورسات</a></div></div></section>
+  <!-- ============================== الكورسات ============================== -->
+  <section class="mh-section">
+    <div class="mh-container">
+      <div class="mh-courses-head" data-reveal>
+        <div class="mh-eyebrow-block">
+          <span class="mh-eyebrow">تصفح المكتبة</span>
+          <h2>الكورسات المتاحة</h2>
+          <p>تظهر الكورسات المنشورة من لوحة الإدارة هنا تلقائيًا.</p>
+        </div>
+      </div>
+      <div class="mh-course-grid course-grid" data-course-list data-reveal></div>
+      <div class="mh-more-row">
+        <a class="mh-btn mh-btn-ghost mh-btn-lg" href="courses.html">عرض كل الكورسات</a>
+      </div>
+    </div>
+  </section>
 
-  <section class="section section-soft"><div class="container"><div class="stats"><div class="stat"><b>دروس</b><span>فيديو وملفات منظمة</span></div><div class="stat"><b>اختبارات</b><span>لقياس الفهم</span></div><div class="stat"><b>متابعة</b><span>للتقدم والاشتراكات</span></div><div class="stat"><b>دعم</b><span>من داخل المنصة والسنتر</span></div></div></div></section>
+  <!-- ============================== إحصائيات ============================== -->
+  <section class="mh-section mh-section-soft">
+    <div class="mh-container">
+      <div class="mh-stats" data-reveal>
+        <div class="mh-stat"><b>دروس</b><span>فيديو وملفات منظمة</span></div>
+        <div class="mh-stat"><b>اختبارات</b><span>لقياس الفهم</span></div>
+        <div class="mh-stat"><b>متابعة</b><span>للتقدم والاشتراكات</span></div>
+        <div class="mh-stat"><b>دعم</b><span>من داخل المنصة والسنتر</span></div>
+      </div>
+    </div>
+  </section>
 
-  <section id="how" class="section"><div class="container"><div class="section-heading"><h2>ابدأ في ثلاث خطوات</h2><p>خطوات بسيطة وواضحة من اختيار الكورس إلى متابعة الدروس.</p></div><div class="steps"><article class="step"><h3>اختر الكورس</h3><p>تصفح الكورسات المناسبة للصف والمادة، ثم راجع التفاصيل والسعر.</p></article><article class="step"><h3>اختر طريقة الدفع</h3><p>يمكنك الدفع أونلاين عند تفعيل البوابة، أو تقديم طلب دفع نقدي أو محفظة أو تحويل بنكي.</p></article><article class="step"><h3>ابدأ الدراسة</h3><p>بعد التفعيل، تجد الكورس في حسابك مع الدروس والواجبات والاختبارات.</p></article></div></div></section>
+  <!-- ============================== خطوات البدء ============================== -->
+  <section id="how" class="mh-section">
+    <div class="mh-container">
+      <div class="mh-section-head" data-reveal>
+        <span class="mh-eyebrow">طريقة الدراسة</span>
+        <h2>ابدأ في ثلاث خطوات</h2>
+        <p>خطوات بسيطة وواضحة من اختيار الكورس إلى متابعة الدروس.</p>
+      </div>
+      <div class="mh-steps">
+        <article class="mh-step" data-reveal><span class="mh-step-num">١</span><h3>اختر الكورس</h3><p>تصفح الكورسات المناسبة للصف والمادة، ثم راجع التفاصيل والسعر.</p></article>
+        <article class="mh-step" data-reveal><span class="mh-step-num">٢</span><h3>اختر طريقة الدفع</h3><p>يمكنك الدفع أونلاين عند تفعيل البوابة، أو تقديم طلب دفع نقدي أو محفظة أو تحويل بنكي.</p></article>
+        <article class="mh-step" data-reveal><span class="mh-step-num">٣</span><h3>ابدأ الدراسة</h3><p>بعد التفعيل، تجد الكورس في حسابك مع الدروس والواجبات والاختبارات.</p></article>
+      </div>
+    </div>
+  </section>
 
-  <section id="contact" class="section section-soft">
-    <div class="container">
-      <div class="section-heading">
+  <!-- ============================== تواصل ============================== -->
+  <section id="contact" class="mh-section">
+    <div class="mh-container">
+      <div class="mh-contact-card" data-reveal>
         <h2>تواصل مع مدرسك</h2>
         <p>لأي استفسار عن الكورسات أو الاشتراك الشهري أو أي مشكلة تقنية، تقدر تتواصل معانا مباشرة من أي وسيلة من دول.</p>
-      </div>
-      <div class="contact-links">
-        <a class="button button-primary" href="https://wa.me/201225857167" target="_blank" rel="noopener">💬 واتساب</a>
-        <a class="button button-secondary" href="https://www.facebook.com/share/19MdaMpVLk/" target="_blank" rel="noopener">📘 فيسبوك</a>
-        <a class="button button-secondary" href="https://youtube.com/@mr-mamoun-1" target="_blank" rel="noopener">▶ يوتيوب</a>
-        <a class="button button-secondary" href="https://t.me/abdelrhman253" target="_blank" rel="noopener">✈ تليجرام</a>
+        <div class="mh-contact-links">
+          <a class="mh-btn mh-btn-primary" href="https://wa.me/201225857167" target="_blank" rel="noopener">💬 واتساب</a>
+          <a class="mh-btn" href="https://www.facebook.com/share/19MdaMpVLk/" target="_blank" rel="noopener">📘 فيسبوك</a>
+          <a class="mh-btn" href="https://youtube.com/@mr-mamoun-1" target="_blank" rel="noopener">▶ يوتيوب</a>
+          <a class="mh-btn" href="https://t.me/abdelrhman253" target="_blank" rel="noopener">✈ تليجرام</a>
+        </div>
       </div>
     </div>
   </section>
 </main>
-<footer class="footer"><div class="container footer-row"><span class="brand"><span class="brand-mark">م</span>المأمون التعليمية</span><a href="https://wa.me/201009712501" target="_blank" rel="noopener" class="button button-secondary" style="width:auto;display:inline-flex;gap:8px;padding:8px 16px">💬Programmer/Engineer Mohamed Hesham Mohamed. Click to contact us.</a></div></footer>  <script type="module" src="js/store.js"></script>
+
+<footer class="mh-footer">
+  <div class="mh-container mh-footer-row">
+    <span class="mh-footer-brand"><span class="mh-brand-mark">م</span>المأمون التعليمية</span>
+    <a href="https://wa.me/201009712501" target="_blank" rel="noopener" class="mh-footer-credit">💬 Programmer/Engineer Mohamed Hesham Mohamed. Click to contact us.</a>
+  </div>
+</footer>
+
+<script type="module" src="js/store.js"></script>
+<script>
+  (function () {
+    var navWrap = document.querySelector('[data-nav]');
+    var toggle = document.querySelector('[data-menu-toggle]');
+
+    window.addEventListener('scroll', function () {
+      navWrap.classList.toggle('is-scrolled', window.scrollY > 8);
+    }, { passive: true });
+
+    toggle.addEventListener('click', function () {
+      navWrap.classList.toggle('is-open');
+    });
+    document.querySelectorAll('[data-mobile-panel] a').forEach(function (link) {
+      link.addEventListener('click', function () { navWrap.classList.remove('is-open'); });
+    });
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+    } else {
+      document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('is-visible'); });
+    }
+  })();
+</script>
 </body>
 </html>
