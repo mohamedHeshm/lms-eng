@@ -32,21 +32,7 @@
         <div class="hero-actions"><a class="button button-primary" href="courses.html">تصفح الكورسات</a><a class="button button-secondary" href="index.html">إنشاء حساب أو دخول</a></div>
         <p class="trust-line">الدفع متاح أونلاين أو من داخل السنتر بعد تأكيد الإدارة.</p>
       </div>
-      <div class="teacher-photo" data-hero-media>
-        <img src="images/abdo.jpeg" alt="صورة توضيحية لمنصة المأمون التعليمية" onerror="this.remove()">
-        <video
-                data-hero-video
-                src="videos/WhatsApp Video 2026-08-15 at 2.38.17 PM.mp4"
-                poster="images/abdo.jpeg"
-                autoplay
-                muted
-                loop
-                playsinline
-                preload="metadata"
-                aria-hidden="true"
-        ></video>
-        <div class="teacher-caption"><strong>معك خطوة بخطوة</strong><span>دروس، واجبات، واختبارات في مكان واحد</span></div>
-      </div>
+      <div class="teacher-photo"><img src="images/abdo.jpeg" alt="صورة المدرس" onerror="this.remove()"><div class="teacher-caption"><strong>معك خطوة بخطوة</strong><span>دروس، واجبات، واختبارات في مكان واحد</span></div></div>
     </div>
   </section>
 
@@ -77,20 +63,6 @@
     </div>
   </section>
 </main>
-<footer class="footer"><div class="container footer-row"><span class="brand"><span class="brand-mark">م</span>المأمون التعليمية</span><a href="https://wa.me/201009712501" target="_blank" rel="noopener" class="button button-secondary" style="width:auto;display:inline-flex;gap:8px;padding:8px 16px">💬Programmer/Engineer Mohamed Hesham Mohamed. Click to contact us.</a></div></footer>  <script>
-  // فيديو الـHero: تعامل هادئ مع فشل التحميل واحترام تفضيل تقليل الحركة
-  (function () {
-    var video = document.querySelector('[data-hero-video]');
-    if (!video) return;
-    // لو المتصفح فشل في تحميل/تشغيل الفيديو، نخفيه ونسيب الصورة الثابتة خلفه بدل ما التصميم ينهار
-    video.addEventListener('error', function () { video.style.display = 'none'; });
-    // احترام تفضيل المستخدم بتقليل الحركة: نوقف التشغيل التلقائي ونكتفي بالـposter
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      video.removeAttribute('autoplay');
-      video.pause();
-    }
-  })();
-</script>
-<script type="module" src="js/store.js"></script>
+<footer class="footer"><div class="container footer-row"><span class="brand"><span class="brand-mark">م</span>المأمون التعليمية</span><a href="https://wa.me/201009712501" target="_blank" rel="noopener" class="button button-secondary" style="width:auto;display:inline-flex;gap:8px;padding:8px 16px">💬Programmer/Engineer Mohamed Hesham Mohamed. Click to contact us.</a></div></footer>  <script type="module" src="js/store.js"></script>
 </body>
 </html>
