@@ -116,7 +116,7 @@ async function initCheckout() {
     const method = form.querySelector('input[name="method"]:checked')?.value;
     const isWallet = method === 'wallet';
     referenceInput.required = isWallet;
-    if (referenceLabel) referenceLabel.firstChild.textContent = isWallet ?  'رقم العملية (اختياري)';
+    if (referenceLabel) referenceLabel.firstChild.textContent = isWallet ? 'رقم العملية اللي حوّلت بيه (إجباري)' : 'رقم العملية أو مرجع الدفع (اختياري)';
     if (walletPanel) walletPanel.hidden = !isWallet;
     if (!isWallet) { senderPhoneInput.required = false; senderPhoneInput.value = ''; clearSenderPhoneError(); }
     else { senderPhoneInput.required = true; }
