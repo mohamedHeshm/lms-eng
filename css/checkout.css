@@ -1,0 +1,134 @@
+/* ============================================================================
+   المأمون التعليمية — Checkout Page (Premium)
+   طبقة تصميم فوق design-system.css، محصورة بالكامل داخل body.checkout-page
+   حتى لا تتعارض مع أي صفحة أخرى تستخدم design-system.css (courses.html،
+   البوابات...). لا تعديل على أي منطق أو استعلامات Supabase — تصميم بصري
+   وتفاعلات واجهة فقط.
+   ============================================================================ */
+
+body.checkout-page {
+  --co-primary: #145c4a;
+  --co-primary-dark: #0d3028;
+  --co-light: #e8f3ef;
+  --co-bg: #f7f9f8;
+  --co-text: #10221d;
+  --co-muted: #66736f;
+  --co-gold: #d9a928;
+  --co-border: #e1e9e4;
+  --co-shadow-sm: 0 2px 10px rgba(13, 48, 40, .05);
+  --co-shadow: 0 18px 44px rgba(13, 48, 40, .1);
+  background: var(--co-bg);
+  font-family: "IBM Plex Sans Arabic", "Cairo", sans-serif;
+}
+
+body.checkout-page h1, body.checkout-page h2, body.checkout-page h3 { font-family: "Cairo", sans-serif; }
+
+/* ---------------- Navbar ---------------- */
+body.checkout-page .site-header { transition: box-shadow .2s ease; }
+body.checkout-page .site-header.is-scrolled { box-shadow: var(--co-shadow-sm); }
+body.checkout-page .nav-actions .button-secondary { display: inline-flex; align-items: center; gap: 8px; }
+
+/* ---------------- Breadcrumb + intro ---------------- */
+body.checkout-page .co-breadcrumb { display: flex; align-items: center; gap: 8px; padding-top: 26px; color: var(--co-muted); font-size: .82rem; }
+body.checkout-page .co-breadcrumb a { color: var(--co-muted); transition: color .15s ease; }
+body.checkout-page .co-breadcrumb a:hover { color: var(--co-primary); }
+body.checkout-page .co-breadcrumb .is-current { color: var(--co-primary-dark); font-weight: 700; }
+body.checkout-page .co-intro { padding: 14px 0 30px; animation: co-fade-up .5s ease both; }
+body.checkout-page .co-intro .eyebrow { margin-bottom: 12px; }
+body.checkout-page .co-intro h1 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); margin: 0 0 8px; letter-spacing: -.02em; }
+body.checkout-page .co-intro p { color: var(--co-muted); max-width: 560px; margin: 0; }
+
+/* ---------------- Layout ---------------- */
+body.checkout-page .co-layout { grid-template-columns: minmax(0, 1.55fr) minmax(300px, .95fr); align-items: start; gap: 22px; padding-bottom: 70px; }
+body.checkout-page .co-form-col { display: grid; gap: 18px; min-width: 0; }
+body.checkout-page .co-card { padding: 26px; border-radius: 22px; box-shadow: var(--co-shadow-sm); border: 1px solid var(--co-border); animation: co-fade-up .55s ease both; }
+body.checkout-page .co-card h2 { font-size: 1.15rem; margin: 0 0 16px; }
+@keyframes co-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { body.checkout-page .co-intro, body.checkout-page .co-card { animation: none; } }
+
+/* ---------------- Alert ---------------- */
+body.checkout-page .co-alert { display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; margin-bottom: 22px; border-radius: 14px; background: #fdf6e6; border: 1px solid #f0dba8; color: #6f531f; font-size: .85rem; line-height: 1.7; }
+body.checkout-page .co-alert svg { flex: none; margin-top: 2px; color: var(--co-gold); }
+
+/* ---------------- Payment method cards ---------------- */
+body.checkout-page .co-methods { display: grid; gap: 12px; margin-bottom: 4px; }
+body.checkout-page .co-method-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 16px; border: 1.5px solid var(--co-border); cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .15s ease; }
+body.checkout-page .co-method-card:hover { transform: translateY(-1px); border-color: #b9d3c8; }
+body.checkout-page .co-method-card:has(input:checked) { border-color: var(--co-primary); background: var(--co-light); }
+body.checkout-page .co-method-card::before { display: none; }
+body.checkout-page .co-method-icon { flex: none; width: 42px; height: 42px; border-radius: 12px; background: #fff; display: grid; place-items: center; font-size: 1.25rem; box-shadow: var(--co-shadow-sm); }
+body.checkout-page .co-method-body { display: grid; gap: 3px; flex: 1; padding: 0; }
+body.checkout-page .co-method-body strong { font-size: .93rem; color: var(--co-text); }
+body.checkout-page .co-method-body span { color: var(--co-muted); font-size: .8rem; }
+body.checkout-page .co-method-check { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--co-border); display: grid; place-items: center; color: transparent; background: #fff; transition: all .18s ease; }
+body.checkout-page .co-method-card:has(input:checked) .co-method-check { background: var(--co-primary); border-color: var(--co-primary); color: #fff; }
+
+/* ---------------- Wallet panel ---------------- */
+body.checkout-page .co-wallet-panel { margin-top: 16px; padding: 18px; border-radius: 16px; background: #fbfcfb; border: 1px dashed var(--co-border); animation: co-fade-up .3s ease both; }
+body.checkout-page .co-wallet-head strong { font-size: .9rem; }
+body.checkout-page .co-wallet-number-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; padding: 12px 14px; background: #fff; border: 1px solid var(--co-border); border-radius: 12px; }
+body.checkout-page .co-wallet-label { display: block; color: var(--co-muted); font-size: .74rem; margin-bottom: 3px; }
+body.checkout-page .co-wallet-number { display: block; font-weight: 800; font-size: 1.05rem; color: var(--co-primary-dark); letter-spacing: .02em; direction: ltr; text-align: right; }
+body.checkout-page .co-copy-btn { min-height: 38px; padding: 8px 14px; font-size: .8rem; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+body.checkout-page .co-copy-btn.is-copied { background: var(--co-light); color: var(--co-primary); border-color: var(--co-primary); }
+body.checkout-page .co-wallet-hint { margin: 0 0 4px; color: var(--co-muted); font-size: .82rem; line-height: 1.7; }
+
+body.checkout-page .co-sender-field { margin-top: 14px; }
+body.checkout-page .co-field-desc { font-weight: 400; color: var(--co-muted); font-size: .76rem; margin-top: 2px; }
+body.checkout-page .co-field-error { display: block; font-weight: 700; color: var(--error, #b8413e); font-size: .78rem; margin-top: 4px; }
+body.checkout-page .co-sender-field.has-error input { border-color: var(--error, #b8413e); background: #fef7f6; }
+
+/* ---------------- Submit button ---------------- */
+body.checkout-page .co-submit-btn { width: 100%; min-height: 52px; font-size: .96rem; margin-top: 20px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+body.checkout-page .co-submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(20,92,74,.28); }
+body.checkout-page .co-submit-btn:disabled { opacity: .8; cursor: not-allowed; }
+body.checkout-page .co-submit-btn[data-arrow-hidden] [data-submit-arrow] { display: none; }
+body.checkout-page .co-submit-btn .co-spinner { width: 17px; height: 17px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; animation: co-spin .7s linear infinite; }
+@keyframes co-spin { to { transform: rotate(360deg); } }
+
+body.checkout-page .co-trust { display: grid; gap: 6px; margin-top: 16px; color: var(--co-muted); font-size: .78rem; }
+
+/* ---------------- Result state (success / error) ---------------- */
+body.checkout-page .co-result { text-align: center; padding: 42px 30px; }
+body.checkout-page .co-result-icon { width: 62px; height: 62px; margin: 0 auto 16px; border-radius: 50%; display: grid; place-items: center; font-size: 1.7rem; animation: co-pop .4s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes co-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+body.checkout-page .co-result.is-success .co-result-icon { background: #eaf6ee; color: #145735; }
+body.checkout-page .co-result.is-error .co-result-icon { background: #fcefed; color: #8f2f2b; }
+body.checkout-page .co-result h3 { margin: 0 0 8px; font-size: 1.25rem; }
+body.checkout-page .co-result p { color: var(--co-muted); margin: 0 auto 18px; max-width: 420px; }
+body.checkout-page .co-result-meta { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; background: var(--co-light); color: var(--co-primary-dark); font-size: .85rem; font-weight: 700; margin-bottom: 22px; }
+body.checkout-page .co-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+/* ---------------- Order summary ---------------- */
+body.checkout-page .co-summary { position: sticky; top: 20px; padding: 24px; }
+body.checkout-page .co-summary-course { display: flex; align-items: center; gap: 14px; margin: 10px 0 0; }
+body.checkout-page .co-summary-cover { flex: none; width: 74px; height: 74px; border-radius: 14px; overflow: hidden; background: var(--co-light); display: grid; place-items: center; color: var(--co-primary); font-size: 1.4rem; }
+body.checkout-page .co-summary-cover img { width: 100%; height: 100%; object-fit: cover; }
+body.checkout-page .co-summary-course h2 { font-size: 1.05rem; margin: 0 0 3px; }
+body.checkout-page .co-summary-course .course-meta { margin: 0; }
+body.checkout-page .co-summary-divider { height: 1px; background: var(--co-border); margin: 18px 0; }
+body.checkout-page .co-summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: .88rem; color: var(--co-muted); }
+body.checkout-page .co-summary-total { margin-top: 6px; padding-top: 12px; border-top: 1px dashed var(--co-border); font-size: 1.05rem; font-weight: 800; color: var(--co-text); }
+body.checkout-page .co-summary-total span:last-child { color: var(--co-primary); font-size: 1.25rem; }
+body.checkout-page .co-status-badge { display: block; width: fit-content; margin: 16px 0; }
+body.checkout-page .co-safety-note { display: flex; gap: 10px; padding: 14px; border-radius: 14px; background: var(--co-light); color: var(--co-primary-dark); }
+body.checkout-page .co-safety-note svg { flex: none; color: var(--co-primary); }
+body.checkout-page .co-safety-note p { margin: 0; font-size: .78rem; line-height: 1.7; }
+
+/* ---------------- Skeleton loading ---------------- */
+body.checkout-page .is-loading [data-checkout-course],
+body.checkout-page .is-loading [data-checkout-teacher] { color: transparent; background: linear-gradient(90deg, #eef2ef 25%, #e3ece7 37%, #eef2ef 63%); background-size: 400% 100%; border-radius: 6px; animation: co-shimmer 1.3s ease infinite; }
+@keyframes co-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 900px) {
+  body.checkout-page .co-layout { grid-template-columns: 1fr; }
+  body.checkout-page .co-summary { position: static; }
+}
+@media (max-width: 600px) {
+  body.checkout-page .co-card { padding: 20px; border-radius: 18px; }
+  body.checkout-page .co-method-card { padding: 13px 14px; }
+  body.checkout-page .co-wallet-number-row { flex-direction: column; align-items: stretch; }
+  body.checkout-page .co-copy-btn { width: 100%; justify-content: center; }
+  body.checkout-page .co-result { padding: 30px 18px; }
+}

@@ -1,7 +1,160 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>إتمام الاشتراك | المأمون التعليمية</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/design-system.css"></head>
-<body><header class="site-header"><nav class="container nav"> <a class="brand" href="dashboard-home.html">
-    <img src="images/logo.jpeg" class="brand-image" alt="شعار المأمون التعليمية">
-    <span>المأمون التعليمية</span>
-</a>  <div class="nav-actions"><a class="button button-secondary" href="courses.html">رجوع للكورسات</a></div></nav></header><main class="container"><section class="page-intro"><span class="eyebrow">إتمام الاشتراك</span><h1>اختر طريقة الدفع المناسبة</h1><p>لن يتم تفعيل الكورس إلا بعد مراجعة الدفع من الإدارة.</p></section><section class="checkout-layout"><form class="checkout-card" data-checkout-form><h2>طلب دفع جديد</h2><p class="notice">للدفع داخل السنتر، اختر «نقدي» ثم توجّه للإدارة باسم الحساب المسجل. للتحويل أو المحفظة، أضف رقم العملية بعد الدفع.</p><div class="payment-methods"><label class="payment-method"><input type="radio" name="method" value="cash" checked><strong>دفع نقدي داخل السنتر</strong><span>يُراجع الطلب عند الحضور للإدارة.</span></label><label class="payment-method"><input type="radio" name="method" value="wallet"><strong>محفظة إلكترونية</strong><span>أدخل رقم العملية بعد التحويل.</span></label><label class="payment-method"><input type="radio" name="method" value="bank_transfer"><span>يُفعّل بعد ربط مزود الدفع والتحقق من الـ webhook.</span></label></div><label class="field" style="margin-top:16px" data-reference-label>رقم العملية أو مرجع الدفع (اختياري)<input name="reference_number" maxlength="100" placeholder="مثال: 123456"></label><label class="field">ملاحظة للإدارة (اختياري)<textarea name="notes" rows="3" placeholder="أي تفاصيل تساعد على مراجعة الطلب"></textarea></label><button class="button button-primary" type="submit">إرسال طلب الدفع</button><div data-payment-status class="status-message" role="status"></div></form><aside class="checkout-card"><p class="course-meta">الكورس المختار</p><h2 data-checkout-course>جارٍ التحميل…</h2><div class="course-footer"><span>إجمالي الاشتراك</span><span class="price" data-checkout-price>—</span></div><p class="course-meta" style="margin-top:16px">يظهر طلبك في لوحة الإدارة بحالة «قيد المراجعة». عند القبول، ينشأ الاشتراك وتصل لك إشعارات التفعيل.</p></aside></section></main><script type="module" src="js/store.js"></script></body></html>
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+    <title>إتمام الاشتراك | المأمون التعليمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body class="checkout-page">
+
+<header class="site-header" data-checkout-navbar>
+    <nav class="container nav">
+        <a class="brand" href="dashboard-home.html">
+            <img src="images/logo.jpeg" class="brand-image" alt="شعار المأمون التعليمية">
+            <span>المأمون التعليمية</span>
+        </a>
+        <div class="nav-actions">
+            <a class="button button-secondary" href="courses.html">
+                <span>العودة للكورسات</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<main class="container checkout-main">
+
+    <nav class="co-breadcrumb" aria-label="مسار الصفحة">
+        <a href="dashboard-home.html">الرئيسية</a>
+        <span>←</span>
+        <a href="courses.html">الكورسات</a>
+        <span>←</span>
+        <span class="is-current">الدفع</span>
+    </nav>
+
+    <section class="page-intro co-intro">
+        <span class="eyebrow">إتمام الاشتراك</span>
+        <h1>اختر طريقة الدفع المناسبة</h1>
+        <p>أكمل بيانات الدفع، وسيتم تفعيل الكورس بعد مراجعة الإدارة.</p>
+    </section>
+
+    <section class="checkout-layout co-layout">
+
+        <div class="co-form-col">
+            <div class="checkout-card co-card" data-checkout-form-wrap>
+                <h2>طلب دفع جديد</h2>
+                <div class="co-alert">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><circle cx="12" cy="16.2" r=".4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg>
+                    <span>اختر طريقة الدفع، ثم أدخل بيانات العملية. سيتم تفعيل الكورس بعد مراجعة الإدارة.</span>
+                </div>
+
+                <form data-checkout-form novalidate>
+                    <div class="co-methods">
+                        <label class="payment-method co-method-card">
+                            <input type="radio" name="method" value="cash" checked>
+                            <span class="co-method-icon">💵</span>
+                            <span class="co-method-body"><strong>الدفع نقدي داخل السنتر</strong><span>راجع الطلب عند الحضور إلى الإدارة لتأكيد الدفع.</span></span>
+                            <span class="co-method-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+                        </label>
+                        <label class="payment-method co-method-card">
+                            <input type="radio" name="method" value="wallet">
+                            <span class="co-method-icon">💳</span>
+                            <span class="co-method-body"><strong>محفظة إلكترونية</strong><span>قم بالتحويل إلى رقم المحفظة ثم أدخل بيانات العملية.</span></span>
+                            <span class="co-method-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+                        </label>
+                    </div>
+
+                    <div class="co-wallet-panel" data-wallet-panel hidden>
+                        <div class="co-wallet-head">
+                            <strong>بيانات التحويل</strong>
+                        </div>
+                        <div class="co-wallet-number-row">
+                            <div>
+                                <span class="co-wallet-label">رقم المحفظة</span>
+                                <span class="co-wallet-number" data-wallet-number>—</span>
+                            </div>
+                            <button type="button" class="button button-secondary co-copy-btn" data-copy-wallet>
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+                                <span data-copy-wallet-label>نسخ الرقم</span>
+                            </button>
+                        </div>
+                        <p class="co-wallet-hint" data-wallet-hint>قم بالتحويل أولًا إلى الرقم الموضح أعلاه، ثم أدخل رقم الهاتف الذي تم التحويل منه.</p>
+
+                        <label class="field co-sender-field" data-sender-phone-wrap>
+                            رقم الهاتف المحول منه *
+                            <input type="tel" name="sender_phone" inputmode="numeric" maxlength="11" placeholder="مثال: 01012345678" autocomplete="off">
+                            <span class="co-field-desc">اكتب رقم الهاتف الذي تم تحويل المبلغ منه.</span>
+                            <span class="co-field-error" data-sender-phone-error hidden>يرجى إدخال رقم هاتف مصري صحيح مكون من 11 رقمًا.</span>
+                        </label>
+                    </div>
+
+                    <label class="field co-reference-field" style="margin-top:16px" data-reference-label>
+                        رقم العملية أو مرجع الدفع (اختياري)
+                        <input name="reference_number" maxlength="100" placeholder="مثال: 123456">
+                        <span class="co-field-desc">يساعد رقم العملية الإدارة في التحقق من الدفع.</span>
+                    </label>
+
+                    <label class="field">ملاحظة للإدارة (اختياري)
+                        <textarea name="notes" rows="3" placeholder="اكتب أي تفاصيل تساعد الإدارة على مراجعة طلبك..."></textarea>
+                    </label>
+
+                    <button class="button button-primary co-submit-btn" type="submit" data-submit-btn>
+                        <span data-submit-label>إرسال طلب الدفع</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-submit-arrow><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+                    </button>
+
+                    <div class="co-trust">
+                        <span>🔒 بياناتك محفوظة بأمان</span>
+                        <span>✓ يتم مراجعة طلب الدفع من الإدارة</span>
+                        <span>✓ لن يتم تفعيل الكورس إلا بعد تأكيد العملية</span>
+                    </div>
+
+                    <div data-payment-status class="status-message" role="status"></div>
+                </form>
+            </div>
+
+            <div class="checkout-card co-card co-result" data-checkout-result hidden>
+                <!-- تُملأ بواسطة JavaScript عند النجاح أو الفشل -->
+            </div>
+        </div>
+
+        <aside class="checkout-card co-card co-summary" data-checkout-summary>
+            <p class="course-meta">الكورس المختار</p>
+            <div class="co-summary-course">
+                <div class="co-summary-cover">
+                    <img data-checkout-image alt="" hidden>
+                    <span class="co-summary-cover-fallback" data-checkout-image-fallback>◒</span>
+                </div>
+                <div>
+                    <h2 data-checkout-course>جارٍ التحميل…</h2>
+                    <p class="course-meta" data-checkout-teacher></p>
+                </div>
+            </div>
+
+            <div class="co-summary-divider"></div>
+
+            <div class="co-summary-row"><span>قيمة الكورس</span><span data-checkout-subtotal>—</span></div>
+            <div class="co-summary-row"><span>الخصم</span><span>0 ج.م</span></div>
+            <div class="co-summary-row co-summary-total"><span>الإجمالي</span><span data-checkout-price>—</span></div>
+
+            <span class="status-badge pending co-status-badge">في انتظار الدفع</span>
+
+            <div class="co-safety-note">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>
+                <p>بعد إرسال الطلب، ستقوم الإدارة بمراجعته وتفعيل الكورس بعد تأكيد عملية الدفع.</p>
+            </div>
+        </aside>
+
+    </section>
+</main>
+
+<script type="module" src="js/store.js"></script>
+</body>
+</html>
