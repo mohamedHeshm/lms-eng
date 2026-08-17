@@ -48,17 +48,61 @@ async function loadCourses(target, filters = {}) {
 
   const search = (filters.search || '').trim().toLocaleLowerCase('ar');
   const withTeacherName = (courses || []).map((c) => ({ ...c, teacher_name: c.profiles?.full_name }));
-  const shown = withTeacherName.filter((c) => !search || `${c.title} ${c.teacher_name || ''}`.toLocaleLowerCase('ar').includes(search));
+const shown = withTeacherName.filter((c) => {
+  if (!search) return true;
 
+  const searchableText = [
+    c.title,
+    c.teacher_name,
+    c.subject,
+    c.stage
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('ar');
+
+  return searchableText.includes(search);
+});
   target.innerHTML = shown.length ? shown.map(courseCard).join('') : '<div class="empty-state">لا توجد كورسات مطابقة حاليًا.</div>';
 }
 
 async function initCourseLists() {
   const targets = document.querySelectorAll('[data-course-list]');
   if (!targets.length) return;
+
   const form = document.querySelector('[data-course-filters]');
-  const update = () => targets.forEach((target) => loadCourses(target, form ? Object.fromEntries(new FormData(form).entries()) : {}));
-  if (form) form.addEventListener('input', update);
+  const searchInput =
+    document.querySelector('[data-course-search]') ||
+    form?.querySelector('input[type="search"]') ||
+    form?.querySelector('input[name="search"]');
+
+  let timer;
+
+  const update = () => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      const filters = form
+        ? Object.fromEntries(new FormData(form).entries())
+        : {};
+
+      // نضمن إن قيمة البحث وصلت حتى لو الـ input مفيهوش name
+      if (searchInput) {
+        filters.search = searchInput.value.trim();
+      }
+
+      targets.forEach((target) => {
+        loadCourses(target, filters);
+      });
+    }, 150);
+  };
+
+  // البحث أثناء الكتابة
+  searchInput?.addEventListener('input', update);
+
+  // باقي الفلاتر
+  form?.addEventListener('change', update);
+
   update();
 }
 
