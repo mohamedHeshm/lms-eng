@@ -521,38 +521,477 @@ function setupUploadMaterialForm() {
   });
 }
 
-/* ============================== الطلاب + الاشتراك الشهري ============================== */
+/* ============================== الطلاب + الاشتراك الشهري (محدث) ============================== */
+
+// دوال مساعدة لتنسيق التواريخ وعرض حالة الاشتراك
+function formatDate(date) {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString('ar-EG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function getSubscriptionStatusText(subscription) {
+  if (!subscription) {
+    return { status: 'غير مشترك', badge: 'rejected', text: 'غير مشترك' };
+  }
+
+  const now = new Date();
+  const startDate = subscription.start_date ? new Date(subscription.start_date) : null;
+  const endDate = subscription.end_date ? new Date(subscription.end_date) : null;
+
+  if (subscription.status === 'cancelled') {
+    return { status: 'ملغي', badge: 'rejected', text: 'ملغي', cancelled: true };
+  }
+
+  if (subscription.status === 'pending') {
+    return { status: 'بانتظار المراجعة', badge: 'pending', text: 'بانتظار المراجعة' };
+  }
+
+  if (subscription.status === 'rejected') {
+    return { status: 'مرفوض', badge: 'rejected', text: 'مرفوض' };
+  }
+
+  if (subscription.status === 'approved') {
+    if (!startDate || !endDate) {
+      return { status: 'نشط (غير محدد)', badge: 'approved', text: 'نشط' };
+    }
+
+    if (now >= startDate && now <= endDate) {
+      const diffTime = endDate.getTime() - now.getTime();
+      const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return {
+        status: 'نشط',
+        badge: 'approved',
+        text: 'نشط',
+        daysRemaining,
+        startDate,
+        endDate
+      };
+    } else if (now > endDate) {
+      return { status: 'منتهي', badge: 'rejected', text: 'منتهي', expired: true };
+    }
+  }
+
+  return { status: 'غير مشترك', badge: 'rejected', text: 'غير مشترك' };
+}
+
+// عرض نافذة تعديل مدة الاشتراك
+function openSubscriptionModal(student, subscription) {
+  const modalHost = document.querySelector('[data-lesson-modal]');
+  if (!modalHost) return;
+  modalHost.classList.add('active');
+
+  const startDate = subscription?.start_date || new Date().toISOString().split('T')[0];
+  const endDate = subscription?.end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  modalHost.innerHTML = `
+    <div class="panel" style="max-width:600px;margin:30px auto;">
+      <div class="panel-head">
+        <h3>تعديل مدة الاشتراك</h3>
+        <button class="button button-text" data-close-modal>إغلاق ✕</button>
+      </div>
+      <div class="content-grid" style="grid-template-columns:1fr;">
+        <div style="margin-bottom:16px;">
+          <h4>${esc(student.full_name)}</h4>
+          <p class="course-meta">تعديل مدة الاشتراك الشهري للطالب</p>
+        </div>
+        <form data-subscription-edit-form>
+          <label class="field">
+            تاريخ بداية الاشتراك
+            <input name="start_date" type="date" value="${startDate}" required>
+          </label>
+          <label class="field">
+            تاريخ انتهاء الاشتراك
+            <input name="end_date" type="date" value="${endDate}" required>
+          </label>
+          <label class="field">
+            اختيار مدة محددة
+            <select name="duration_preset" data-duration-preset>
+              <option value="">اختر مدة</option>
+              <option value="7">7 أيام</option>
+              <option value="15">15 يوم</option>
+              <option value="30">شهر</option>
+              <option value="60">شهرين</option>
+              <option value="90">3 شهور</option>
+              <option value="custom">مدة مخصصة</option>
+            </select>
+          </label>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="button button-primary" type="submit">حفظ التعديلات</button>
+            <button class="button button-secondary" type="button" data-close-modal>إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  const form = modalHost.querySelector('[data-subscription-edit-form]');
+  if (!form) return;
+  const startDateInput = form.querySelector('[name="start_date"]');
+  const endDateInput = form.querySelector('[name="end_date"]');
+  const durationPreset = form.querySelector('[data-duration-preset]');
+
+  durationPreset?.addEventListener('change', () => {
+    const value = parseInt(durationPreset.value);
+    if (value && value > 0 && !isNaN(value) && startDateInput && endDateInput) {
+      const start = new Date(startDateInput.value);
+      const end = new Date(start);
+      end.setDate(end.getDate() + value);
+      endDateInput.value = end.toISOString().split('T')[0];
+    }
+  });
+
+  modalHost.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', () => {
+      modalHost.classList.remove('active');
+      modalHost.innerHTML = '';
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+
+    if (!startDate || !endDate) {
+      setStatus('يرجى تحديد تاريخ البدء والانتهاء', 'error');
+      return;
+    }
+
+    if (new Date(endDate) <= new Date(startDate)) {
+      setStatus('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 'error');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('subscription_payments')
+      .update({
+        start_date: startDate,
+        end_date: endDate,
+        status: 'approved',
+        updated_at: new Date().toISOString()
+      })
+      .eq('student_id', student.id)
+      .eq('teacher_id', user.id);
+
+    if (error) {
+      setStatus('تعذر تحديث الاشتراك: ' + error.message, 'error');
+      return;
+    }
+
+    setStatus('تم تحديث مدة الاشتراك بنجاح', 'success');
+    modalHost.classList.remove('active');
+    modalHost.innerHTML = '';
+    loadStudents();
+  });
+}
+
+// عرض نافذة تأكيد الإلغاء
+function showCancelConfirmation(student, subscription) {
+  const modalHost = document.querySelector('[data-lesson-modal]');
+  if (!modalHost) return;
+  modalHost.classList.add('active');
+
+  modalHost.innerHTML = `
+    <div class="panel" style="max-width:500px;margin:30px auto;">
+      <div class="panel-head">
+        <h3>تأكيد إلغاء الاشتراك</h3>
+        <button class="button button-text" data-close-modal>إغلاق ✕</button>
+      </div>
+      <div class="content-grid" style="grid-template-columns:1fr;">
+        <div style="margin-bottom:16px;">
+          <h4>${esc(student.full_name)}</h4>
+          <p class="course-meta">هل أنت متأكد من إلغاء الاشتراك الشهري لهذا الطالب؟</p>
+          <div style="margin-top:12px;padding:12px;background:var(--surface-alt);border-radius:var(--radius);">
+            <div>تاريخ بداية الاشتراك: ${formatDate(subscription?.start_date)}</div>
+            <div>تاريخ انتهاء الاشتراك: ${formatDate(subscription?.end_date)}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:16px;">
+          <button class="button button-secondary" data-close-modal>إلغاء</button>
+          <button class="button button-danger" data-confirm-cancel>تأكيد الإلغاء</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modalHost.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', () => {
+      modalHost.classList.remove('active');
+      modalHost.innerHTML = '';
+    });
+  });
+
+  modalHost.querySelector('[data-confirm-cancel]')?.addEventListener('click', async () => {
+    const { error } = await supabase
+      .from('subscription_payments')
+      .update({
+        status: 'cancelled',
+        cancelled_at: new Date().toISOString(),
+        cancelled_by: user.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq('student_id', student.id)
+      .eq('teacher_id', user.id);
+
+    if (error) {
+      setStatus('تعذر إلغاء الاشتراك: ' + error.message, 'error');
+      return;
+    }
+
+    setStatus('تم إلغاء اشتراك الطالب بنجاح', 'success');
+    modalHost.classList.remove('active');
+    modalHost.innerHTML = '';
+    loadStudents();
+  });
+}
+
+// عرض نافذة إعادة التفعيل
+function showReactivateConfirmation(student) {
+  const modalHost = document.querySelector('[data-lesson-modal]');
+  if (!modalHost) return;
+  modalHost.classList.add('active');
+
+  const today = new Date().toISOString().split('T')[0];
+  const defaultEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  modalHost.innerHTML = `
+    <div class="panel" style="max-width:550px;margin:30px auto;">
+      <div class="panel-head">
+        <h3>إعادة تفعيل الاشتراك</h3>
+        <button class="button button-text" data-close-modal>إغلاق ✕</button>
+      </div>
+      <div class="content-grid" style="grid-template-columns:1fr;">
+        <div style="margin-bottom:16px;">
+          <h4>${esc(student.full_name)}</h4>
+          <p class="course-meta">حدد تاريخ بداية ونهاية الاشتراك الجديد</p>
+        </div>
+        <form data-reactivate-form>
+          <label class="field">
+            تاريخ بداية الاشتراك
+            <input name="start_date" type="date" value="${today}" required>
+          </label>
+          <label class="field">
+            تاريخ انتهاء الاشتراك
+            <input name="end_date" type="date" value="${defaultEnd}" required>
+          </label>
+          <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+            <button class="button button-secondary" data-close-modal>إلغاء</button>
+            <button class="button button-primary" type="submit">إعادة التفعيل</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  modalHost.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', () => {
+      modalHost.classList.remove('active');
+      modalHost.innerHTML = '';
+    });
+  });
+
+  modalHost.querySelector('[data-reactivate-form]')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+
+    if (!startDate || !endDate) {
+      setStatus('يرجى تحديد تاريخ البدء والانتهاء', 'error');
+      return;
+    }
+
+    if (new Date(endDate) <= new Date(startDate)) {
+      setStatus('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 'error');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('subscription_payments')
+      .update({
+        status: 'approved',
+        start_date: startDate,
+        end_date: endDate,
+        cancelled_at: null,
+        cancelled_by: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('student_id', student.id)
+      .eq('teacher_id', user.id);
+
+    if (error) {
+      setStatus('تعذر إعادة التفعيل: ' + error.message, 'error');
+      return;
+    }
+
+    setStatus('تم إعادة تفعيل اشتراك الطالب بنجاح', 'success');
+    modalHost.classList.remove('active');
+    modalHost.innerHTML = '';
+    loadStudents();
+  });
+}
+
+// دالة loadStudents المحدثة
 async function loadStudents() {
   const target = document.querySelector('[data-students-list]');
   if (!target) return;
   target.innerHTML = '<p class="loading">جاري التحميل…</p>';
-  const { data: students, error } = await supabase.from('profiles').select('*').eq('teacher_id', user.id).eq('role', 'student').order('full_name');
-  if (error) { target.innerHTML = empty(genericError); return; }
-  if (!students.length) { target.innerHTML = empty('لا يوجد طلاب مرتبطون بحسابك بعد. يقوم الطالب بربط نفسه بك من صفحة "حسابي".'); return; }
 
-  const month = currentMonthStart();
-  const { data: subs } = await supabase.from('subscription_payments').select('*').eq('teacher_id', user.id).eq('month', month);
-  const subByStudent = Object.fromEntries((subs || []).map((s) => [s.student_id, s]));
+  const { data: students, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('teacher_id', user.id)
+    .eq('role', 'student')
+    .order('full_name');
 
-  target.innerHTML = `<table class="subscription-table"><thead><tr><th>الطالب</th><th>المرحلة</th><th>اشتراك هذا الشهر</th><th>إجراء</th></tr></thead><tbody>
-    ${students.map((st) => {
-      const sub = subByStudent[st.id];
-      const status = sub?.status === 'approved' ? '<span class="status-badge approved">مدفوع ✓</span>' : sub?.status === 'pending' ? '<span class="status-badge pending">بانتظار المراجعة</span>' : '<span class="status-badge rejected">غير مدفوع</span>';
-      return `<tr><td>${esc(st.full_name)}</td><td>${esc(st.stage || '—')}</td><td>${status}</td>
-        <td>${sub?.status === 'approved' ? '—' : `<button class="button button-primary" style="width:auto;padding:7px 14px" data-mark-paid="${st.id}">تسجيل دفع نقدي</button>`}</td></tr>`;
-    }).join('')}
-  </tbody></table>`;
+  if (error) {
+    target.innerHTML = empty(genericError);
+    return;
+  }
 
-  target.querySelectorAll('[data-mark-paid]').forEach((btn) => btn.addEventListener('click', async () => {
-    const amount = prompt('قيمة الاشتراك الشهري (ج.م):', '0');
-    if (amount === null) return;
-    const studentId = btn.dataset.markPaid;
-    const { error } = await supabase.from('subscription_payments').upsert({
-      student_id: studentId, teacher_id: user.id, month, amount: Number(amount) || 0, method: 'cash', status: 'approved',
-    }, { onConflict: 'student_id,teacher_id,month' });
-    if (error) { alert(genericError); return; }
-    loadStudents();
-  }));
+  if (!students.length) {
+    target.innerHTML = empty('لا يوجد طلاب مرتبطون بحسابك بعد. يقوم الطالب بربط نفسه بك من صفحة "حسابي".');
+    return;
+  }
+
+  // جلب الاشتراكات
+  const { data: subscriptions } = await supabase
+    .from('subscription_payments')
+    .select('*')
+    .eq('teacher_id', user.id);
+
+  const subByStudent = Object.fromEntries((subscriptions || []).map((s) => [s.student_id, s]));
+
+  target.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table class="subscription-table">
+        <thead>
+          <tr>
+            <th>الطالب</th>
+            <th>حالة الاشتراك</th>
+            <th>بدأ من</th>
+            <th>ينتهي في</th>
+            <th>المتبقي</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${students.map((st) => {
+            const sub = subByStudent[st.id];
+            const status = getSubscriptionStatusText(sub);
+
+            let daysRemaining = '—';
+            if (status.status === 'نشط' && status.daysRemaining) {
+              daysRemaining = status.daysRemaining > 0 ? `${status.daysRemaining} يوم` : 'ينتهي اليوم';
+            } else if (status.status === 'نشط (غير محدد)') {
+              daysRemaining = 'غير محدد';
+            } else if (status.status === 'منتهي') {
+              daysRemaining = 'انتهى';
+            } else if (status.status === 'ملغي') {
+              daysRemaining = 'ملغي';
+            }
+
+            const startDate = sub?.start_date ? formatDate(sub.start_date) : '—';
+            const endDate = sub?.end_date ? formatDate(sub.end_date) : '—';
+
+            let actions = '';
+            if (sub?.status === 'cancelled') {
+              actions = `
+                <button class="button button-primary" style="width:auto;padding:6px 12px;font-size:0.8rem;" data-reactivate="${st.id}">إعادة التفعيل</button>
+              `;
+            } else if (sub?.status === 'approved') {
+              actions = `
+                <button class="button button-secondary" style="width:auto;padding:6px 12px;font-size:0.8rem;" data-edit-sub="${st.id}">تعديل المدة</button>
+                <button class="button button-danger" style="width:auto;padding:6px 12px;font-size:0.8rem;" data-cancel-sub="${st.id}">إلغاء الاشتراك</button>
+              `;
+            } else {
+              actions = `
+                <button class="button button-secondary" style="width:auto;padding:6px 12px;font-size:0.8rem;" data-mark-paid="${st.id}">تفعيل اشتراك</button>
+              `;
+            }
+
+            return `<tr>
+              <td><strong>${esc(st.full_name)}</strong></td>
+              <td><span class="status-badge ${status.badge}">${status.status}</span></td>
+              <td>${startDate}</td>
+              <td>${endDate}</td>
+              <td>${daysRemaining}</td>
+              <td>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+                  ${actions}
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // ربط الأحداث
+  target.querySelectorAll('[data-edit-sub]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const student = students.find(s => s.id === btn.dataset.editSub);
+      const subscription = subByStudent[student.id];
+      openSubscriptionModal(student, subscription);
+    });
+  });
+
+  target.querySelectorAll('[data-cancel-sub]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const student = students.find(s => s.id === btn.dataset.cancelSub);
+      const subscription = subByStudent[student.id];
+      showCancelConfirmation(student, subscription);
+    });
+  });
+
+  target.querySelectorAll('[data-reactivate]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const student = students.find(s => s.id === btn.dataset.reactivate);
+      showReactivateConfirmation(student);
+    });
+  });
+
+  // زر تفعيل الاشتراك
+  target.querySelectorAll('[data-mark-paid]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const amount = prompt('قيمة الاشتراك الشهري (ج.م):', '0');
+      if (amount === null) return;
+
+      const studentId = btn.dataset.markPaid;
+      const today = new Date().toISOString().split('T')[0];
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+      const endDateStr = endDate.toISOString().split('T')[0];
+
+      const { error } = await supabase
+        .from('subscription_payments')
+        .upsert({
+          student_id: studentId,
+          teacher_id: user.id,
+          month: currentMonthStart(),
+          amount: Number(amount) || 0,
+          method: 'cash',
+          status: 'approved',
+          start_date: today,
+          end_date: endDateStr,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'student_id,teacher_id,month'
+        });
+
+      if (error) {
+        alert(genericError);
+        return;
+      }
+      loadStudents();
+    });
+  });
 }
 
 async function loadSubscriptionRequests() {
@@ -567,8 +1006,28 @@ async function loadSubscriptionRequests() {
       <td>${r.status === 'pending' ? `<div class="row-actions"><button class="button button-primary" style="width:auto;padding:6px 12px" data-approve-sub="${r.id}">قبول</button><button class="button button-danger" style="width:auto;padding:6px 12px" data-reject-sub="${r.id}">رفض</button></div>` : '—'}</td>
     </tr>`).join('')}</tbody></table>` : empty('لا توجد طلبات اشتراك شهري حتى الآن.');
 
-  target.querySelectorAll('[data-approve-sub]').forEach((btn) => btn.addEventListener('click', async () => { await supabase.from('subscription_payments').update({ status: 'approved' }).eq('id', btn.dataset.approveSub); loadSubscriptionRequests(); loadOverview(); }));
-  target.querySelectorAll('[data-reject-sub]').forEach((btn) => btn.addEventListener('click', async () => { await supabase.from('subscription_payments').update({ status: 'rejected' }).eq('id', btn.dataset.rejectSub); loadSubscriptionRequests(); loadOverview(); }));
+  target.querySelectorAll('[data-approve-sub]').forEach((btn) => btn.addEventListener('click', async () => {
+    // عند قبول طلب الاشتراك، نضيف start_date و end_date تلقائياً
+    const today = new Date().toISOString().split('T')[0];
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 30);
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    await supabase.from('subscription_payments').update({
+      status: 'approved',
+      start_date: today,
+      end_date: endDateStr,
+      updated_at: new Date().toISOString()
+    }).eq('id', btn.dataset.approveSub);
+    loadSubscriptionRequests();
+    loadOverview();
+  }));
+
+  target.querySelectorAll('[data-reject-sub]').forEach((btn) => btn.addEventListener('click', async () => {
+    await supabase.from('subscription_payments').update({ status: 'rejected' }).eq('id', btn.dataset.rejectSub);
+    loadSubscriptionRequests();
+    loadOverview();
+  }));
 }
 
 /* ============================== تشغيل ============================== */

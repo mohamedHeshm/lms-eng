@@ -6,7 +6,7 @@ const MATERIAL_LABELS = { sheet: { label: 'شيت', chip: 'chip-sheet', icon: '�
 const session = await requireAuth('student');
 if (!session) throw new Error('redirecting');
 const { user } = session;
-let profile = session.profile; // قد تتغيّر بعد اختيار مدرس
+let profile = session.profile;
 
 function empty(message, action = '') { return `<div class="empty-state">${message}${action ? `<div style="margin-top:12px">${action}</div>` : ''}</div>`; }
 function lockedPanel(message, cta = '') { return `<div class="locked-panel"><div class="lock-icon">🔒</div><h3>محتوى محظور</h3><p>${message}</p>${cta}</div>`; }
@@ -63,12 +63,37 @@ async function loadMyCourses() {
   document.querySelector('[data-course-count]')?.replaceChildren(document.createTextNode(String(courses.length)));
 }
 
-/* ============================== حالة الاشتراك الشهري ============================== */
+/* ============================== حالة الاشتراك الشهري (محدث) ============================== */
 async function getSubscriptionStatus() {
-  if (!profile.teacher_id) return { hasTeacher: false, active: false };
-  const month = currentMonthStart();
-  const { data } = await supabase.from('subscription_payments').select('status').eq('student_id', user.id).eq('teacher_id', profile.teacher_id).eq('month', month).maybeSingle();
-  return { hasTeacher: true, active: data?.status === 'approved', pendingStatus: data?.status };
+  if (!profile.teacher_id) return { hasTeacher: false, active: false, subscription: null };
+
+  const { data: subscription } = await supabase
+    .from('subscription_payments')
+    .select('*')
+    .eq('student_id', user.id)
+    .eq('teacher_id', profile.teacher_id)
+    .order('created_at', { ascending: false })
+    .maybeSingle();
+
+  if (!subscription) {
+    return { hasTeacher: true, active: false, subscription: null };
+  }
+
+  const active = subscription.status === 'approved'
+    && subscription.start_date
+    && subscription.end_date
+    && new Date() >= new Date(subscription.start_date)
+    && new Date() <= new Date(subscription.end_date);
+
+  return {
+    hasTeacher: true,
+    active,
+    subscription,
+    status: subscription.status,
+    startDate: subscription.start_date,
+    endDate: subscription.end_date,
+    isExpired: subscription.status === 'approved' && new Date() > new Date(subscription.end_date)
+  };
 }
 
 /* ============================== الاختبارات ============================== */
@@ -198,36 +223,115 @@ async function loadCoursePayments() {
     <span class="row-end"><span class="status-badge ${r.status}">${r.status === 'approved' ? 'مقبول ✓' : r.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة'}</span></span></div>`).join('') : empty('لا توجد طلبات دفع كورسات حتى الآن.', '<a class="button button-primary" href="courses.html">تصفح الكورسات</a>');
 }
 
-/* ============================== الاشتراك الشهري (مكان مختلف تمامًا عن دفع الكورسات) ============================== */
+/* ============================== الاشتراك الشهري (محدث بالكامل) ============================== */
 async function loadSubscriptionView() {
   const target = document.querySelector('[data-subscription-view]');
   if (!target) return;
   target.innerHTML = '<p class="loading">جاري التحميل…</p>';
 
-  if (!profile.teacher_id) { target.innerHTML = empty('لازم تحدد مدرسك أولًا من صفحة "حسابي" حتى تقدر تدفع الاشتراك الشهري.', '<button class="button button-primary" data-view="profile" data-title="حسابي">اذهب لصفحة حسابي</button>'); rebindInlineNav(target); return; }
+  if (!profile.teacher_id) {
+    target.innerHTML = empty('لازم تحدد مدرسك أولًا من صفحة "حسابي" حتى تقدر تدفع الاشتراك الشهري.',
+      '<button class="button button-primary" data-view="profile" data-title="حسابي">اذهب لصفحة حسابي</button>');
+    rebindInlineNav(target);
+    return;
+  }
 
-  const { data: teacher } = await supabase.from('profiles').select('full_name').eq('id', profile.teacher_id).single();
-  const month = currentMonthStart();
-  const { data: sub } = await supabase.from('subscription_payments').select('*').eq('student_id', user.id).eq('teacher_id', profile.teacher_id).eq('month', month).maybeSingle();
+  const { data: teacher } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', profile.teacher_id)
+    .single();
 
-  const statusHtml = !sub ? '<span class="status-badge rejected">لم يتم الدفع بعد لهذا الشهر</span>' : sub.status === 'approved' ? '<span class="status-badge approved">مفعّل لهذا الشهر ✓</span>' : sub.status === 'pending' ? '<span class="status-badge pending">بانتظار مراجعة المدرس</span>' : '<span class="status-badge rejected">تم رفض الطلب — أرسل من جديد</span>';
+  const sub = await getSubscriptionStatus();
 
-  target.innerHTML = `<div class="panel">
-    <h3>الاشتراك الشهري عند الأستاذ ${esc(teacher?.full_name || '')}</h3>
-    <p class="course-meta" style="margin:10px 0 16px">هذا الاشتراك منفصل تمامًا عن دفع الكورسات، وهو الذي يفتح لك الاختبارات والشيتات والسبورة والمذكرات الخاصة بمرحلتك عند هذا المدرس. الحالة: ${statusHtml}</p>
-    ${sub?.status === 'approved' ? '' : `<form data-subscription-form>
-      <label class="field">قيمة الاشتراك (ج.م)<input name="amount" type="number" min="0" step="1" required></label>
-      <label class="field">طريقة الدفع<select name="method" required><option value="cash">نقدي داخل السنتر</option><option value="wallet">محفظة إلكترونية</option><option value="bank_transfer">تحويل بنكي</option></select></label>
-      <label class="field">رقم العملية (اختياري)<input name="reference_number" maxlength="100"></label>
-      <button class="button button-primary" type="submit">إرسال طلب الاشتراك الشهري</button>
-    </form>`}
-  </div>`;
+  // حساب الأيام المتبقية
+  let daysRemaining = null;
+  let statusDisplay = '';
+
+  if (sub.subscription) {
+    if (sub.active) {
+      const end = new Date(sub.subscription.end_date);
+      const now = new Date();
+      const diffTime = end.getTime() - now.getTime();
+      daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      statusDisplay = `
+        <div class="subscription-status active">
+          <span class="status-badge approved">نشط</span>
+          <div class="subscription-dates">
+            <div>تاريخ البدء: ${new Date(sub.subscription.start_date).toLocaleDateString('ar-EG')}</div>
+            <div>تاريخ الانتهاء: ${new Date(sub.subscription.end_date).toLocaleDateString('ar-EG')}</div>
+            <div><strong>المتبقي: ${daysRemaining} يوم</strong></div>
+          </div>
+        </div>
+      `;
+    } else if (sub.subscription.status === 'cancelled') {
+      statusDisplay = `
+        <div class="subscription-status cancelled">
+          <span class="status-badge rejected">تم الإلغاء</span>
+          <p>تم إلغاء الاشتراك الشهري بواسطة المدرس.</p>
+          ${sub.subscription.cancelled_at ? `<small>تاريخ الإلغاء: ${new Date(sub.subscription.cancelled_at).toLocaleDateString('ar-EG')}</small>` : ''}
+        </div>
+      `;
+    } else if (sub.subscription.status === 'pending') {
+      statusDisplay = `
+        <div class="subscription-status pending">
+          <span class="status-badge pending">بانتظار مراجعة المدرس</span>
+        </div>
+      `;
+    } else if (sub.subscription.status === 'rejected') {
+      statusDisplay = `
+        <div class="subscription-status rejected">
+          <span class="status-badge rejected">تم الرفض</span>
+          <p>تم رفض طلب الاشتراك الشهري. يمكنك تقديم طلب جديد.</p>
+        </div>
+      `;
+    } else if (sub.subscription.status === 'approved' && sub.isExpired) {
+      statusDisplay = `
+        <div class="subscription-status expired">
+          <span class="status-badge rejected">منتهي</span>
+          <div class="subscription-dates">
+            <div>تاريخ البدء: ${new Date(sub.subscription.start_date).toLocaleDateString('ar-EG')}</div>
+            <div>تاريخ الانتهاء: ${new Date(sub.subscription.end_date).toLocaleDateString('ar-EG')}</div>
+            <div><strong>انتهى الاشتراك</strong></div>
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    statusDisplay = `
+      <div class="subscription-status no-subscription">
+        <span class="status-badge rejected">غير مشترك</span>
+        <p>لم يتم الدفع بعد لهذا الشهر</p>
+      </div>
+    `;
+  }
+
+  target.innerHTML = `
+    <div class="panel">
+      <div class="panel-head">
+        <h3>الاشتراك الشهري عند الأستاذ ${esc(teacher?.full_name || '')}</h3>
+      </div>
+      <div style="margin:10px 0 20px;">
+        <p class="course-meta">هذا الاشتراك منفصل تمامًا عن دفع الكورسات، وهو الذي يفتح لك الاختبارات والشيتات والسبورة والمذكرات الخاصة بمرحلتك عند هذا المدرس.</p>
+        ${statusDisplay}
+      </div>
+      ${(!sub.subscription || sub.subscription.status !== 'approved' || sub.isExpired) && sub.subscription?.status !== 'cancelled' ? `
+        <form data-subscription-form>
+          <label class="field">قيمة الاشتراك (ج.م)<input name="amount" type="number" min="0" step="1" required></label>
+          <label class="field">طريقة الدفع<select name="method" required><option value="cash">نقدي داخل السنتر</option><option value="wallet">محفظة إلكترونية</option><option value="bank_transfer">تحويل بنكي</option></select></label>
+          <label class="field">رقم العملية (اختياري)<input name="reference_number" maxlength="100"></label>
+          <button class="button button-primary" type="submit">إرسال طلب الاشتراك الشهري</button>
+        </form>
+      ` : ''}
+    </div>
+  `;
 
   target.querySelector('[data-subscription-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.target).entries());
     const submit = event.target.querySelector('button');
     submit.disabled = true;
+    const month = currentMonthStart();
     const { error } = await supabase.from('subscription_payments').upsert({
       student_id: user.id, teacher_id: profile.teacher_id, month, amount: Number(values.amount) || 0, method: values.method,
       reference_number: values.reference_number || null, status: 'pending',
@@ -260,11 +364,7 @@ function setupTeacherSelectForm() {
   });
 }
 
-/* ==================== إضافات واجهة: إحصائيات سريعة + آخر نشاط + قائمة الإشعارات ====================
-   كل الدوال هنا إضافية فقط ولا تُغيّر أي دالة أو استعلام موجود من قبل.
-   البيانات المعروضة حقيقية بالكامل من نفس الجداول المستخدمة في باقي الصفحة
-   (لا يوجد جدول إشعارات حاليًا، لذلك قائمة الإشعارات تعرض حالة فارغة فقط). */
-
+/* ==================== إضافات واجهة: إحصائيات سريعة + آخر نشاط + قائمة الإشعارات ==================== */
 function setNotifDropdown() {
   const toggle = document.querySelector('[data-notif-toggle]');
   const dropdown = document.querySelector('[data-notif-dropdown]');
@@ -284,11 +384,18 @@ async function loadDashboardStats() {
 
   const sub = await getSubscriptionStatus();
   const subText = sub.active ? 'نشط' : (sub.hasTeacher ? 'غير نشط' : '—');
-  const subSubText = !sub.hasTeacher ? 'حدد مدرسك أولًا من صفحة حسابي' : sub.active ? 'ساري هذا الشهر ✓' : sub.pendingStatus === 'pending' ? 'بانتظار مراجعة المدرس' : 'لم يتم الدفع بعد لهذا الشهر';
+  const subSubText = !sub.hasTeacher ? 'حدد مدرسك أولًا من صفحة حسابي' : sub.active ? 'ساري ✓' : sub.status === 'pending' ? 'بانتظار مراجعة المدرس' : sub.status === 'cancelled' ? 'ملغي' : 'لم يتم الدفع بعد';
   if (subEl) subEl.textContent = subText;
   if (subSubEl) subSubEl.textContent = subSubText;
   if (subSubEl2) subSubEl2.textContent = subSubText;
-  if (subBadgeEl) { subBadgeEl.textContent = subText; subBadgeEl.className = `status-badge ${sub.active ? 'approved' : sub.pendingStatus === 'pending' ? 'pending' : 'rejected'}`; }
+  if (subBadgeEl) {
+    let badgeClass = 'rejected';
+    if (sub.active) badgeClass = 'approved';
+    else if (sub.status === 'pending') badgeClass = 'pending';
+    else if (sub.status === 'cancelled') badgeClass = 'rejected';
+    subBadgeEl.textContent = subText;
+    subBadgeEl.className = `status-badge ${badgeClass}`;
+  }
 
   if (!sub.hasTeacher || !sub.active) {
     if (quizzesEl) quizzesEl.textContent = '🔒';

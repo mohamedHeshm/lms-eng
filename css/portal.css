@@ -105,3 +105,62 @@ body { background: #f7f8f6; }
 
 .stage-select-inline { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
 .stage-select-inline select { width:auto; min-width:200px; margin:0; }
+
+/* تنسيقات الاشتراك للطالب */
+.subscription-status {
+  padding: 16px;
+  border-radius: var(--radius);
+  margin: 12px 0;
+  background: var(--surface-alt);
+}
+
+.subscription-status.active {
+  border-right: 4px solid var(--success);
+}
+
+.subscription-status.cancelled {
+  border-right: 4px solid var(--error);
+  background: #fcefed;
+}
+
+.subscription-status.expired {
+  border-right: 4px solid var(--warning);
+  background: #fff8e1;
+}
+
+.subscription-status.pending {
+  border-right: 4px solid var(--warning);
+  background: #fff8e1;
+}
+
+.subscription-dates {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subscription-dates div {
+  font-size: 0.9rem;
+}
+
+/* تنسيق جدول الطلاب المحسن */
+.subscription-table td {
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+.subscription-table .status-badge {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .subscription-table {
+    font-size: 0.8rem;
+  }
+
+  .subscription-table td,
+  .subscription-table th {
+    padding: 8px 4px;
+  }
+}
