@@ -16,11 +16,24 @@ function courseCard(course) {
   const teacher = esc(course.teacher_name || 'فريق المنصة');
   const image = course.cover_image_url;
   const price = course.price || 0;
+  const isFree = !price;
   return `<article class="course-card">
-    <div class="course-cover">${image ? `<img src="${esc(image)}" alt="${title}">` : '◒'}</div>
-    <div class="course-card-body">
-      <div><div class="course-meta">${esc(course.stage || 'المرحلة الثانوية')} · ${esc(course.subject || '')}</div><h3>${title}</h3><p class="course-meta">مع ${teacher}</p></div>
-      <div class="course-footer"><span class="price">${price ? money(price) : 'مجانًا'}</span><a class="button button-secondary" href="checkout.html?course=${encodeURIComponent(course.id)}">التفاصيل</a></div>
+    <div class="course-cover">
+      ${image ? `<img src="${esc(image)}" alt="${title}" loading="lazy">` : '◒'}
+      <span class="cp-card-badge${isFree ? ' free' : ''}">${isFree ? 'مجاني' : 'مدفوع'}</span>
+    </div>
+    <div class="cp-card-body">
+      <div class="cp-card-meta">
+        ${course.stage ? `<span class="cp-stage">${esc(course.stage)}</span>` : ''}
+        ${course.subject ? `<span class="cp-subject">${esc(course.subject)}</span>` : ''}
+      </div>
+      <h3 class="cp-card-title">${title}</h3>
+      <p class="cp-card-teacher">مع <strong>${teacher}</strong></p>
+      <div class="cp-card-divider"></div>
+      <div class="cp-card-footer">
+        <span class="cp-card-price">${price ? money(price) : 'مجانًا'}</span>
+        <a class="cp-card-btn primary" href="checkout.html?course=${encodeURIComponent(course.id)}">التفاصيل <span class="cp-arrow">←</span></a>
+      </div>
     </div>
   </article>`;
 }

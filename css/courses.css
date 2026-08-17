@@ -138,9 +138,23 @@ body.courses-page .cp-hero-bg::after {
   left: -60px;
 }
 
+body.courses-page .cp-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 28px;
+}
+
 body.courses-page .cp-hero-content {
   position: relative;
   z-index: 1;
+}
+
+body.courses-page .cp-hero-illustration {
+  flex: none;
+  filter: drop-shadow(0 12px 22px rgba(13, 48, 40, .08));
 }
 
 body.courses-page .cp-badge {
@@ -239,6 +253,20 @@ body.courses-page .cp-results-count {
 
 body.courses-page .cp-results-count strong {
   color: var(--cp-primary);
+}
+
+body.courses-page .cp-browse-all-btn {
+  white-space: nowrap;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--cp-primary);
+  padding: 8px 6px;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color .2s ease;
+}
+
+body.courses-page .cp-browse-all-btn:hover {
+  border-color: var(--cp-primary);
 }
 
 /* ========== 4. Layout: Filters + Grid ========== */
@@ -847,10 +875,72 @@ body.courses-page .cp-mobile-filter-btn:hover {
   border-color: var(--cp-primary);
 }
 
+/* ========== 11b. Features Strip ========== */
+body.courses-page .cp-features {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 8px 0 64px;
+  padding: 34px 0 0;
+  border-top: 1px solid var(--cp-border);
+}
+
+body.courses-page .cp-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+body.courses-page .cp-feature-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--cp-shadow-sm);
+  border-color: #cfe3da;
+}
+
+body.courses-page .cp-feature-icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--cp-light);
+  color: var(--cp-primary);
+  display: grid;
+  place-items: center;
+}
+
+body.courses-page .cp-feature-item h4 {
+  margin: 0 0 4px;
+  font-size: .92rem;
+  font-weight: 800;
+  color: var(--cp-text);
+}
+
+body.courses-page .cp-feature-item p {
+  margin: 0;
+  font-size: .78rem;
+  line-height: 1.7;
+  color: var(--cp-muted);
+}
+
 /* ========== 12. Responsive ========== */
 @media (max-width: 1024px) {
   body.courses-page .course-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  body.courses-page .cp-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  body.courses-page .cp-hero-illustration {
+    display: none;
   }
 }
 
@@ -873,7 +963,8 @@ body.courses-page .cp-mobile-filter-btn:hover {
     padding: 14px 16px;
   }
 
-  body.courses-page .cp-results-count {
+  body.courses-page .cp-results-count,
+  body.courses-page .cp-browse-all-btn {
     text-align: center;
   }
 
@@ -930,6 +1021,11 @@ body.courses-page .cp-mobile-filter-btn:hover {
 
   body.courses-page .cp-layout {
     padding: 10px 0 50px;
+  }
+
+  body.courses-page .cp-features {
+    grid-template-columns: 1fr;
+    margin-bottom: 44px;
   }
 
   body.courses-page .cp-grid-header h2 {
