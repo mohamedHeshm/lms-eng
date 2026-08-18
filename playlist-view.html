@@ -58,6 +58,116 @@
     return url;
   }
 
+  // ============================================================================
+  // تتبع مشاهدة الطالب لفيديو الدرس (lesson_watch_progress)
+  // لا نعتبر الطالب "شاهد" الدرس بمجرد فتح الصفحة، فقط عند تشغيل الفيديو فعليًا.
+  // ============================================================================
+  const WATCH_UPDATE_INTERVAL_SECONDS = 12; // كل كام ثانية نبعت تحديث لـ Supabase أثناء التشغيل
+  const WATCH_COMPLETION_THRESHOLD_PERCENT = 90; // من هذه النسبة فأكثر يُعتبر الدرس "مكتمل"
+
+  function extractYouTubeId(url) {
+    try {
+      if (url.includes('watch?v=')) return new URL(url).searchParams.get('v');
+      if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+      if (url.includes('embed/')) return url.split('embed/')[1].split('?')[0].split('&')[0];
+    } catch { /* رابط غير متوقع — سيتم التعامل معه كفشل استخراج بالأسفل */ }
+    return null;
+  }
+
+  let ytApiPromise = null;
+  function loadYouTubeIframeApi() {
+    if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+    if (ytApiPromise) return ytApiPromise;
+    ytApiPromise = new Promise((resolve) => {
+      const previousReady = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { previousReady?.(); resolve(window.YT); };
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    });
+    return ytApiPromise;
+  }
+
+  // متتبّع نشط واحد فقط في كل مرة (يتم تنظيفه عند تبديل الدرس)
+  let activeWatchTracker = null;
+  function cleanupActiveTracker() {
+    if (!activeWatchTracker) return;
+    clearInterval(activeWatchTracker.intervalId);
+    try { activeWatchTracker.player?.destroy(); } catch { /* تجاهل */ }
+    activeWatchTracker = null;
+  }
+  window.addEventListener('pagehide', () => { activeWatchTracker?.flush?.(); });
+
+  async function initWatchTracking(lesson, mountEl) {
+    cleanupActiveTracker();
+    const videoId = extractYouTubeId(lesson.video_url);
+    if (!videoId) {
+      // فشل استخراج معرف الفيديو — نعرض الفيديو بالطريقة القديمة بدون تتبع حتى لا نكسر العرض
+      mountEl.innerHTML = `<iframe src="${esc(toEmbed(lesson.video_url))}" allowfullscreen></iframe>`;
+      return;
+    }
+
+    const { data: existing } = await supabase.from('lesson_watch_progress')
+      .select('watched_seconds,completed')
+      .eq('student_id', studentId).eq('lesson_id', lesson.id).maybeSingle();
+
+    const startSeconds = existing && !existing.completed ? Math.max(0, Math.floor((existing.watched_seconds || 0) - 2)) : 0;
+    let maxWatchedSeconds = existing?.watched_seconds || 0;
+    let hasStartedRecord = !!existing;
+
+    const mountId = `yt-player-${lesson.id}`;
+    mountEl.innerHTML = `<div id="${mountId}"></div>`;
+
+    const YT = await loadYouTubeIframeApi();
+    // لو الطالب بدّل الدرس بسرعة قبل ما الـ API يخلص تحميل، نتأكد إننا لسه على نفس الدرس
+    if (!document.getElementById(mountId)) return;
+
+    async function pushProgress(finalState) {
+      if (!player || typeof player.getCurrentTime !== 'function') return;
+      let current = 0, duration = 0;
+      try { current = player.getCurrentTime() || 0; duration = player.getDuration() || 0; } catch { return; }
+      if (current > maxWatchedSeconds) maxWatchedSeconds = current;
+      const pct = duration > 0 ? Math.min(100, Math.round((maxWatchedSeconds / duration) * 100)) : 0;
+      const completed = finalState === 'ended' || pct >= WATCH_COMPLETION_THRESHOLD_PERCENT;
+      const payload = {
+        student_id: studentId, course_id: courseId, lesson_id: lesson.id,
+        last_watched_at: new Date().toISOString(),
+        watched_seconds: Math.round(maxWatchedSeconds),
+        video_duration: duration ? Math.round(duration) : null,
+        progress_percentage: pct,
+        completed,
+      };
+      if (!hasStartedRecord) payload.started_at = new Date().toISOString();
+      const { error } = await supabase.from('lesson_watch_progress').upsert(payload, { onConflict: 'student_id,lesson_id' });
+      if (!error) hasStartedRecord = true;
+    }
+
+    let player;
+    let intervalId = null;
+    player = new YT.Player(mountId, {
+      videoId,
+      playerVars: { rel: 0, start: startSeconds },
+      events: {
+        onStateChange(event) {
+          if (event.data === YT.PlayerState.PLAYING) {
+            if (!intervalId) intervalId = setInterval(() => pushProgress(), WATCH_UPDATE_INTERVAL_SECONDS * 1000);
+          } else {
+            clearInterval(intervalId);
+            intervalId = null;
+            if (event.data === YT.PlayerState.ENDED) pushProgress('ended');
+            else if (event.data === YT.PlayerState.PAUSED) pushProgress();
+          }
+        },
+      },
+    });
+
+    activeWatchTracker = {
+      get intervalId() { return intervalId; },
+      player,
+      flush: () => pushProgress(),
+    };
+  }
+
   const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
   if (error) { layoutEl.innerHTML = '<div class="empty-state">حدث خطأ أثناء تحميل الدروس.</div>'; throw new Error('load error'); }
   if (!lessons.length) { layoutEl.innerHTML = '<div class="empty-state">لا توجد دروس مضافة بعد لهذا الكورس.</div>'; throw new Error('no lessons'); }
@@ -106,7 +216,7 @@
 
     mainEl.innerHTML = `<div class="lesson-item">
       <h3>▶ ${esc(lesson.title)}</h3>
-      <iframe src="${esc(toEmbed(lesson.video_url))}" allowfullscreen></iframe>
+      <div data-video-mount></div>
       ${(lesson.board_pdf_url || lesson.explanation_pdf_url) ? `<div class="row-actions" style="margin-top:14px">
         ${lesson.board_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.board_pdf_url)}" target="_blank">🖼 سبورة الدرس</a>` : ''}
         ${lesson.explanation_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.explanation_pdf_url)}" target="_blank">📘 شرح كتابي PDF</a>` : ''}
@@ -116,6 +226,8 @@
       </div>
       <div data-sheet-area></div>
     </div>`;
+
+    initWatchTracking(lesson, mainEl.querySelector('[data-video-mount]'));
 
     document.getElementById('finishBtn')?.addEventListener('click', async () => {
       const btn = document.getElementById('finishBtn');

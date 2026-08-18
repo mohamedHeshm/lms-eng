@@ -9,6 +9,19 @@
   <style>
     [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
     [data-lesson-modal].active { display:block; }
+
+    /* متابعة الطلاب — تتبع مشاهدة الدروس */
+    .wt-progress { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; min-width: 90px; }
+    .wt-progress > span { display: block; height: 100%; background: var(--success, #1f9d55); border-radius: 999px; }
+    .wt-row-name { font-weight: 600; }
+    table.wt-table td, table.wt-table th { text-align: center; vertical-align: middle; }
+    @media (max-width: 760px) {
+      table.wt-table thead { display: none; }
+      table.wt-table, table.wt-table tbody, table.wt-table tr, table.wt-table td { display: block; width: 100%; }
+      table.wt-table tr { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; padding: 10px; }
+      table.wt-table td { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 4px; border: 0; text-align: start; }
+      table.wt-table td::before { content: attr(data-label); font-weight: 600; color: var(--muted, #6b7280); }
+    }
   </style>
 </head>
 <body data-role="teacher">
@@ -26,6 +39,7 @@
       <button data-view="explainer-videos" data-title="فيديو الشرح">فيديو الشرح</button>
       <button data-view="content" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
       <button data-view="students" data-title="الطلاب">الطلاب</button>
+      <button data-view="watch-tracking" data-title="متابعة الطلاب الذين شاهدوا الدروس">متابعة الطلاب</button>
       <button data-view="subscriptions" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
       <button data-view="reports" data-title="التقارير">التقارير</button>
     </nav>
@@ -142,6 +156,36 @@
       <section class="view" id="students">
         <div class="section-title"><div><h2>الطلاب</h2><p>الطلاب المرتبطون بحسابك، وحالة اشتراكهم الشهري للشهر الحالي.</p></div></div>
         <div class="panel"><div data-students-list></div></div>
+      </section>
+
+      <!-- متابعة الطلاب الذين شاهدوا الدروس -->
+      <section class="view" id="watch-tracking">
+        <div class="section-title"><div><h2>متابعة الطلاب الذين شاهدوا الدروس</h2><p>تابع تقدّم كل طالب في مشاهدة دروس كورساتك لحظة بلحظة.</p></div></div>
+
+        <div class="stat-grid">
+          <article class="portal-stat"><span>طلاب شاهدوا دروسًا</span><b data-wt-students>—</b></article>
+          <article class="portal-stat"><span>إجمالي المشاهدات</span><b data-wt-views>—</b></article>
+          <article class="portal-stat"><span>دروس تمت مشاهدتها</span><b data-wt-lessons>—</b></article>
+          <article class="portal-stat"><span>دروس مكتملة</span><b data-wt-completed>—</b></article>
+          <article class="portal-stat"><span>متوسط نسبة المشاهدة</span><b data-wt-avg>—</b></article>
+        </div>
+
+        <form class="toolbar" data-watch-filters>
+          <label class="field">الكورس<select name="course"><option value="">كل الكورسات</option></select></label>
+          <label class="field">الدرس<select name="lesson"><option value="">كل الدروس</option></select></label>
+          <label class="field">اسم الطالب<input type="search" name="name" placeholder="ابحث بالاسم"></label>
+          <label class="field">البريد الإلكتروني<input type="search" name="email" placeholder="ابحث بالإيميل"></label>
+          <label class="field">الحالة
+            <select name="status">
+              <option value="">كل الحالات</option>
+              <option value="completed">مكتمل</option>
+              <option value="in_progress">جاري المشاهدة</option>
+              <option value="not_started">لم يشاهد الدرس</option>
+            </select>
+          </label>
+        </form>
+
+        <div class="panel"><div data-watch-table><p class="loading">جاري التحميل…</p></div></div>
       </section>
 
       <!-- الاشتراك الشهري -->

@@ -42,6 +42,7 @@ function onViewOpen(view) {
   if (view === 'content') loadMaterials();
   if (view === 'students') loadStudents();
   if (view === 'subscriptions') loadSubscriptionRequests();
+  if (view === 'watch-tracking') { setupWatchTrackingFilters(); loadWatchTracking(); }
 }
 
 /* ============================== نظرة عامة ============================== */
@@ -1028,6 +1029,221 @@ async function loadSubscriptionRequests() {
     loadSubscriptionRequests();
     loadOverview();
   }));
+}
+
+/* ============================== متابعة الطلاب (تتبع مشاهدة الدروس) ============================== */
+const WATCH_STATUS_LABELS = {
+  completed: { text: 'مكتمل', badge: 'approved' },
+  in_progress: { text: 'جاري المشاهدة', badge: 'pending' },
+  not_started: { text: 'لم يشاهد', badge: 'rejected' },
+};
+
+function watchStatusOf(row) {
+  if (!row) return 'not_started';
+  return row.completed ? 'completed' : 'in_progress';
+}
+
+function timeAgoAr(dateStr) {
+  if (!dateStr) return '—';
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'الآن';
+  if (mins < 60) return `منذ ${mins} دقيقة`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `منذ ${hours} ساعة`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `منذ ${days} يوم`;
+  return new Date(dateStr).toLocaleDateString('ar-EG');
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+let wtCoursesCache = [];
+let wtFiltersInitialized = false;
+
+async function setupWatchTrackingFilters() {
+  const filterForm = document.querySelector('[data-watch-filters]');
+  const courseSelect = filterForm?.querySelector('select[name="course"]');
+  const lessonSelect = filterForm?.querySelector('select[name="lesson"]');
+  if (!filterForm || !courseSelect) return;
+
+  if (!wtCoursesCache.length) {
+    const { data: courses } = await supabase.from('courses').select('id,title').eq('teacher_id', user.id).order('title');
+    wtCoursesCache = courses || [];
+    courseSelect.innerHTML = `<option value="">كل الكورسات</option>${wtCoursesCache.map((c) => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}`;
+  }
+
+  if (wtFiltersInitialized) return;
+  wtFiltersInitialized = true;
+
+  courseSelect.addEventListener('change', async () => {
+    const courseId = courseSelect.value;
+    if (!courseId) { lessonSelect.innerHTML = '<option value="">كل الدروس</option>'; loadWatchTracking(); return; }
+    const { data: lessons } = await supabase.from('course_lessons').select('id,title').eq('course_id', courseId).order('sort_order', { ascending: true });
+    lessonSelect.innerHTML = `<option value="">كل الدروس</option>${(lessons || []).map((l) => `<option value="${l.id}">${esc(l.title)}</option>`).join('')}`;
+    loadWatchTracking();
+  });
+  lessonSelect?.addEventListener('change', () => loadWatchTracking());
+  filterForm.querySelector('input[name="name"]')?.addEventListener('input', debounce(() => loadWatchTracking(), 300));
+  filterForm.querySelector('input[name="email"]')?.addEventListener('input', debounce(() => loadWatchTracking(), 300));
+  filterForm.querySelector('select[name="status"]')?.addEventListener('change', () => loadWatchTracking());
+}
+
+function renderWatchStats(rows) {
+  const distinctStudents = new Set(rows.map((r) => r.student_id)).size;
+  const totalViews = rows.length;
+  const distinctLessons = new Set(rows.map((r) => r.lesson_id)).size;
+  const completedCount = rows.filter((r) => r.completed).length;
+  const avgProgress = rows.length ? Math.round(rows.reduce((sum, r) => sum + (r.progress_percentage || 0), 0) / rows.length) : 0;
+  const setNum = (sel, value) => { const el = document.querySelector(sel); if (el) el.textContent = String(value); };
+  setNum('[data-wt-students]', distinctStudents);
+  setNum('[data-wt-views]', totalViews);
+  setNum('[data-wt-lessons]', distinctLessons);
+  setNum('[data-wt-completed]', completedCount);
+  setNum('[data-wt-avg]', avgProgress + '%');
+}
+
+async function loadWatchTracking() {
+  const tableTarget = document.querySelector('[data-watch-table]');
+  if (!tableTarget) return;
+  tableTarget.innerHTML = '<p class="loading">جاري التحميل…</p>';
+
+  const filterForm = document.querySelector('[data-watch-filters]');
+  const filters = filterForm ? Object.fromEntries(new FormData(filterForm).entries()) : {};
+
+  let query = supabase.from('lesson_watch_progress')
+    .select('*, courses!inner(title,teacher_id), profiles!student_id(id,full_name,email), course_lessons(title)')
+    .eq('courses.teacher_id', user.id)
+    .order('last_watched_at', { ascending: false });
+  if (filters.course) query = query.eq('course_id', filters.course);
+  if (filters.lesson) query = query.eq('lesson_id', filters.lesson);
+
+  const { data: rows, error } = await query;
+  if (error) { tableTarget.innerHTML = empty(genericError); return; }
+
+  renderWatchStats(rows || []);
+
+  if (filters.status === 'not_started') {
+    await renderNotStartedStudents(filters);
+    return;
+  }
+
+  let filtered = rows || [];
+  if (filters.name?.trim()) {
+    const q = filters.name.trim().toLocaleLowerCase('ar');
+    filtered = filtered.filter((r) => (r.profiles?.full_name || '').toLocaleLowerCase('ar').includes(q));
+  }
+  if (filters.email?.trim()) {
+    const q = filters.email.trim().toLocaleLowerCase('ar');
+    filtered = filtered.filter((r) => (r.profiles?.email || '').toLocaleLowerCase('ar').includes(q));
+  }
+  if (filters.status === 'completed') filtered = filtered.filter((r) => r.completed);
+  if (filters.status === 'in_progress') filtered = filtered.filter((r) => !r.completed);
+
+  if (!filtered.length) { tableTarget.innerHTML = empty('لا توجد بيانات مشاهدة مطابقة.'); return; }
+
+  tableTarget.innerHTML = `<div style="overflow-x:auto"><table class="subscription-table wt-table">
+    <thead><tr><th>الطالب</th><th>الدرس</th><th>الكورس</th><th>نسبة المشاهدة</th><th>الحالة</th><th>آخر مشاهدة</th></tr></thead>
+    <tbody>
+      ${filtered.map((r) => {
+        const status = watchStatusOf(r);
+        const label = WATCH_STATUS_LABELS[status];
+        const pct = r.progress_percentage || 0;
+        return `<tr data-open-student="${r.profiles?.id || ''}" style="cursor:pointer">
+          <td data-label="الطالب"><span class="wt-row-name">${esc(r.profiles?.full_name || '—')}</span></td>
+          <td data-label="الدرس">${esc(r.course_lessons?.title || '—')}</td>
+          <td data-label="الكورس">${esc(r.courses?.title || '—')}</td>
+          <td data-label="نسبة المشاهدة"><div style="display:flex;align-items:center;gap:8px;justify-content:center"><div class="wt-progress"><span style="width:${pct}%"></span></div><span>${pct}%</span></div></td>
+          <td data-label="الحالة"><span class="status-badge ${label.badge}">${label.text}</span></td>
+          <td data-label="آخر مشاهدة">${timeAgoAr(r.last_watched_at)}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+
+  tableTarget.querySelectorAll('[data-open-student]').forEach((tr) => tr.addEventListener('click', () => {
+    if (tr.dataset.openStudent) openStudentWatchDetail(tr.dataset.openStudent);
+  }));
+}
+
+async function renderNotStartedStudents(filters) {
+  const tableTarget = document.querySelector('[data-watch-table]');
+  if (!filters.lesson && !filters.course) {
+    tableTarget.innerHTML = empty('اختر كورسًا أو درسًا لعرض الطلاب الذين لم يشاهدوه.');
+    return;
+  }
+  const { data: students, error } = await supabase.from('profiles').select('id,full_name,email').eq('teacher_id', user.id).eq('role', 'student').order('full_name');
+  if (error) { tableTarget.innerHTML = empty(genericError); return; }
+
+  let watchedIds = new Set();
+  if (filters.lesson) {
+    const { data: watched } = await supabase.from('lesson_watch_progress').select('student_id').eq('lesson_id', filters.lesson);
+    watchedIds = new Set((watched || []).map((w) => w.student_id));
+  } else if (filters.course) {
+    const { data: watched } = await supabase.from('lesson_watch_progress').select('student_id').eq('course_id', filters.course);
+    watchedIds = new Set((watched || []).map((w) => w.student_id));
+  }
+
+  let notStarted = (students || []).filter((s) => !watchedIds.has(s.id));
+  if (filters.name?.trim()) { const q = filters.name.trim().toLocaleLowerCase('ar'); notStarted = notStarted.filter((s) => (s.full_name || '').toLocaleLowerCase('ar').includes(q)); }
+  if (filters.email?.trim()) { const q = filters.email.trim().toLocaleLowerCase('ar'); notStarted = notStarted.filter((s) => (s.email || '').toLocaleLowerCase('ar').includes(q)); }
+
+  tableTarget.innerHTML = notStarted.length ? `<div style="overflow-x:auto"><table class="subscription-table wt-table">
+    <thead><tr><th>الطالب</th><th>البريد الإلكتروني</th><th>الحالة</th></tr></thead>
+    <tbody>${notStarted.map((s) => `<tr><td data-label="الطالب">${esc(s.full_name)}</td><td data-label="البريد الإلكتروني">${esc(s.email || '—')}</td><td data-label="الحالة"><span class="status-badge rejected">لم يشاهد</span></td></tr>`).join('')}</tbody>
+  </table></div>` : empty('كل الطلاب شاهدوا هذا المحتوى بالفعل 🎉');
+}
+
+async function openStudentWatchDetail(studentId) {
+  const modalHost = document.querySelector('[data-lesson-modal]');
+  if (!modalHost) return;
+  modalHost.classList.add('active');
+  modalHost.innerHTML = `<div class="panel" style="max-width:760px;margin:30px auto;max-height:88vh;overflow:auto;">
+    <div class="panel-head"><h3 data-student-name>تفاصيل الطالب</h3><button class="button button-text" data-close-modal>إغلاق ✕</button></div>
+    <div data-student-detail><p class="loading">جاري التحميل…</p></div>
+  </div>`;
+  modalHost.querySelector('[data-close-modal]').addEventListener('click', () => { modalHost.classList.remove('active'); modalHost.innerHTML = ''; });
+
+  const { data: rows, error } = await supabase.from('lesson_watch_progress')
+    .select('*, courses!inner(title,teacher_id), course_lessons(title), profiles!student_id(full_name,email)')
+    .eq('student_id', studentId).eq('courses.teacher_id', user.id)
+    .order('last_watched_at', { ascending: false });
+
+  const detail = modalHost.querySelector('[data-student-detail]');
+  if (error) { detail.innerHTML = empty(genericError); return; }
+  if (!rows.length) { detail.innerHTML = empty('لا توجد بيانات مشاهدة لهذا الطالب.'); return; }
+
+  modalHost.querySelector('[data-student-name]').textContent = rows[0].profiles?.full_name || 'تفاصيل الطالب';
+  const totalLessons = rows.length;
+  const completedLessons = rows.filter((r) => r.completed).length;
+  const avg = Math.round(rows.reduce((s, r) => s + (r.progress_percentage || 0), 0) / totalLessons);
+  const lastActivity = rows[0]?.last_watched_at;
+
+  detail.innerHTML = `
+    <div class="stat-grid" style="margin-bottom:18px">
+      <article class="portal-stat"><span>إجمالي الدروس المشاهدة</span><b>${totalLessons}</b></article>
+      <article class="portal-stat"><span>الدروس المكتملة</span><b>${completedLessons}</b></article>
+      <article class="portal-stat"><span>متوسط المشاهدة</span><b>${avg}%</b></article>
+      <article class="portal-stat"><span>آخر نشاط</span><b style="font-size:14px">${timeAgoAr(lastActivity)}</b></article>
+    </div>
+    <h4 style="margin-bottom:10px">الدروس التي شاهدها</h4>
+    <div class="list">
+      ${rows.map((r) => {
+        const status = watchStatusOf(r);
+        const label = WATCH_STATUS_LABELS[status];
+        return `<div class="list-row">
+          <div style="flex:1">
+            <strong>${esc(r.course_lessons?.title || '—')}</strong>
+            <div class="wt-progress" style="margin:8px 0"><span style="width:${r.progress_percentage || 0}%"></span></div>
+            <span class="course-meta">${esc(r.courses?.title || '')} · أول مشاهدة: ${r.started_at ? new Date(r.started_at).toLocaleDateString('ar-EG') : '—'} · آخر مشاهدة: ${timeAgoAr(r.last_watched_at)}</span>
+          </div>
+          <span class="status-badge ${label.badge}">${label.text}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
 }
 
 /* ============================== تشغيل ============================== */
