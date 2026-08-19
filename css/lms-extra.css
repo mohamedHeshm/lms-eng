@@ -1,0 +1,105 @@
+/* ============================================================================
+   المأمون التعليمية — طبقة تصميم إضافية للـ Features الجديدة (LMS احترافي)
+   يُستورد بعد portal.css / design-system.css / student-dashboard.css في كل
+   من student-modern.html و teacher.html و student-detail.html. لا يعدّل أي
+   تصميم موجود، فقط يضيف Classes جديدة بنفس هوية المنصة.
+   ============================================================================ */
+
+:root {
+  --lms-primary: #1e5b4f;
+  --lms-primary-dark: #0d3028;
+  --lms-light: #e8f1ed;
+  --lms-accent: #c68a37;
+  --lms-border: #dce4df;
+  --lms-muted: #66736f;
+  --lms-success: #247a52;
+  --lms-warning: #a96818;
+  --lms-error: #b8413e;
+  --lms-radius: 16px;
+}
+
+/* ---------------- Progress bar عام (يُستخدم في الطالب والمدرس) ---------------- */
+.lp-bar { width: 100%; height: var(--lp-h, 8px); background: var(--lms-light); border-radius: 999px; overflow: hidden; }
+.lp-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--lms-primary), #1c8a6e); border-radius: 999px; transition: width .35s ease; }
+.lp-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .78rem; color: var(--lms-muted); margin: 6px 0; }
+.lp-meta-row strong { color: var(--lms-primary-dark); }
+
+/* ---------------- بطاقة "أكمل من حيث توقفت" ---------------- */
+.continue-card { display: flex; gap: 16px; align-items: center; padding: 18px; background: #fff; border: 1px solid var(--lms-border); border-radius: var(--lms-radius); box-shadow: 0 10px 26px rgba(13,48,40,.07); }
+.continue-card .cc-cover { width: 84px; height: 84px; flex: none; border-radius: 14px; overflow: hidden; background: var(--lms-light); display: grid; place-items: center; color: var(--lms-primary); font-size: 1.6rem; }
+.continue-card .cc-cover img { width: 100%; height: 100%; object-fit: cover; }
+.continue-card .cc-body { flex: 1; min-width: 0; }
+.continue-card .cc-course { font-size: .76rem; font-weight: 700; color: var(--lms-accent); }
+.continue-card .cc-lesson { margin: 2px 0 8px; font-weight: 800; color: var(--lms-primary-dark); }
+.continue-card .cc-actions { flex: none; }
+@media (max-width: 560px) { .continue-card { flex-direction: column; align-items: stretch; text-align: center; } .continue-card .cc-cover { margin: auto; } }
+
+/* ---------------- إشعارات (Dropdown items) ---------------- */
+.notif-item { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 8px; border: 0; background: transparent; text-align: right; border-radius: 10px; cursor: pointer; position: relative; }
+.notif-item:hover { background: var(--lms-light); }
+.notif-item.unread { background: #f4f9f6; }
+.notif-item-icon { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--lms-light); display: grid; place-items: center; font-size: .9rem; }
+.notif-item-body { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.notif-item-body strong { font-size: .84rem; color: var(--lms-primary-dark); }
+.notif-item-msg { font-size: .78rem; color: var(--lms-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notif-item-time { font-size: .7rem; color: #9aa6a0; }
+.notif-dot { position: absolute; top: 10px; left: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--lms-accent); }
+.notif-dropdown-foot { border-top: 1px solid var(--lms-border); padding: 8px; display: flex; justify-content: space-between; gap: 8px; }
+.notif-badge { position: absolute; top: -4px; left: -4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--lms-error); color: #fff; font-size: .64rem; font-weight: 800; display: grid; place-items: center; line-height: 1; }
+.icon-button { position: relative; }
+
+/* ---------------- إنجازاتي (Gamification) ---------------- */
+.achv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.achv-card { padding: 20px 16px; text-align: center; background: #fff; border: 1px solid var(--lms-border); border-radius: var(--lms-radius); box-shadow: 0 6px 18px rgba(13,48,40,.05); transition: transform .2s ease; }
+.achv-card.earned:hover { transform: translateY(-3px); }
+.achv-card .achv-icon { font-size: 2rem; margin-bottom: 8px; filter: none; }
+.achv-card.locked { opacity: .5; filter: grayscale(1); }
+.achv-card h4 { margin: 4px 0 4px; font-size: .95rem; color: var(--lms-primary-dark); }
+.achv-card p { margin: 0; font-size: .78rem; color: var(--lms-muted); }
+.achv-card .achv-date { display: block; margin-top: 8px; font-size: .72rem; color: var(--lms-accent); font-weight: 700; }
+
+/* ---------------- تفاصيل الطالب (المدرس) ---------------- */
+.sd-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 22px 26px; background: linear-gradient(120deg, var(--lms-primary-dark), var(--lms-primary)); color: #fff; border-radius: var(--lms-radius); margin-bottom: 20px; }
+.sd-header h2 { margin: 0 0 4px; }
+.sd-header p { margin: 0; opacity: .85; font-size: .86rem; }
+.sd-header .status-badge { background: rgba(255,255,255,.16); color: #fff; }
+.sd-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.sd-stat { padding: 16px; background: #fff; border: 1px solid var(--lms-border); border-radius: 14px; text-align: center; }
+.sd-stat span { display: block; font-size: .76rem; color: var(--lms-muted); margin-bottom: 6px; }
+.sd-stat b { font-size: 1.35rem; color: var(--lms-primary-dark); }
+.sd-course-card { padding: 16px; background: #fff; border: 1px solid var(--lms-border); border-radius: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
+.sd-course-cover { width: 64px; height: 64px; border-radius: 12px; background: var(--lms-light); overflow: hidden; flex: none; display: grid; place-items: center; color: var(--lms-primary); }
+.sd-course-cover img { width: 100%; height: 100%; object-fit: cover; }
+.sd-course-body { flex: 1; min-width: 0; }
+.sd-lesson-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px dashed var(--lms-border); font-size: .86rem; }
+.sd-lesson-row:last-child { border-bottom: 0; }
+.sd-lesson-icon { flex: none; width: 22px; text-align: center; }
+.sd-lesson-row.done .sd-lesson-icon { color: var(--lms-success); }
+.sd-lesson-row.in-progress .sd-lesson-icon { color: var(--lms-warning); }
+.sd-lesson-row.not-started .sd-lesson-icon { color: #b9c2bd; }
+.sd-lesson-row .lp-bar { max-width: 120px; }
+@media (max-width: 760px) { .sd-stat-grid { grid-template-columns: repeat(2,1fr); } }
+
+/* ---------------- طلاب يحتاجون متابعة ---------------- */
+.followup-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #fff; border: 1px solid var(--lms-border); border-radius: 14px; margin-bottom: 10px; cursor: pointer; transition: box-shadow .15s ease, transform .15s ease; }
+.followup-row:hover { box-shadow: 0 8px 22px rgba(13,48,40,.08); transform: translateY(-1px); }
+.followup-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--lms-light); color: var(--lms-primary); display: grid; place-items: center; font-weight: 800; flex: none; }
+.followup-body { flex: 1; min-width: 0; }
+.followup-body strong { display: block; color: var(--lms-primary-dark); }
+.followup-body span { font-size: .8rem; color: var(--lms-muted); }
+.followup-status { flex: none; padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 800; white-space: nowrap; }
+.followup-status.good { background: #eaf6ee; color: var(--lms-success); }
+.followup-status.warn { background: #fff6e5; color: var(--lms-warning); }
+.followup-status.danger { background: #fcefed; color: var(--lms-error); }
+
+/* ---------------- الإحصائيات (تحليلات المدرس) ---------------- */
+.analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.analytics-grid.secondary { grid-template-columns: repeat(5, 1fr); margin-top: 12px; }
+.an-stat { padding: 16px; background: #fff; border: 1px solid var(--lms-border); border-radius: 14px; text-align: center; }
+.an-stat span { display: block; font-size: .76rem; color: var(--lms-muted); margin-bottom: 6px; }
+.an-stat b { font-size: 1.4rem; color: var(--lms-primary-dark); }
+.an-course-row { display: grid; grid-template-columns: 1.4fr .8fr .8fr 1fr; gap: 10px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--lms-border); }
+.an-course-row:last-child { border-bottom: 0; }
+.an-course-row .an-course-name { font-weight: 700; color: var(--lms-primary-dark); }
+.an-course-row .an-course-sub { font-size: .74rem; color: var(--lms-muted); display: block; }
+@media (max-width: 900px) { .analytics-grid, .analytics-grid.secondary { grid-template-columns: repeat(2,1fr); } .an-course-row { grid-template-columns: 1fr; text-align: right; } }

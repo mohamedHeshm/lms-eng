@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/portal.css">
   <link rel="stylesheet" href="css/student-dashboard.css">
+  <link rel="stylesheet" href="css/lms-extra.css">
   <style>
     [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(9,20,17,.6); z-index:50; padding:20px; overflow:auto; backdrop-filter: blur(2px); }
     [data-lesson-modal].active { display:block; }
@@ -50,6 +51,10 @@
       <button data-view="subscription" data-title="الاشتراك الشهري">
         <svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>
         <span>الاشتراك الشهري</span>
+      </button>
+      <button data-view="achievements" data-title="إنجازاتي">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5 7 21l5-2.5L17 21l-1.5-8.5"/></svg>
+        <span>إنجازاتي</span>
       </button>
       <button data-view="profile" data-title="حسابي">
         <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
@@ -140,9 +145,14 @@
           </article>
         </div>
 
+        <div class="panel" data-reveal style="margin-bottom:22px">
+          <div class="panel-head"><h3>أكمل من حيث توقفت</h3></div>
+          <div data-continue-watching><p class="loading">جاري التحميل…</p></div>
+        </div>
+
         <div class="content-grid">
           <section class="panel" data-reveal>
-            <div class="panel-head"><h3>تابع من حيث توقفت</h3><button class="button button-text" data-view="my-courses" data-title="كورساتي">عرض كل الكورسات</button></div>
+            <div class="panel-head"><h3>كورساتي</h3><button class="button button-text" data-view="my-courses" data-title="كورساتي">عرض كل الكورسات</button></div>
             <div class="course-grid portal-courses continue-learning" data-student-courses></div>
           </section>
           <aside class="side-stack" data-reveal>
@@ -196,6 +206,12 @@
       <section class="view" id="subscription">
         <div class="section-title"><div><h2>الاشتراك الشهري</h2><p>مكان منفصل تمامًا عن دفع الكورسات، خاص بالاشتراك الشهري عند مدرسك.</p></div></div>
         <div data-subscription-view></div>
+      </section>
+
+      <!-- إنجازاتي -->
+      <section class="view" id="achievements">
+        <div class="section-title"><div><h2>إنجازاتي</h2><p>إنجازات تُفتح تلقائيًا كلما تقدّمت في دراستك.</p></div></div>
+        <div class="achv-grid" data-achievements-list><p class="loading">جاري التحميل…</p></div>
       </section>
 
       <!-- حسابي -->

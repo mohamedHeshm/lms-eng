@@ -1,5 +1,7 @@
 import { supabase, esc, money, genericError, currentMonthStart } from './supabase-client.js';
 import { requireAuth } from './auth-guard.js';
+import { fetchNotifications, unreadCount, markRead, markAllRead, renderNotifList, subscribeRealtimeNotifications, notify, notifyMany, timeAgoAr as notifTimeAgo } from './notifications.js';
+import { progressBarHtml } from './progress-tracker.js';
 
 const STAGES = ['الأولى الثانوية', 'الثانية الثانوية', 'الثالثة الثانوية'];
 const MATERIAL_LABELS = { sheet: { label: 'شيت', chip: 'chip-sheet', icon: '📄' }, board: { label: 'سبورة', chip: 'chip-board', icon: '🖼' }, note: { label: 'مذكرة', chip: 'chip-note', icon: '📘' } };
@@ -43,6 +45,8 @@ function onViewOpen(view) {
   if (view === 'students') loadStudents();
   if (view === 'subscriptions') loadSubscriptionRequests();
   if (view === 'watch-tracking') { setupWatchTrackingFilters(); loadWatchTracking(); }
+  if (view === 'follow-up') loadFollowUpStudents();
+  if (view === 'analytics') loadAnalytics();
 }
 
 /* ============================== نظرة عامة ============================== */
@@ -917,13 +921,14 @@ async function loadStudents() {
             }
 
             return `<tr>
-              <td><strong>${esc(st.full_name)}</strong></td>
+              <td><a href="student-detail.html?student=${encodeURIComponent(st.id)}" style="font-weight:700;color:var(--primary)">${esc(st.full_name)}</a></td>
               <td><span class="status-badge ${status.badge}">${status.status}</span></td>
               <td>${startDate}</td>
               <td>${endDate}</td>
               <td>${daysRemaining}</td>
               <td>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+                  <a class="button button-secondary" style="width:auto;padding:6px 12px;font-size:0.8rem;" href="student-detail.html?student=${encodeURIComponent(st.id)}">تفاصيل الطالب</a>
                   ${actions}
                 </div>
               </td>
@@ -990,6 +995,7 @@ async function loadStudents() {
         alert(genericError);
         return;
       }
+      notify(studentId, { title: 'تم تفعيل اشتراكك الشهري', message: `فتح مدرسك الاختبارات والمواد حتى ${new Date(endDateStr).toLocaleDateString('ar-EG')}`, type: 'subscription' });
       loadStudents();
     });
   });
@@ -1004,7 +1010,7 @@ async function loadSubscriptionRequests() {
   target.innerHTML = requests.length ? `<table class="subscription-table"><thead><tr><th>الطالب</th><th>الشهر</th><th>المبلغ</th><th>الطريقة</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>
     ${requests.map((r) => `<tr><td>${esc(r.profiles?.full_name || '—')}</td><td>${new Date(r.month).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' })}</td><td>${money(r.amount)}</td><td>${esc(r.method)}</td>
       <td><span class="status-badge ${r.status}">${r.status === 'approved' ? 'مقبول' : r.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة'}</span></td>
-      <td>${r.status === 'pending' ? `<div class="row-actions"><button class="button button-primary" style="width:auto;padding:6px 12px" data-approve-sub="${r.id}">قبول</button><button class="button button-danger" style="width:auto;padding:6px 12px" data-reject-sub="${r.id}">رفض</button></div>` : '—'}</td>
+      <td>${r.status === 'pending' ? `<div class="row-actions"><button class="button button-primary" style="width:auto;padding:6px 12px" data-approve-sub="${r.id}" data-student-id="${r.student_id}">قبول</button><button class="button button-danger" style="width:auto;padding:6px 12px" data-reject-sub="${r.id}" data-student-id="${r.student_id}">رفض</button></div>` : '—'}</td>
     </tr>`).join('')}</tbody></table>` : empty('لا توجد طلبات اشتراك شهري حتى الآن.');
 
   target.querySelectorAll('[data-approve-sub]').forEach((btn) => btn.addEventListener('click', async () => {
@@ -1020,12 +1026,14 @@ async function loadSubscriptionRequests() {
       end_date: endDateStr,
       updated_at: new Date().toISOString()
     }).eq('id', btn.dataset.approveSub);
+    notify(btn.dataset.studentId, { title: 'تم تفعيل اشتراكك الشهري', message: `فتح مدرسك الاختبارات والمواد حتى ${new Date(endDateStr).toLocaleDateString('ar-EG')}`, type: 'subscription', relatedType: 'subscription', relatedId: btn.dataset.approveSub });
     loadSubscriptionRequests();
     loadOverview();
   }));
 
   target.querySelectorAll('[data-reject-sub]').forEach((btn) => btn.addEventListener('click', async () => {
     await supabase.from('subscription_payments').update({ status: 'rejected' }).eq('id', btn.dataset.rejectSub);
+    notify(btn.dataset.studentId, { title: 'تم رفض طلب الاشتراك الشهري', message: 'راجع بيانات الدفع وأعد إرسال الطلب.', type: 'subscription', relatedType: 'subscription', relatedId: btn.dataset.rejectSub });
     loadSubscriptionRequests();
     loadOverview();
   }));
@@ -1202,7 +1210,12 @@ async function openStudentWatchDetail(studentId) {
   if (!modalHost) return;
   modalHost.classList.add('active');
   modalHost.innerHTML = `<div class="panel" style="max-width:760px;margin:30px auto;max-height:88vh;overflow:auto;">
-    <div class="panel-head"><h3 data-student-name>تفاصيل الطالب</h3><button class="button button-text" data-close-modal>إغلاق ✕</button></div>
+    <div class="panel-head"><h3 data-student-name>تفاصيل الطالب</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a class="button button-secondary" style="width:auto;padding:6px 12px" href="student-detail.html?student=${encodeURIComponent(studentId)}">الصفحة الكاملة ↗</a>
+        <button class="button button-text" data-close-modal>إغلاق ✕</button>
+      </div>
+    </div>
     <div data-student-detail><p class="loading">جاري التحميل…</p></div>
   </div>`;
   modalHost.querySelector('[data-close-modal]').addEventListener('click', () => { modalHost.classList.remove('active'); modalHost.innerHTML = ''; });
@@ -1246,6 +1259,194 @@ async function openStudentWatchDetail(studentId) {
     </div>`;
 }
 
+/* ============================== طلاب يحتاجون متابعة ============================== */
+function daysSince(dateStr) {
+  if (!dateStr) return Infinity;
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function followUpStatusOf({ daysSinceActivity, avgProgress, avgQuiz }) {
+  // 🔴 يحتاج تدخل: غياب طويل أو تقدم شديد الانخفاض
+  if (daysSinceActivity >= 14 || avgProgress < 20 || (avgQuiz != null && avgQuiz < 40)) {
+    return { level: 'danger', label: '🔴 يحتاج تدخل' };
+  }
+  // 🟡 يحتاج متابعة: غياب متوسط أو تقدم منخفض
+  if (daysSinceActivity >= 7 || avgProgress < 50 || (avgQuiz != null && avgQuiz < 60)) {
+    return { level: 'warn', label: '🟡 يحتاج متابعة' };
+  }
+  return { level: 'good', label: '🟢 ممتاز' };
+}
+
+async function loadFollowUpStudents() {
+  const target = document.querySelector('[data-followup-list]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+
+  const [{ data: students, error }, { data: progressRows }, { data: quizAttempts }] = await Promise.all([
+    supabase.from('profiles').select('id, full_name, created_at').eq('teacher_id', user.id).eq('role', 'student').order('full_name'),
+    supabase.from('v_course_progress').select('student_id, avg_percentage, last_watched_at').eq('teacher_id', user.id),
+    supabase.from('quiz_attempts').select('student_id, score, total, created_at, quizzes!inner(teacher_id)').eq('quizzes.teacher_id', user.id),
+  ]);
+  if (error) { target.innerHTML = empty(genericError); return; }
+  if (!students.length) { target.innerHTML = empty('لا يوجد طلاب مرتبطون بحسابك بعد.'); return; }
+
+  const progressByStudent = {};
+  (progressRows || []).forEach((r) => { (progressByStudent[r.student_id] ||= []).push(r); });
+  const quizByStudent = {};
+  (quizAttempts || []).forEach((a) => { (quizByStudent[a.student_id] ||= []).push(a); });
+
+  const rows = students.map((st) => {
+    const courses = progressByStudent[st.id] || [];
+    const avgProgress = courses.length ? Math.round(courses.reduce((s, c) => s + (c.avg_percentage || 0), 0) / courses.length) : 0;
+    const lastActivity = [
+      ...courses.map((c) => c.last_watched_at).filter(Boolean),
+      ...(quizByStudent[st.id] || []).map((a) => a.created_at),
+    ].sort((a, b) => new Date(b) - new Date(a))[0];
+    const quizzes = quizByStudent[st.id] || [];
+    const avgQuiz = quizzes.length ? Math.round(quizzes.reduce((s, a) => s + (a.total ? (a.score / a.total) * 100 : 0), 0) / quizzes.length) : null;
+    const daysSinceActivity = lastActivity ? daysSince(lastActivity) : daysSince(st.created_at);
+    const status = followUpStatusOf({ daysSinceActivity, avgProgress, avgQuiz });
+    return { student: st, avgProgress, lastActivity, status, daysSinceActivity };
+  }).sort((a, b) => {
+    const order = { danger: 0, warn: 1, good: 2 };
+    return order[a.status.level] - order[b.status.level] || b.daysSinceActivity - a.daysSinceActivity;
+  });
+
+  target.innerHTML = rows.map((r) => `
+    <div class="followup-row" data-open-student="${r.student.id}">
+      <div class="followup-avatar">${esc((r.student.full_name || '؟').trim().charAt(0))}</div>
+      <div class="followup-body">
+        <strong>${esc(r.student.full_name)}</strong>
+        <span>التقدم: ${r.avgProgress}% · آخر نشاط: ${r.lastActivity ? timeAgoAr(r.lastActivity) : 'لم يبدأ بعد'}</span>
+      </div>
+      <span class="followup-status ${r.status.level}">${r.status.label}</span>
+    </div>`).join('');
+
+  target.querySelectorAll('[data-open-student]').forEach((row) => row.addEventListener('click', () => {
+    location.href = `student-detail.html?student=${encodeURIComponent(row.dataset.openStudent)}`;
+  }));
+}
+
+/* ============================== الإحصائيات (تحليلات المدرس) ============================== */
+async function loadAnalytics() {
+  const setNum = (sel, value) => { const el = document.querySelector(sel); if (el) el.textContent = String(value); };
+  const coursesTarget = document.querySelector('[data-an-courses]');
+  coursesTarget.innerHTML = '<p class="loading">جاري التحميل…</p>';
+
+  const { data: courses } = await supabase.from('courses').select('id, title').eq('teacher_id', user.id);
+  const courseIds = (courses || []).map((c) => c.id);
+
+  const [{ count: totalStudents }, { data: lessons }, { data: watchRows }, { data: progressRows }, { data: quizAttempts }] = await Promise.all([
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('teacher_id', user.id).eq('role', 'student'),
+    courseIds.length ? supabase.from('course_lessons').select('id, course_id, title').in('course_id', courseIds) : Promise.resolve({ data: [] }),
+    courseIds.length ? supabase.from('lesson_watch_progress').select('student_id, lesson_id, course_id, last_watched_at, completed').in('course_id', courseIds) : Promise.resolve({ data: [] }),
+    supabase.from('v_course_progress').select('*').eq('teacher_id', user.id),
+    supabase.from('quiz_attempts').select('student_id, created_at, quizzes!inner(teacher_id)').eq('quizzes.teacher_id', user.id),
+  ]);
+
+  const activeStudentIds = new Set();
+  const activeTodayIds = new Set();
+  const activeWeekIds = new Set();
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+  const weekStart = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  let lessonsWatchedToday = 0;
+  let lessonsCompletedToday = 0;
+
+  (watchRows || []).forEach((r) => {
+    if (!r.last_watched_at) return;
+    const t = new Date(r.last_watched_at).getTime();
+    activeStudentIds.add(r.student_id);
+    if (t >= todayStart.getTime()) { activeTodayIds.add(r.student_id); lessonsWatchedToday += 1; if (r.completed) lessonsCompletedToday += 1; }
+    if (t >= weekStart) activeWeekIds.add(r.student_id);
+  });
+  (quizAttempts || []).forEach((a) => {
+    if (!a.created_at) return;
+    const t = new Date(a.created_at).getTime();
+    activeStudentIds.add(a.student_id);
+    if (t >= todayStart.getTime()) activeTodayIds.add(a.student_id);
+    if (t >= weekStart) activeWeekIds.add(a.student_id);
+  });
+
+  const avgProgressAll = (progressRows || []).length
+    ? Math.round((progressRows.reduce((s, r) => s + (r.avg_percentage || 0), 0)) / progressRows.length) : 0;
+
+  setNum('[data-an-total-students]', totalStudents ?? 0);
+  setNum('[data-an-active-students]', activeWeekIds.size);
+  setNum('[data-an-inactive-students]', Math.max((totalStudents ?? 0) - activeWeekIds.size, 0));
+  setNum('[data-an-avg-progress]', avgProgressAll + '%');
+  setNum('[data-an-total-courses]', courses?.length ?? 0);
+  setNum('[data-an-total-lessons]', lessons?.length ?? 0);
+  setNum('[data-an-total-views]', (watchRows || []).length);
+  setNum('[data-an-active-today]', activeTodayIds.size);
+  setNum('[data-an-active-week]', activeWeekIds.size);
+
+  // إحصائيات حسب الكورس
+  const viewsByLesson = {};
+  (watchRows || []).forEach((r) => { viewsByLesson[r.lesson_id] = (viewsByLesson[r.lesson_id] || 0) + 1; });
+
+  const courseRowsHtml = (courses || []).map((c) => {
+    const studentsRows = (progressRows || []).filter((r) => r.course_id === c.id);
+    const studentsCount = studentsRows.length;
+    const avgProgress = studentsCount ? Math.round(studentsRows.reduce((s, r) => s + (r.avg_percentage || 0), 0) / studentsCount) : 0;
+    const completedLessonsTotal = studentsRows.reduce((s, r) => s + (r.completed_lessons || 0), 0);
+    const courseLessons = (lessons || []).filter((l) => l.course_id === c.id);
+    let most = null, least = null;
+    courseLessons.forEach((l) => {
+      const views = viewsByLesson[l.id] || 0;
+      if (!most || views > most.views) most = { title: l.title, views };
+      if (!least || views < least.views) least = { title: l.title, views };
+    });
+    return `<div class="an-course-row">
+      <div><span class="an-course-name">${esc(c.title)}</span><span class="an-course-sub">${studentsCount} طالب مشترك</span></div>
+      <div><span class="an-course-sub">متوسط التقدم</span><strong>${avgProgress}%</strong></div>
+      <div><span class="an-course-sub">دروس مكتملة</span><strong>${completedLessonsTotal}</strong></div>
+      <div>
+        <span class="an-course-sub">الأكثر مشاهدة: ${most ? esc(most.title) + ` (${most.views})` : '—'}</span>
+        <span class="an-course-sub">الأقل مشاهدة: ${least ? esc(least.title) + ` (${least.views})` : '—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  coursesTarget.innerHTML = (courses || []).length ? courseRowsHtml : empty('أنشئ كورسًا أولًا حتى تظهر إحصائياته هنا.');
+}
+
+/* ============================== الإشعارات ============================== */
+async function loadNotifications() {
+  const listEl = document.querySelector('[data-notif-list]');
+  if (!listEl) return;
+  const items = await fetchNotifications(user.id);
+  listEl.innerHTML = renderNotifList(items);
+  listEl.querySelectorAll('[data-notif-id]').forEach((btn) => btn.addEventListener('click', async () => {
+    await markRead(btn.dataset.notifId);
+    refreshNotifBadge();
+    if (btn.dataset.notifRelated === 'lesson' || btn.dataset.notifRelated === 'student') {
+      // من الممكن مستقبلاً فتح الطالب مباشرة لو أضفنا related_id = student_id
+    }
+  }));
+}
+
+async function refreshNotifBadge() {
+  const toggle = document.querySelector('[data-notif-toggle]');
+  if (!toggle) return;
+  const count = await unreadCount(user.id);
+  let badge = toggle.querySelector('.notif-badge');
+  if (count > 0) {
+    if (!badge) { badge = document.createElement('span'); badge.className = 'notif-badge'; toggle.appendChild(badge); }
+    badge.textContent = count > 9 ? '9+' : String(count);
+  } else if (badge) { badge.remove(); }
+}
+
+function setNotifDropdown() {
+  const toggle = document.querySelector('[data-notif-toggle]');
+  const dropdown = document.querySelector('[data-notif-dropdown]');
+  if (!toggle || !dropdown) return;
+  toggle.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('open'); if (dropdown.classList.contains('open')) loadNotifications(); });
+  document.addEventListener('click', (event) => { if (!dropdown.contains(event.target) && event.target !== toggle) dropdown.classList.remove('open'); });
+  document.querySelector('[data-notif-mark-all]')?.addEventListener('click', async () => { await markAllRead(user.id); loadNotifications(); refreshNotifBadge(); });
+  refreshNotifBadge();
+  subscribeRealtimeNotifications(user.id, () => refreshNotifBadge());
+}
+
 /* ============================== تشغيل ============================== */
 setNavigation();
 setMobileMenu();
@@ -1256,3 +1457,4 @@ setupCreateQuizForm();
 setupCreateVideoForm();
 setupMaterialFilter();
 setupUploadMaterialForm();
+setNotifDropdown();

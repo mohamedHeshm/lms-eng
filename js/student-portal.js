@@ -1,5 +1,8 @@
 import { supabase, esc, money, genericError, currentMonthStart } from './supabase-client.js';
 import { requireAuth } from './auth-guard.js';
+import { getAllCourseProgress, getContinueWatching, progressBarHtml } from './progress-tracker.js';
+import { fetchNotifications, unreadCount, markRead, markAllRead, renderNotifList, subscribeRealtimeNotifications, timeAgoAr, notify } from './notifications.js';
+import { ACHIEVEMENTS, getEarnedAchievements, checkAndAwardAchievements } from './achievements.js';
 
 const MATERIAL_LABELS = { sheet: { label: 'شيت', chip: 'chip-sheet', icon: '📄' }, board: { label: 'سبورة', chip: 'chip-board', icon: '🖼' }, note: { label: 'مذكرة', chip: 'chip-note', icon: '📘' } };
 
@@ -42,13 +45,20 @@ function onViewOpen(view) {
   if (view === 'subscription') loadSubscriptionView();
   if (view === 'payments') loadCoursePayments();
   if (view === 'profile') loadProfileView();
+  if (view === 'achievements') loadAchievements();
 }
 
 /* ============================== نظرة عامة + كورساتي ============================== */
-function courseCard(course) {
+function courseCard(course, progress) {
+  const total = progress?.total_lessons || 0;
+  const completed = progress?.completed_lessons || 0;
+  const pct = total ? Math.round((completed / total) * 100) : 0;
+  const progressBlock = total
+    ? `<div style="margin:10px 0"><div class="lp-meta-row"><span>${completed}/${total} درس مكتمل</span><strong>${pct}%</strong></div>${progressBarHtml(pct)}</div>`
+    : `<p class="course-meta" style="margin:10px 0">لم تبدأ دروس هذا الكورس بعد.</p>`;
   return `<article class="course-card"><div class="course-cover">${course.cover_image_url ? `<img src="${esc(course.cover_image_url)}" alt="${esc(course.title)}">` : '◒'}</div><div class="course-card-body">
-    <div><div class="course-meta">${esc(course.subject || 'محتوى تعليمي')}</div><h3>${esc(course.title)}</h3><p class="course-meta">يمكنك متابعة دروس الكورس.</p></div>
-    <div class="course-footer"><span class="price">مفعّل</span><a class="button button-secondary" href="playlist-view.html?course=${encodeURIComponent(course.id)}">عرض الدروس</a></div>
+    <div><div class="course-meta">${esc(course.subject || 'محتوى تعليمي')}</div><h3>${esc(course.title)}</h3>${progressBlock}</div>
+    <div class="course-footer"><span class="price">${pct >= 100 && total ? 'مكتمل ✓' : 'مفعّل'}</span><a class="button button-secondary" href="playlist-view.html?course=${encodeURIComponent(course.id)}">${completed > 0 ? 'متابعة الدروس' : 'عرض الدروس'}</a></div>
   </div></article>`;
 }
 
@@ -56,11 +66,57 @@ async function loadMyCourses() {
   const targets = document.querySelectorAll('[data-student-courses]');
   if (!targets.length) return;
   targets.forEach((t) => { t.innerHTML = '<p class="loading">جاري تحميل كورساتك…</p>'; });
-  const { data, error } = await supabase.from('enrollments').select('course:courses(*)').eq('student_id', user.id);
+  const [{ data, error }, progressRows] = await Promise.all([
+    supabase.from('enrollments').select('course:courses(*)').eq('student_id', user.id),
+    getAllCourseProgress(user.id),
+  ]);
   const courses = error ? [] : (data || []).map((r) => r.course).filter(Boolean);
-  const content = courses.length ? courses.map(courseCard).join('') : empty('لا توجد كورسات مفعّلة في حسابك حاليًا.', '<a class="button button-primary" href="courses.html">تصفح الكورسات</a>');
+  const progressByCourse = Object.fromEntries(progressRows.map((p) => [p.course_id, p]));
+  const content = courses.length
+    ? courses.map((c) => courseCard(c, progressByCourse[c.id])).join('')
+    : empty('لا توجد كورسات مفعّلة في حسابك حاليًا.', '<a class="button button-primary" href="courses.html">تصفح الكورسات</a>');
   targets.forEach((t) => { t.innerHTML = content; });
   document.querySelector('[data-course-count]')?.replaceChildren(document.createTextNode(String(courses.length)));
+}
+
+/* ============================== أكمل من حيث توقفت ============================== */
+async function loadContinueWatching() {
+  const target = document.querySelector('[data-continue-watching]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+  const cw = await getContinueWatching(user.id);
+  if (!cw) {
+    target.innerHTML = empty('لا يوجد درس متوقف عنده حاليًا. ابدأ درسًا جديدًا!', '<a class="button button-primary" href="courses.html">ابدأ درسًا جديدًا</a>');
+    return;
+  }
+  target.innerHTML = `<div class="continue-card">
+    <div class="cc-cover">${cw.cover_image_url ? `<img src="${esc(cw.cover_image_url)}" alt="${esc(cw.course_title)}">` : '◒'}</div>
+    <div class="cc-body">
+      <div class="cc-course">${esc(cw.course_title)}</div>
+      <div class="cc-lesson">الدرس: ${esc(cw.lesson_title)}</div>
+      <div class="lp-meta-row"><span>${cw.progress_percentage || 0}% مكتمل</span></div>
+      ${progressBarHtml(cw.progress_percentage)}
+    </div>
+    <div class="cc-actions"><a class="button button-primary" href="playlist-view.html?course=${encodeURIComponent(cw.course_id)}&lesson=${encodeURIComponent(cw.lesson_id)}">متابعة المشاهدة</a></div>
+  </div>`;
+}
+
+/* ============================== إنجازاتي ============================== */
+async function loadAchievements() {
+  const target = document.querySelector('[data-achievements-list]');
+  if (!target) return;
+  target.innerHTML = '<p class="loading">جاري التحميل…</p>';
+  const earned = await getEarnedAchievements(user.id);
+  const earnedMap = Object.fromEntries(earned.map((e) => [e.achievement_id, e]));
+  target.innerHTML = ACHIEVEMENTS.map((a) => {
+    const record = earnedMap[a.id];
+    return `<div class="achv-card ${record ? 'earned' : 'locked'}">
+      <div class="achv-icon">${a.icon}</div>
+      <h4>${esc(a.title)}</h4>
+      <p>${esc(a.desc)}</p>
+      ${record ? `<span class="achv-date">تم الفتح ${new Date(record.earned_at).toLocaleDateString('ar-EG')}</span>` : `<span class="achv-date" style="color:#9aa6a0">لم يُفتح بعد</span>`}
+    </div>`;
+  }).join('');
 }
 
 /* ============================== حالة الاشتراك الشهري (محدث) ============================== */
@@ -163,6 +219,8 @@ async function openQuizTaker(quizId) {
     if (error) { alert(genericError); return; }
     openQuizTaker(quizId);
     loadQuizzes();
+    const newAchievements = await checkAndAwardAchievements(user.id);
+    if (newAchievements.length) setTimeout(() => alert(`🎉 مبروك! فتحت إنجاز جديد: ${newAchievements.map((a) => a.title).join('، ')}`), 300);
   });
 }
 
@@ -338,6 +396,7 @@ async function loadSubscriptionView() {
     }, { onConflict: 'student_id,teacher_id,month' });
     submit.disabled = false;
     if (error) { alert(genericError); return; }
+    notify(profile.teacher_id, { title: 'اشتراك شهري جديد', message: `أرسل الطالب ${profile.full_name} طلب اشتراك شهري`, type: 'new_subscription', relatedType: 'subscription', relatedId: user.id });
     loadSubscriptionView();
   });
 }
@@ -359,18 +418,46 @@ function setupTeacherSelectForm() {
     const teacherId = new FormData(form).get('teacher_id') || null;
     const { error } = await supabase.from('profiles').update({ teacher_id: teacherId }).eq('id', user.id);
     if (error) { setStatus('تعذر حفظ المدرس.'); return; }
+    const isNewTeacher = teacherId && teacherId !== profile.teacher_id;
     profile.teacher_id = teacherId;
     setStatus('تم حفظ مدرسك بنجاح.', 'success');
+    if (isNewTeacher) {
+      notify(teacherId, { title: 'طالب جديد', message: `ربط الطالب ${profile.full_name} حسابه بك`, type: 'new_student', relatedType: 'student', relatedId: user.id });
+    }
   });
 }
 
 /* ==================== إضافات واجهة: إحصائيات سريعة + آخر نشاط + قائمة الإشعارات ==================== */
+async function loadNotifications() {
+  const dropdown = document.querySelector('[data-notif-dropdown]');
+  if (!dropdown) return;
+  const items = await fetchNotifications(user.id);
+  const bodyHtml = renderNotifList(items);
+  dropdown.innerHTML = `<div class="notif-head">الإشعارات</div><div data-notif-body>${bodyHtml}</div>
+    <div class="notif-dropdown-foot"><button class="button button-text" style="width:auto;padding:4px 8px;font-size:.78rem" data-notif-mark-all>تحديد الكل كمقروء</button></div>`;
+  dropdown.querySelectorAll('[data-notif-id]').forEach((btn) => btn.addEventListener('click', async () => { await markRead(btn.dataset.notifId); refreshNotifBadge(); }));
+  dropdown.querySelector('[data-notif-mark-all]')?.addEventListener('click', async (event) => { event.stopPropagation(); await markAllRead(user.id); loadNotifications(); refreshNotifBadge(); });
+}
+
+async function refreshNotifBadge() {
+  const toggle = document.querySelector('[data-notif-toggle]');
+  if (!toggle) return;
+  const count = await unreadCount(user.id);
+  let badge = toggle.querySelector('.notif-badge');
+  if (count > 0) {
+    if (!badge) { badge = document.createElement('span'); badge.className = 'notif-badge'; toggle.appendChild(badge); }
+    badge.textContent = count > 9 ? '9+' : String(count);
+  } else if (badge) { badge.remove(); }
+}
+
 function setNotifDropdown() {
   const toggle = document.querySelector('[data-notif-toggle]');
   const dropdown = document.querySelector('[data-notif-dropdown]');
   if (!toggle || !dropdown) return;
-  toggle.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('open'); });
+  toggle.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('open'); if (dropdown.classList.contains('open')) loadNotifications(); });
   document.addEventListener('click', (event) => { if (!dropdown.contains(event.target) && event.target !== toggle) dropdown.classList.remove('open'); });
+  refreshNotifBadge();
+  subscribeRealtimeNotifications(user.id, () => refreshNotifBadge());
 }
 
 async function loadDashboardStats() {
@@ -440,3 +527,4 @@ setupTeacherSelectForm();
 setNotifDropdown();
 loadDashboardStats();
 loadActivityFeed();
+loadContinueWatching();

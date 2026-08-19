@@ -1,5 +1,6 @@
 import { supabase, esc, money, genericError } from './supabase-client.js';
 import { requireAuth } from './auth-guard.js';
+import { notify } from './notifications.js';
 
 const STAGES = ['الأولى الثانوية', 'الثانية الثانوية', 'الثالثة الثانوية'];
 
@@ -104,7 +105,7 @@ async function loadCoursePayments() {
   target.innerHTML = requests.length ? `<table class="subscription-table"><thead><tr><th>الطالب</th><th>الكورس</th><th>المبلغ</th><th>الطريقة</th><th>رقم العملية</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>
     ${requests.map((r) => `<tr><td>${esc(r.profiles?.full_name || '—')}</td><td>${esc(r.courses?.title || '—')}</td><td>${money(r.amount)}</td><td>${esc(r.method)}</td><td>${esc(r.reference_number || '—')}</td>
       <td><span class="status-badge ${r.status}">${r.status === 'approved' ? 'مقبول' : r.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة'}</span></td>
-      <td>${r.status === 'pending' ? `<div class="row-actions"><button class="button button-primary" style="width:auto;padding:6px 12px" data-approve-pay="${r.id}" data-ref="${esc(r.reference_number || '')}" data-student="${esc(r.profiles?.full_name || '')}">قبول</button><button class="button button-danger" style="width:auto;padding:6px 12px" data-reject-pay="${r.id}">رفض</button></div>` : '—'}</td>
+      <td>${r.status === 'pending' ? `<div class="row-actions"><button class="button button-primary" style="width:auto;padding:6px 12px" data-approve-pay="${r.id}" data-ref="${esc(r.reference_number || '')}" data-student="${esc(r.profiles?.full_name || '')}" data-student-id="${r.student_id}" data-course-title="${esc(r.courses?.title || '')}">قبول</button><button class="button button-danger" style="width:auto;padding:6px 12px" data-reject-pay="${r.id}" data-student-id="${r.student_id}">رفض</button></div>` : '—'}</td>
     </tr>`).join('')}</tbody></table>` : empty('لا توجد طلبات دفع كورسات حتى الآن.');
 
   target.querySelectorAll('[data-approve-pay]').forEach((btn) => btn.addEventListener('click', async () => {
@@ -114,9 +115,14 @@ async function loadCoursePayments() {
       : `تأكيد قبول طلب دفع "${btn.dataset.student}"؟`;
     if (!confirm(confirmMsg)) return;
     await supabase.from('payment_requests').update({ status: 'approved' }).eq('id', btn.dataset.approvePay);
+    notify(btn.dataset.studentId, { title: 'تم قبول طلب الدفع', message: `تم تفعيل كورس "${btn.dataset.courseTitle}" في حسابك.`, type: 'course', relatedType: 'payment_request', relatedId: btn.dataset.approvePay });
     loadCoursePayments();
   }));
-  target.querySelectorAll('[data-reject-pay]').forEach((btn) => btn.addEventListener('click', async () => { await supabase.from('payment_requests').update({ status: 'rejected' }).eq('id', btn.dataset.rejectPay); loadCoursePayments(); }));
+  target.querySelectorAll('[data-reject-pay]').forEach((btn) => btn.addEventListener('click', async () => {
+    await supabase.from('payment_requests').update({ status: 'rejected' }).eq('id', btn.dataset.rejectPay);
+    notify(btn.dataset.studentId, { title: 'تم رفض طلب الدفع', message: 'راجع بيانات الدفع من صفحة دفع الكورسات وأعد المحاولة، أو تواصل مع الإدارة.', type: 'course', relatedType: 'payment_request', relatedId: btn.dataset.rejectPay });
+    loadCoursePayments();
+  }));
 }
 
 /* ============================== نظرة عامة على الاشتراكات الشهرية ============================== */

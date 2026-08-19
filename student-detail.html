@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تفاصيل الطالب | المأمون التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/lms-extra.css">
+  <style>
+    body { background: var(--bg, #f7f8f6); }
+    .sd-shell { max-width: 1080px; margin: 0 auto; padding: 22px 20px 60px; }
+    .sd-back { display: inline-flex; align-items: center; gap: 6px; color: var(--lms-primary); font-weight: 700; font-size: .88rem; margin-bottom: 14px; }
+    .sd-section-title { margin: 26px 0 12px; font-size: 1.05rem; color: var(--lms-primary-dark); }
+  </style>
+</head>
+<body data-role="teacher">
+  <div class="sd-shell">
+    <a class="sd-back" href="teacher.html">→ العودة للوحة المدرس</a>
+
+    <div class="sd-header">
+      <div>
+        <span class="welcome-eyebrow" style="background:rgba(255,255,255,.16)">تفاصيل الطالب</span>
+        <h2 data-student-name>جاري التحميل…</h2>
+        <p data-student-email>—</p>
+      </div>
+      <span class="status-badge" data-subscription-badge>—</span>
+    </div>
+
+    <div data-basic-info style="margin-bottom:20px" class="panel">
+      <div class="list-row"><div class="list-icon">📅</div><div><strong>تاريخ التسجيل</strong><span data-reg-date>—</span></div></div>
+      <div class="list-row"><div class="list-icon">💳</div><div><strong>الاشتراك الشهري</strong><span data-sub-dates>—</span></div></div>
+      <div class="list-row"><div class="list-icon">🎓</div><div><strong>المرحلة الدراسية</strong><span data-stage>—</span></div></div>
+    </div>
+
+    <h3 class="sd-section-title">إحصائيات الطالب</h3>
+    <div class="sd-stat-grid">
+      <div class="sd-stat"><span>عدد الكورسات</span><b data-stat-courses>—</b></div>
+      <div class="sd-stat"><span>الدروس المكتملة</span><b data-stat-completed>—</b></div>
+      <div class="sd-stat"><span>إجمالي الدروس</span><b data-stat-total-lessons>—</b></div>
+      <div class="sd-stat"><span>متوسط التقدم</span><b data-stat-avg-progress>—</b></div>
+      <div class="sd-stat"><span>عدد الاختبارات</span><b data-stat-quizzes>—</b></div>
+      <div class="sd-stat"><span>متوسط الدرجات</span><b data-stat-avg-quiz>—</b></div>
+      <div class="sd-stat"><span>آخر نشاط</span><b data-stat-last-activity style="font-size:1rem">—</b></div>
+      <div class="sd-stat"><span>وقت المشاهدة (تقديري)</span><b data-stat-watch-time style="font-size:1rem">—</b></div>
+    </div>
+
+    <h3 class="sd-section-title">كورسات الطالب</h3>
+    <div data-courses-list><p class="loading">جاري التحميل…</p></div>
+
+    <h3 class="sd-section-title">تفاصيل مشاهدة الدروس</h3>
+    <div class="panel" data-lessons-detail><p class="loading">جاري التحميل…</p></div>
+  </div>
+
+  <div data-lesson-modal style="display:none"></div>
+  <script type="module" src="js/student-detail.js"></script>
+</body>
+</html>

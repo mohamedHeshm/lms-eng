@@ -1,319 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>دروس الكورس | المأمون التعليمية</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/lms-extra.css">
   <style>
-    body { background: var(--bg); }
-    .lessons-page { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; }
-    .lessons-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
-    @media (max-width: 800px) { .lessons-layout { grid-template-columns: 1fr; } }
-    .lesson-nav { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; position: sticky; top: 20px; }
-    .lesson-nav-item { display: flex; align-items: center; gap: 10px; padding: 12px 10px; border-radius: 10px; cursor: pointer; margin-bottom: 4px; }
-    .lesson-nav-item[data-locked="true"] { cursor: not-allowed; opacity: .5; }
-    .lesson-nav-item[data-current="true"] { background: var(--bg); font-weight: 700; }
-    .lesson-nav-item .badge { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--border); font-size: 13px; }
-    .lesson-nav-item[data-done="true"] .badge { background: var(--success, #1f9d55); color: #fff; }
-    .lesson-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
-    .lesson-item h3 { margin-bottom: 12px; }
-    .lesson-item iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 12px; }
-    .sheet-box { margin-top: 16px; padding: 16px; border: 1px dashed var(--border); border-radius: 12px; background: var(--bg); }
+    body { background: var(--bg, #f7f8f6); }
+    .pv-shell { max-width: 1160px; margin: 0 auto; padding: 22px 20px 60px; }
+    .pv-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .pv-back { display: inline-flex; align-items: center; gap: 6px; color: var(--lms-primary); font-weight: 700; font-size: .88rem; }
+    .pv-title { margin: 4px 0 2px; }
+    .pv-course-progress { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .pv-course-progress .lp-bar { max-width: 260px; }
+    .pv-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 22px; align-items: start; }
+    .pv-player-wrap { background: #0d1a16; border-radius: var(--radius, 16px); overflow: hidden; aspect-ratio: 16/9; position: relative; }
+    .pv-player-wrap iframe, .pv-player-wrap video { width: 100%; height: 100%; border: 0; display: block; }
+    .pv-current-lesson { margin-top: 14px; padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius, 16px); }
+    .pv-lessons-panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius, 16px); overflow: hidden; }
+    .pv-lessons-panel h3 { margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: .95rem; }
+    .pv-lesson-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: 0; background: #fff; border-bottom: 1px solid var(--border); text-align: right; cursor: pointer; font-family: inherit; }
+    .pv-lesson-item:last-child { border-bottom: 0; }
+    .pv-lesson-item:hover { background: #f6faf7; }
+    .pv-lesson-item.active { background: var(--lms-light); }
+    .pv-lesson-num { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .76rem; font-weight: 800; background: #eef2ef; color: var(--muted); }
+    .pv-lesson-item.done .pv-lesson-num { background: var(--lms-success); color: #fff; }
+    .pv-lesson-item.active .pv-lesson-num { background: var(--lms-primary); color: #fff; }
+    .pv-lesson-info { flex: 1; min-width: 0; }
+    .pv-lesson-info strong { display: block; font-size: .86rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pv-lesson-info small { color: var(--muted); font-size: .74rem; }
+    @media (max-width: 900px) { .pv-layout { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-<div class="lessons-page">
-  <a href="student-modern.html" class="button button-secondary" style="margin-bottom:20px;display:inline-flex">← الرجوع للوحتي</a>
-  <h1 id="courseTitle" style="margin-bottom:6px">جارٍ التحميل…</h1>
-  <p class="course-meta" style="margin-bottom:24px" id="courseSubtitle"></p>
-  <div id="lessonsLayout"><p class="loading">جاري التحميل…</p></div>
+<div class="pv-shell">
+  <div class="pv-topbar">
+    <a class="pv-back" href="student-modern.html">→ العودة للوحة الطالب</a>
+  </div>
+
+  <div data-course-header>
+    <h1 class="pv-title" data-course-title>جاري التحميل…</h1>
+    <p class="course-meta" data-course-subtitle></p>
+    <div class="pv-course-progress">
+      <div class="lp-bar" style="flex:1"><span data-course-progress-fill style="width:0%"></span></div>
+      <span data-course-progress-text style="font-size:.82rem;font-weight:700;color:var(--lms-primary)">0%</span>
+    </div>
+  </div>
+
+  <div class="pv-layout" style="margin-top:20px">
+    <div>
+      <div class="pv-player-wrap" data-player-wrap>
+        <div style="color:#fff;display:flex;align-items:center;justify-content:center;height:100%;">جاري تحميل الدرس…</div>
+      </div>
+      <div class="pv-current-lesson">
+        <h3 data-lesson-title style="margin:0 0 8px">—</h3>
+        <div class="lp-meta-row">
+          <span>نسبة مشاهدتك لهذا الدرس: <strong data-lesson-pct>0%</strong></span>
+          <span data-lesson-status></span>
+        </div>
+        <div class="lp-bar"><span data-lesson-bar-fill style="width:0%"></span></div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap" data-lesson-files></div>
+      </div>
+    </div>
+    <aside class="pv-lessons-panel">
+      <h3>دروس الكورس</h3>
+      <div data-lessons-list><p class="loading">جاري التحميل…</p></div>
+    </aside>
+  </div>
 </div>
 
-<script type="module">
-  import { supabase, esc } from './js/supabase-client.js';
-  import { requireAuth } from './js/auth-guard.js';
-
-  const session = await requireAuth('student');
-  if (!session) throw new Error('redirecting');
-  const studentId = session.user.id;
-
-  const params = new URLSearchParams(location.search);
-  const courseId = params.get('course');
-  const layoutEl = document.getElementById('lessonsLayout');
-  if (!courseId) { layoutEl.innerHTML = '<div class="empty-state">لم يتم تحديد كورس.</div>'; throw new Error('no course'); }
-
-  const { data: enrollment } = await supabase.from('enrollments').select('id').eq('student_id', studentId).eq('course_id', courseId).maybeSingle();
-  if (!enrollment) { layoutEl.innerHTML = '<div class="empty-state">أنت غير مشترك في هذا الكورس.</div>'; throw new Error('not enrolled'); }
-
-  const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single();
-  document.getElementById('courseTitle').textContent = course?.title || 'الكورس';
-  document.getElementById('courseSubtitle').textContent = `${course?.subject || ''} · ${course?.stage || ''}`;
-
-  function toEmbed(url) {
-    if (url.includes('watch?v=')) return url.replace('watch?v=', 'embed/');
-    if (url.includes('youtu.be/')) return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
-    return url;
-  }
-
-  // ============================================================================
-  // تتبع مشاهدة الطالب لفيديو الدرس (lesson_watch_progress)
-  // لا نعتبر الطالب "شاهد" الدرس بمجرد فتح الصفحة، فقط عند تشغيل الفيديو فعليًا.
-  // ============================================================================
-  const WATCH_UPDATE_INTERVAL_SECONDS = 12; // كل كام ثانية نبعت تحديث لـ Supabase أثناء التشغيل
-  const WATCH_COMPLETION_THRESHOLD_PERCENT = 90; // من هذه النسبة فأكثر يُعتبر الدرس "مكتمل"
-
-  function extractYouTubeId(url) {
-    try {
-      if (url.includes('watch?v=')) return new URL(url).searchParams.get('v');
-      if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0].split('&')[0];
-      if (url.includes('embed/')) return url.split('embed/')[1].split('?')[0].split('&')[0];
-    } catch { /* رابط غير متوقع — سيتم التعامل معه كفشل استخراج بالأسفل */ }
-    return null;
-  }
-
-  let ytApiPromise = null;
-  function loadYouTubeIframeApi() {
-    if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
-    if (ytApiPromise) return ytApiPromise;
-    ytApiPromise = new Promise((resolve) => {
-      const previousReady = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => { previousReady?.(); resolve(window.YT); };
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
-    });
-    return ytApiPromise;
-  }
-
-  // متتبّع نشط واحد فقط في كل مرة (يتم تنظيفه عند تبديل الدرس)
-  let activeWatchTracker = null;
-  function cleanupActiveTracker() {
-    if (!activeWatchTracker) return;
-    clearInterval(activeWatchTracker.intervalId);
-    try { activeWatchTracker.player?.destroy(); } catch { /* تجاهل */ }
-    activeWatchTracker = null;
-  }
-  window.addEventListener('pagehide', () => { activeWatchTracker?.flush?.(); });
-
-  async function initWatchTracking(lesson, mountEl) {
-    cleanupActiveTracker();
-    const videoId = extractYouTubeId(lesson.video_url);
-    if (!videoId) {
-      // فشل استخراج معرف الفيديو — نعرض الفيديو بالطريقة القديمة بدون تتبع حتى لا نكسر العرض
-      mountEl.innerHTML = `<iframe src="${esc(toEmbed(lesson.video_url))}" allowfullscreen></iframe>`;
-      return;
-    }
-
-    const { data: existing } = await supabase.from('lesson_watch_progress')
-      .select('watched_seconds,completed')
-      .eq('student_id', studentId).eq('lesson_id', lesson.id).maybeSingle();
-
-    const startSeconds = existing && !existing.completed ? Math.max(0, Math.floor((existing.watched_seconds || 0) - 2)) : 0;
-    let maxWatchedSeconds = existing?.watched_seconds || 0;
-    let hasStartedRecord = !!existing;
-
-    const mountId = `yt-player-${lesson.id}`;
-    mountEl.innerHTML = `<div id="${mountId}"></div>`;
-
-    const YT = await loadYouTubeIframeApi();
-    // لو الطالب بدّل الدرس بسرعة قبل ما الـ API يخلص تحميل، نتأكد إننا لسه على نفس الدرس
-    if (!document.getElementById(mountId)) return;
-
-    async function pushProgress(finalState) {
-      if (!player || typeof player.getCurrentTime !== 'function') return;
-      let current = 0, duration = 0;
-      try { current = player.getCurrentTime() || 0; duration = player.getDuration() || 0; } catch { return; }
-      if (current > maxWatchedSeconds) maxWatchedSeconds = current;
-      const pct = duration > 0 ? Math.min(100, Math.round((maxWatchedSeconds / duration) * 100)) : 0;
-      const completed = finalState === 'ended' || pct >= WATCH_COMPLETION_THRESHOLD_PERCENT;
-      const payload = {
-        student_id: studentId, course_id: courseId, lesson_id: lesson.id,
-        last_watched_at: new Date().toISOString(),
-        watched_seconds: Math.round(maxWatchedSeconds),
-        video_duration: duration ? Math.round(duration) : null,
-        progress_percentage: pct,
-        completed,
-      };
-      if (!hasStartedRecord) payload.started_at = new Date().toISOString();
-      const { error } = await supabase.from('lesson_watch_progress').upsert(payload, { onConflict: 'student_id,lesson_id' });
-      if (!error) hasStartedRecord = true;
-    }
-
-    let player;
-    let intervalId = null;
-    player = new YT.Player(mountId, {
-      videoId,
-      playerVars: { rel: 0, start: startSeconds },
-      events: {
-        onStateChange(event) {
-          if (event.data === YT.PlayerState.PLAYING) {
-            if (!intervalId) intervalId = setInterval(() => pushProgress(), WATCH_UPDATE_INTERVAL_SECONDS * 1000);
-          } else {
-            clearInterval(intervalId);
-            intervalId = null;
-            if (event.data === YT.PlayerState.ENDED) pushProgress('ended');
-            else if (event.data === YT.PlayerState.PAUSED) pushProgress();
-          }
-        },
-      },
-    });
-
-    activeWatchTracker = {
-      get intervalId() { return intervalId; },
-      player,
-      flush: () => pushProgress(),
-    };
-  }
-
-  const { data: lessons, error } = await supabase.from('course_lessons').select('*').eq('course_id', courseId).order('sort_order', { ascending: true });
-  if (error) { layoutEl.innerHTML = '<div class="empty-state">حدث خطأ أثناء تحميل الدروس.</div>'; throw new Error('load error'); }
-  if (!lessons.length) { layoutEl.innerHTML = '<div class="empty-state">لا توجد دروس مضافة بعد لهذا الكورس.</div>'; throw new Error('no lessons'); }
-
-  const { data: progressRows } = await supabase.from('lesson_progress').select('lesson_id').eq('student_id', studentId).in('lesson_id', lessons.map((l) => l.id));
-  const completedSet = new Set((progressRows || []).map((p) => p.lesson_id));
-
-  // أول درس غير مكتمل هو الافتراضي، أو آخر درس لو كله خلص
-  let currentIndex = lessons.findIndex((l) => !completedSet.has(l.id));
-  if (currentIndex === -1) currentIndex = lessons.length - 1;
-
-  layoutEl.innerHTML = `<div class="lessons-layout">
-    <nav class="lesson-nav" id="lessonNav"></nav>
-    <div id="lessonMain"></div>
-  </div>`;
-  const navEl = document.getElementById('lessonNav');
-  const mainEl = document.getElementById('lessonMain');
-
-  function isUnlocked(index) {
-    if (index === 0) return true;
-    return completedSet.has(lessons[index - 1].id);
-  }
-
-  function renderNav() {
-    navEl.innerHTML = lessons.map((l, i) => {
-      const done = completedSet.has(l.id);
-      const locked = !isUnlocked(i);
-      const current = i === currentIndex;
-      return `<div class="lesson-nav-item" data-locked="${locked}" data-current="${current}" data-done="${done}" data-index="${i}">
-        <span class="badge">${done ? '✓' : locked ? '🔒' : (i + 1)}</span>
-        <span>${esc(l.title)}</span>
-      </div>`;
-    }).join('');
-    navEl.querySelectorAll('.lesson-nav-item').forEach((el) => el.addEventListener('click', () => {
-      const i = Number(el.dataset.index);
-      if (!isUnlocked(i)) return;
-      currentIndex = i;
-      renderNav();
-      renderMain();
-    }));
-  }
-
-  async function renderMain() {
-    const lesson = lessons[currentIndex];
-    const done = completedSet.has(lesson.id);
-
-    mainEl.innerHTML = `<div class="lesson-item">
-      <h3>▶ ${esc(lesson.title)}</h3>
-      <div data-video-mount></div>
-      ${(lesson.board_pdf_url || lesson.explanation_pdf_url) ? `<div class="row-actions" style="margin-top:14px">
-        ${lesson.board_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.board_pdf_url)}" target="_blank">🖼 سبورة الدرس</a>` : ''}
-        ${lesson.explanation_pdf_url ? `<a class="button button-secondary" href="${esc(lesson.explanation_pdf_url)}" target="_blank">📘 شرح كتابي PDF</a>` : ''}
-      </div>` : ''}
-      <div style="margin-top:14px" data-video-action>
-        ${done ? '' : `<button class="button button-primary" id="finishBtn" style="width:auto;padding:10px 20px">أنهيت مشاهدة الفيديو ✅</button>`}
-      </div>
-      <div data-sheet-area></div>
-    </div>`;
-
-    initWatchTracking(lesson, mainEl.querySelector('[data-video-mount]'));
-
-    document.getElementById('finishBtn')?.addEventListener('click', async () => {
-      const btn = document.getElementById('finishBtn');
-      btn.disabled = true;
-      const { error } = await supabase.from('lesson_progress').upsert(
-        { student_id: studentId, lesson_id: lesson.id },
-        { onConflict: 'student_id,lesson_id' }
-      );
-      if (error) { btn.disabled = false; alert('تعذر حفظ تقدمك، حاول مرة أخرى.'); return; }
-      completedSet.add(lesson.id);
-      renderNav();
-      mainEl.querySelector('[data-video-action]').innerHTML = '';
-      renderSheetArea(lesson);
-    });
-
-    if (done) await renderSheetArea(lesson);
-  }
-
-  async function renderSheetArea(lesson) {
-    const area = mainEl.querySelector('[data-sheet-area]');
-    if (!area) return;
-    area.innerHTML = '<p class="loading">جاري تحميل شيت الدرس…</p>';
-
-    const { data: questions, error: qError } = await supabase.from('lesson_sheet_questions').select('*').eq('lesson_id', lesson.id).order('sort_order', { ascending: true });
-    if (qError) { area.innerHTML = ''; renderNextButton(area); return; }
-
-    if (!questions.length) { area.innerHTML = ''; renderNextButton(area); return; }
-
-    const { data: existingAttempt } = await supabase.from('lesson_sheet_attempts').select('*').eq('lesson_id', lesson.id).eq('student_id', studentId).maybeSingle();
-
-    if (existingAttempt) {
-      const answers = existingAttempt.answers || {};
-      area.innerHTML = `<div class="sheet-box">
-        <h4 style="margin-bottom:10px">📝 شيت الدرس</h4>
-        <div class="quiz-result-banner ${existingAttempt.score >= existingAttempt.total / 2 ? '' : 'fail'}">درجتك: ${existingAttempt.score} من ${existingAttempt.total}</div>
-        ${questions.map((q, i) => `<div class="quiz-take-question"><strong>س${i + 1}: ${esc(q.question_text)}</strong>
-          ${q.options.map((opt, idx) => `<div class="option-label" style="${idx === q.correct_index ? 'border-color:var(--success);background:#eaf6ee' : (answers[q.id] === idx ? 'border-color:var(--error);background:#fcefed' : '')}">${esc(opt)} ${idx === q.correct_index ? '✓ الإجابة الصحيحة' : (answers[q.id] === idx ? '✗ إجابتك' : '')}</div>`).join('')}
-        </div>`).join('')}
-      </div>`;
-      renderNextButton(area);
-      return;
-    }
-
-    area.innerHTML = `<div class="sheet-box">
-      <h4 style="margin-bottom:10px">📝 شيت الدرس — حلّه الأول قبل ما تكمل</h4>
-      <form data-sheet-form>
-        ${questions.map((q, i) => `<div class="quiz-take-question"><strong>س${i + 1}: ${esc(q.question_text)}</strong>
-          ${q.options.map((opt, idx) => `<label class="option-label"><input type="radio" name="q_${q.id}" value="${idx}" required>${esc(opt)}</label>`).join('')}
-        </div>`).join('')}
-        <button class="button button-primary" type="submit">تسليم الإجابات</button>
-      </form>
-    </div>`;
-
-    area.querySelector('[data-sheet-form]').addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const formData = new FormData(event.target);
-      const answers = {};
-      let score = 0;
-      questions.forEach((q) => {
-        const chosen = Number(formData.get(`q_${q.id}`));
-        answers[q.id] = chosen;
-        if (chosen === q.correct_index) score += 1;
-      });
-      const { error } = await supabase.from('lesson_sheet_attempts').insert({ lesson_id: lesson.id, student_id: studentId, answers, score, total: questions.length });
-      if (error) { alert('تعذر تسليم الشيت، حاول مرة أخرى.'); return; }
-      renderSheetArea(lesson);
-    });
-  }
-
-  function renderNextButton(area) {
-    const nextExists = currentIndex < lessons.length - 1;
-    const wrap = document.createElement('div');
-    wrap.style.marginTop = '16px';
-    wrap.innerHTML = nextExists
-      ? `<button class="button button-primary" data-next-lesson style="width:auto;padding:10px 20px">الدرس التالي ▶</button>`
-      : `<p class="course-meta">🎉 خلصت كل دروس الكورس.</p>`;
-    area.appendChild(wrap);
-    wrap.querySelector('[data-next-lesson]')?.addEventListener('click', () => {
-      currentIndex += 1;
-      renderNav();
-      renderMain();
-    });
-  }
-
-  renderNav();
-  renderMain();
-</script>
+<script type="module" src="js/playlist-view.js"></script>
 </body>
 </html>

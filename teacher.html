@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/lms-extra.css">
   <style>
     [data-lesson-modal] { display:none; position:fixed; inset:0; background:rgba(22,34,31,.55); z-index:50; padding:20px; overflow:auto; }
     [data-lesson-modal].active { display:block; }
@@ -40,6 +41,8 @@
       <button data-view="content" data-title="الشيتات والسبورة والمذكرات">الشيتات والسبورة والمذكرات</button>
       <button data-view="students" data-title="الطلاب">الطلاب</button>
       <button data-view="watch-tracking" data-title="متابعة الطلاب الذين شاهدوا الدروس">متابعة الطلاب</button>
+      <button data-view="follow-up" data-title="طلاب يحتاجون متابعة">طلاب يحتاجون متابعة</button>
+      <button data-view="analytics" data-title="الإحصائيات">الإحصائيات</button>
       <button data-view="subscriptions" data-title="الاشتراك الشهري">الاشتراك الشهري</button>
       <button data-view="reports" data-title="التقارير">التقارير</button>
     </nav>
@@ -55,7 +58,20 @@
         <button class="icon-button menu-toggle" data-menu-toggle aria-label="فتح القائمة">☰</button>
         <div><span class="breadcrumb">إدارة المحتوى</span><h1 data-page-title>لوحة المدرس</h1></div>
       </div>
-      <div class="header-actions"><button class="icon-button" aria-label="الإشعارات">◌</button></div>
+      <div class="header-actions">
+        <div class="notif-wrap">
+          <button class="icon-button" data-notif-toggle aria-label="الإشعارات">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z"/><path d="M10 18.5a2 2 0 0 0 4 0"/></svg>
+          </button>
+          <div class="notif-dropdown" data-notif-dropdown>
+            <div class="notif-head">الإشعارات</div>
+            <div data-notif-list class="notif-empty">لا توجد إشعارات جديدة حاليًا.</div>
+            <div class="notif-dropdown-foot">
+              <button class="button button-text" style="width:auto;padding:4px 8px;font-size:.78rem" data-notif-mark-all>تحديد الكل كمقروء</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <div class="portal-content">
@@ -186,6 +202,34 @@
         </form>
 
         <div class="panel"><div data-watch-table><p class="loading">جاري التحميل…</p></div></div>
+      </section>
+
+      <!-- طلاب يحتاجون متابعة -->
+      <section class="view" id="follow-up">
+        <div class="section-title"><div><h2>طلاب يحتاجون متابعة</h2><p>اكتشاف تلقائي للطلاب الأقل نشاطًا أو الأقل تقدمًا، حتى تتابعهم قبل ما يتأخروا.</p></div></div>
+        <div class="panel" data-followup-list><p class="loading">جاري التحميل…</p></div>
+      </section>
+
+      <!-- الإحصائيات -->
+      <section class="view" id="analytics">
+        <div class="section-title"><div><h2>الإحصائيات</h2><p>نظرة عامة حقيقية على أداء طلابك وكورساتك، محدثة لحظيًا من قاعدة البيانات.</p></div></div>
+
+        <div class="analytics-grid" data-an-general>
+          <div class="an-stat"><span>إجمالي الطلاب</span><b data-an-total-students>—</b></div>
+          <div class="an-stat"><span>طلاب نشطون</span><b data-an-active-students>—</b></div>
+          <div class="an-stat"><span>طلاب غير نشطين</span><b data-an-inactive-students>—</b></div>
+          <div class="an-stat"><span>متوسط تقدم الطلاب</span><b data-an-avg-progress>—</b></div>
+        </div>
+        <div class="analytics-grid secondary" data-an-secondary>
+          <div class="an-stat"><span>إجمالي الكورسات</span><b data-an-total-courses>—</b></div>
+          <div class="an-stat"><span>إجمالي الدروس</span><b data-an-total-lessons>—</b></div>
+          <div class="an-stat"><span>إجمالي مشاهدات الدروس</span><b data-an-total-views>—</b></div>
+          <div class="an-stat"><span>نشطون اليوم</span><b data-an-active-today>—</b></div>
+          <div class="an-stat"><span>نشطون هذا الأسبوع</span><b data-an-active-week>—</b></div>
+        </div>
+
+        <div class="section-title" style="margin-top:26px"><div><h3 style="margin:0">إحصائيات حسب الكورس</h3></div></div>
+        <div class="panel" data-an-courses><p class="loading">جاري التحميل…</p></div>
       </section>
 
       <!-- الاشتراك الشهري -->
